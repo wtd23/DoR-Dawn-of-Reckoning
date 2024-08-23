@@ -98,12 +98,12 @@ namespace WorldServer
 
             Version ver = Assembly.GetEntryAssembly().GetName().Version;
 
-            Utils.PushColor(ConsoleColor.Cyan);
-            Console.WriteLine("DagonUO Version {0}.{1}, Build {2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision);
+            Utils.PushColor(ConsoleColor.Blue);
+            Console.WriteLine("DoR-Dawn-of-Reckoning Version {0}.{1}, Build {2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision);
             Console.WriteLine("Core: Running on .NET Framework Version {0}.{1}.{2}", Environment.Version.Major, Environment.Version.Minor, Environment.Version.Build);
             Utils.PopColor();
-            Console.WriteLine("ARGOG DAN");
-            Utils.PushColor(ConsoleColor.Cyan);
+            Console.WriteLine("DoR-Dawn-of-Reckoning");
+            Utils.PushColor(ConsoleColor.Blue);
             string s = Arguments;
 
             if (s.Length > 0)
