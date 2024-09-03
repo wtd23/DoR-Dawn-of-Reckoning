@@ -10,10 +10,10 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
     public class ZoneLockRewardDistributor
     {
         private static readonly Logger RewardLogger = LogManager.GetLogger("RewardLogger");
-        public List<RVRZoneLockReward> ZoneLockRewards { get; private set; }
+        public List<rvr_zone_lock_reward> ZoneLockRewards { get; private set; }
         public IRandomGenerator RandomGenerator { get; }
 
-        public ZoneLockRewardDistributor(IRandomGenerator randomGenerator, List<RVRZoneLockReward> zoneLockRewards)
+        public ZoneLockRewardDistributor(IRandomGenerator randomGenerator, List<rvr_zone_lock_reward> zoneLockRewards)
         {
             ZoneLockRewards = zoneLockRewards;
             RandomGenerator = randomGenerator;
@@ -49,7 +49,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
             if (player.CurrentArea != null)
             {
                 ushort influenceId = 0;
-                if (player.Realm == Realms.REALMS_REALM_ORDER)
+                if (player.Realm == SetRealms.REALMS_REALM_ORDER)
                     influenceId = (ushort)player.CurrentArea.OrderInfluenceId;
                 else
                     influenceId = (ushort)player.CurrentArea.DestroInfluenceId;

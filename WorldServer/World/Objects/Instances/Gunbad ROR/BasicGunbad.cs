@@ -24,7 +24,7 @@ namespace WorldServer.World.Objects.Instances.Gunbad
 
             Creature_proto Proto = CreatureService.GetCreatureProto((uint)Entry);
 
-            Creature_spawn Spawn = new Creature_spawn();
+            creature_spawns Spawn = new creature_spawns();
             Spawn.Guid = (uint)CreatureService.GenerateCreatureSpawnGUID();
             Spawn.BuildFromProto(Proto);
             Spawn.WorldO = (int)O;
@@ -98,7 +98,7 @@ namespace WorldServer.World.Objects.Instances.Gunbad
 
             GameObject_proto Proto = GameObjectService.GetGameObjectProto((uint)Entry);
 
-            GameObject_spawn Spawn = new GameObject_spawn();
+            gameobject_spawns Spawn = new gameobject_spawns();
             Spawn.Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID();
             Spawn.BuildFromProto(Proto);
             Spawn.WorldO = O;
@@ -153,7 +153,7 @@ namespace WorldServer.World.Objects.Instances.Gunbad
         {
             GameObject_proto Proto = GameObjectService.GetGameObjectProto(98878); // This is portal
 
-            GameObject_spawn Spawn = new GameObject_spawn();
+            gameobject_spawns Spawn = new gameobject_spawns();
             Spawn.Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID();
             Spawn.BuildFromProto(Proto);
             Spawn.WorldO = O;

@@ -34,9 +34,9 @@ namespace WorldServer.Managers.Commands
         public static bool ReloadCharacter(Player plr, ref List<string> values)
         {
             string name = GetString(ref values);
-            Character Char = CharMgr.LoadCharacterInfo(name, true);
+            characters Char = CharMgr.LoadCharacterInfo(name, true);
             if (Char != null)
-                plr.SendClientMessage("RELOADCHARACTER: Character Loaded : " + Char.CharacterId);
+                plr.SendClientMessage("RELOADCHARACTER: characters Loaded : " + Char.CharacterId);
             else
                 plr.SendClientMessage("RELOADCHARACTER: Invalid character specified: " + name);
             return true;

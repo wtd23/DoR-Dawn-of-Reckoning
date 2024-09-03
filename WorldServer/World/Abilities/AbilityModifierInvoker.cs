@@ -21,11 +21,11 @@ namespace WorldServer.World.Abilities
     /// </summary>
     public class AbilityModifier
     {
-        private readonly List<AbilityModifierCheck> _myCheckList = new List<AbilityModifierCheck>();
+        private readonly List<ability_modifier_checks> _myCheckList = new List<ability_modifier_checks>();
 
         public ushort Affecting { get; }
         public ushort Source { get; }
-        public AbilityModifierEffect Effect { get; private set; }
+        public ability_modifiers Effect { get; private set; }
 
         public AbilityModifier(ushort source, ushort affecting)
         {
@@ -33,7 +33,7 @@ namespace WorldServer.World.Abilities
             Source = source;
         }
 
-        public void AddCheck(AbilityModifierCheck check)
+        public void AddCheck(ability_modifier_checks check)
         {
             while (_myCheckList.Count < check.Sequence)
                 _myCheckList.Add(null);
@@ -45,7 +45,7 @@ namespace WorldServer.World.Abilities
             else _myCheckList[check.Sequence] = check;
         }
 
-        public void AddModifier(AbilityModifierEffect effect)
+        public void AddModifier(ability_modifiers effect)
         {
             if (Effect == null)
                 Effect = effect;
@@ -81,11 +81,11 @@ namespace WorldServer.World.Abilities
     [Service(typeof(WorldMgr))]
     public static class AbilityModifierInvoker
     {
-        private delegate bool AbilityCheckDelegate(Unit caster, Unit target, AbilityInfo myInfo, AbilityModifierCheck myCheck);
+        private delegate bool AbilityCheckDelegate(Unit caster, Unit target, AbilityInfo myInfo, ability_modifier_checks myCheck);
 
-        private delegate void AbilityModifierDelegate(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect);
+        private delegate void AbilityModifierDelegate(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect);
 
-        private delegate void BuffModifierDelegate(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect);
+        private delegate void BuffModifierDelegate(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect);
 
         private static readonly Dictionary<string, AbilityCheckDelegate> CheckList = new Dictionary<string, AbilityCheckDelegate>();
         private static readonly Dictionary<string, AbilityModifierDelegate> ModifierList = new Dictionary<string, AbilityModifierDelegate>();
@@ -225,11 +225,11 @@ namespace WorldServer.World.Abilities
 
         #region Interface
 
-        public static Tuple<bool, byte> PerformCheck(List<AbilityModifierCheck> myCheckList, Unit caster, Unit target, AbilityInfo abInfo)
+        public static Tuple<bool, byte> PerformCheck(List<ability_modifier_checks> myCheckList, Unit caster, Unit target, AbilityInfo abInfo)
         {
             foreach (var check in myCheckList)
             {
-                for (AbilityModifierCheck myCheck = check; ; myCheck = myCheck.nextCheck)
+                for (ability_modifier_checks myCheck = check; ; myCheck = myCheck.nextCheck)
                 {
                     if (CheckList[myCheck.CommandName](caster, target, abInfo, myCheck))
                     {
@@ -253,7 +253,7 @@ namespace WorldServer.World.Abilities
             return new Tuple<bool, byte>(true, 0);
         }
 
-        public static void InvokeEffect(AbilityModifierEffect myEffect, Unit caster, AbilityInfo abInfo)
+        public static void InvokeEffect(ability_modifiers myEffect, Unit caster, AbilityInfo abInfo)
         {
             while (myEffect != null)
             {
@@ -269,7 +269,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        public static void InvokeBuffEffect(AbilityModifierEffect myEffect, Unit caster, BuffInfo buffInfo)
+        public static void InvokeBuffEffect(ability_modifiers myEffect, Unit caster, BuffInfo buffInfo)
         {
             while (myEffect != null)
             {
@@ -295,17 +295,17 @@ namespace WorldServer.World.Abilities
         /// Returns whether the caster is behind the target.
         /// Primary value is the angle of the back arc.
         /// </summary>
-        private static bool IsBehind(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool IsBehind(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return !target.IsObjectInFront(caster, 360 - myCheck.PrimaryValue);
         }
 
-        private static bool IsFlanking(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool IsFlanking(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return !target.IsObjectInFront(caster, 90);
         }
 
-        private static bool WithinJumpZ(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool WithinJumpZ(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return caster.Z > target.Z || target.Z - caster.Z < myCheck.PrimaryValue * 12;
         }
@@ -314,12 +314,12 @@ namespace WorldServer.World.Abilities
 
         #region Health
 
-        private static bool HasCriticalBackstab(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool HasCriticalBackstab(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return !target.IsObjectInFront(caster, 180) && target.PctHealth < 11;
         }
 
-        private static bool TargetHPBelow(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool TargetHPBelow(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return target.PctHealth < myCheck.PrimaryValue;
         }
@@ -328,17 +328,17 @@ namespace WorldServer.World.Abilities
 
         #region Crowd Control
 
-        private static bool IsCCed(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool IsCCed(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return target.CrowdControlType != 0 || target.StsInterface.IsImpeded();
         }
 
-        private static bool IsImpeded(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool IsImpeded(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return target.StsInterface.IsImpeded();
         }
 
-        private static bool CanMove(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool CanMove(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             /*if (caster is Player && ((Player) caster).FallGuard)
                 return false;*/
@@ -349,7 +349,7 @@ namespace WorldServer.World.Abilities
 
         #region Resources
 
-        private static bool HasResource(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool HasResource(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             if (caster is Player)
             {
@@ -362,12 +362,12 @@ namespace WorldServer.World.Abilities
             return false;
         }
 
-        private static bool RequiresResource(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool RequiresResource(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return abInfo.SpecialCost > 0;
         }
 
-        private static bool ForTheHagQueen(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool ForTheHagQueen(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return StaticRandom.Instance.Next(100) < ((Player)caster).CrrInterface.CareerResource * 10;
         }
@@ -376,14 +376,14 @@ namespace WorldServer.World.Abilities
 
         #region Buff Management
 
-        private static bool HasBuff(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool HasBuff(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             NewBuff buff = caster.BuffInterface.GetBuff((ushort)myCheck.PrimaryValue, null);
 
             return buff != null && !buff.BuffHasExpired;
         }
 
-        private static bool MissingBuff(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool MissingBuff(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             NewBuff buff = caster.BuffInterface.GetBuff((ushort)myCheck.PrimaryValue, null);
             if (buff != null && !buff.BuffHasExpired)
@@ -396,26 +396,26 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static bool TargetHasBuff(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool TargetHasBuff(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             NewBuff buff = target.BuffInterface.GetBuff((ushort)myCheck.PrimaryValue, null);
 
             return buff != null && !buff.BuffHasExpired;
         }
 
-        private static bool HasCareerBuff(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool HasCareerBuff(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             NewBuff buff = caster.BuffInterface.GetCareerBuff(myCheck.SecondaryValue);
 
             return buff != null && buff.Entry == myCheck.PrimaryValue;
         }
 
-        private static bool HasBuffOfType(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool HasBuffOfType(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return target.BuffInterface.HasBuffOfType((byte)myCheck.PrimaryValue);
         }
 
-        private static bool NotImmovable(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool NotImmovable(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             if (target.IsImmovable)
                 return false;
@@ -432,40 +432,40 @@ namespace WorldServer.World.Abilities
 
         #region Combat
 
-        private static bool OutOfCombat(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool OutOfCombat(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return !caster.CbtInterface.IsInCombat;
         }
 
-        private static bool OutOfRvR(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool OutOfRvR(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             Player plr = (Player)caster;
 
             return plr.ScnInterface.Scenario == null && (plr.CurrentArea == null || !plr.CurrentArea.IsRvR);
         }
 
-        private static bool HasDefended(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool HasDefended(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return caster.CbtInterface.HasDefended(myCheck.PrimaryValue);
         }
 
-        private static bool IsGrounded(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool IsGrounded(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             Player plr = (Player)caster;
             return plr.WasGrounded;
         }
 
-        private static bool TargetDefended(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool TargetDefended(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return caster.CbtInterface.WasDefendedAgainst(myCheck.PrimaryValue);
         }
 
-        private static bool TargetIsCasting(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool TargetIsCasting(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return target is Player && target.AbtInterface.IsCasting();
         }
 
-        private static bool OffensiveDamaging(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool OffensiveDamaging(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return abInfo.TargetType == CommandTargetTypes.Enemy && abInfo.ConstantInfo.IsDamaging;
         }
@@ -474,32 +474,32 @@ namespace WorldServer.World.Abilities
 
         #region Relations to Target
 
-        private static bool CasterTargetRelation(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool CasterTargetRelation(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             if (myCheck.PrimaryValue == 0)
                 return caster != target;
             return caster == target;
         }
 
-        private static bool CasterTargetSameRealm(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool CasterTargetSameRealm(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             if (myCheck.PrimaryValue == 0)
                 return caster.Faction == 64 || caster.Realm != target.Realm;
             return caster.Realm == target.Realm && caster.Faction != 64;
         }
 
-        private static bool TargetWithinRange(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool TargetWithinRange(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return target != null && caster.ObjectWithinRadiusFeet(target, myCheck.PrimaryValue);
         }
 
-        private static bool HostileWithinRange(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool HostileWithinRange(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             Unit realTarget = caster.CbtInterface.GetTarget(TargetTypes.TARGETTYPES_TARGET_ENEMY);
             return realTarget != null && !realTarget.IsDead && caster.ObjectWithinRadiusFeet(realTarget, myCheck.PrimaryValue);
         }
 
-        private static bool TargetWithinRangeOfPet(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool TargetWithinRangeOfPet(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             Pet myPet = ((Player)caster).CrrInterface.GetTargetOfInterest() as Pet;
 
@@ -509,7 +509,7 @@ namespace WorldServer.World.Abilities
             return myPet.IsInCastRange(target, (uint)myCheck.PrimaryValue);
         }
 
-        private static bool TOIWithinRange(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool TOIWithinRange(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             Player plr = caster as Player;
 
@@ -521,21 +521,21 @@ namespace WorldServer.World.Abilities
             return careerTarget != null && !careerTarget.IsDead && (myCheck.PrimaryValue == 0 || caster.ObjectWithinRadiusFeet(careerTarget, myCheck.PrimaryValue));
         }
 
-        private static bool TargetIsPlayer(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool TargetIsPlayer(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             if (myCheck.PrimaryValue == 0)
                 return !(target is Player);
             return target is Player;
         }
 
-        private static bool TargetIsOrganic(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool TargetIsOrganic(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             if (myCheck.PrimaryValue == 0)
                 return !(target is Player || target is Creature);
             return target is Player || target is Creature;
         }
 
-        private static bool IsPrincipalTarget(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool IsPrincipalTarget(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return target == caster.CbtInterface.GetTarget(TargetTypes.TARGETTYPES_TARGET_ENEMY);
         }
@@ -544,16 +544,16 @@ namespace WorldServer.World.Abilities
 
         #region RvR
 
-        private static bool CanDeploySiege(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool CanDeploySiege(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
-            if (!(caster is Player player))
+            Player player = caster as Player;
+            if (player == null)
                 return false;
 
-            if (!(caster as Player).CbtInterface.IsPvp)
+            if (!player.CbtInterface.IsPvp)
                 return false;
 
-            if ((caster as Player).ZoneId !=
-                WorldMgr.UpperTierCampaignManager.GetActiveBattleFrontFromProgression().ZoneId)
+            if (!WorldMgr.ScalingCampaignManager.IsInActiveBattlefront(player.ZoneId))
             {
                 player.SendClientMessage("You may only deploy Siege in the active zone",
                     ChatLogFilters.CHATLOGFILTERS_C_ABILITY_ERROR);
@@ -630,7 +630,7 @@ namespace WorldServer.World.Abilities
 
         #endregion RvR
 
-        private static bool IsOffensive(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool IsOffensive(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             Item offHand = caster.ItmInterface.GetItemInSlot((ushort)EquipSlot.OFF_HAND);
 
@@ -642,14 +642,14 @@ namespace WorldServer.World.Abilities
             return mainHand?.Info != null && mainHand.Info.TwoHanded;
         }
 
-        private static bool ExperimentalMode(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool ExperimentalMode(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             Player player = caster as Player;
 
             return player == null || player.CrrInterface.ExperimentalModeCheckAbility(abInfo);
         }
 
-        private static bool CanMount(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool CanMount(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             Player player = caster as Player;
 
@@ -668,7 +668,7 @@ namespace WorldServer.World.Abilities
             return true;
         }
 
-        private static bool ItemInSlot(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck mycheck)
+        private static bool ItemInSlot(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks mycheck)
         {
             Player plr = caster as Player;
             if (plr.ItmInterface.GetItemInSlot((ushort)mycheck.PrimaryValue) == null)
@@ -681,7 +681,7 @@ namespace WorldServer.World.Abilities
 
         #region BlockingChecks
 
-        private static bool RemoveIfOn(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool RemoveIfOn(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             NewBuff B = caster.BuffInterface.GetBuff((ushort)myCheck.PrimaryValue, caster);
 
@@ -691,7 +691,7 @@ namespace WorldServer.World.Abilities
             return B == null;
         }
 
-        private static bool CheckAllowAura(Unit caster, Unit target, AbilityInfo abInfo, AbilityModifierCheck myCheck)
+        private static bool CheckAllowAura(Unit caster, Unit target, AbilityInfo abInfo, ability_modifier_checks myCheck)
         {
             return caster.BuffInterface.CanAcceptAura();
         }
@@ -700,7 +700,7 @@ namespace WorldServer.World.Abilities
 
         #region Modifiers
 
-        private static void MoveCast(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void MoveCast(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             if (abInfo.ConstantInfo.ChannelID == 0)
             {
@@ -709,7 +709,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyCastTime(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyCastTime(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             if (abInfo.ConstantInfo.ChannelID != 0)
                 return;
@@ -739,7 +739,7 @@ namespace WorldServer.World.Abilities
                 abInfo.CanCastWhileMoving = true;
         }
 
-        private static void ModifyAPCostByResourceLevel(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyAPCostByResourceLevel(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             Player plr = caster as Player;
 
@@ -753,25 +753,25 @@ namespace WorldServer.World.Abilities
                 abInfo.ApCost = (byte)(abInfo.ApCost + myEffect.PrimaryValue * myResource);
         }
 
-        private static void ModifySpecialCost(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifySpecialCost(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             if (abInfo.SpecialCost > 0)
                 abInfo.SpecialCost += (short)myEffect.PrimaryValue;
         }
 
-        private static void AddCooldownMS(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void AddCooldownMS(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             if (abInfo.Cooldown * 1000 < -myEffect.PrimaryValue)
                 abInfo.Cooldown = 0;
             else abInfo.Cooldown += (ushort)(myEffect.PrimaryValue * 0.001f);
         }
 
-        private static void MultiplyCooldown(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void MultiplyCooldown(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             abInfo.Cooldown = (ushort)(abInfo.Cooldown * (float)(100 + myEffect.PrimaryValue) * 0.01f);
         }
 
-        private static void MultiplyCooldownGreatweapon(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void MultiplyCooldownGreatweapon(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             Item myItem = caster.ItmInterface.GetItemInSlot((ushort)EquipSlot.MAIN_HAND);
 
@@ -779,32 +779,32 @@ namespace WorldServer.World.Abilities
                 abInfo.Cooldown = (ushort)(abInfo.Cooldown * (float)(100 + myEffect.PrimaryValue) * 0.01f);
         }
 
-        private static void SetCooldown(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void SetCooldown(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             abInfo.Cooldown = (ushort)myEffect.PrimaryValue;
         }
 
-        private static void AddAPCost(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void AddAPCost(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             abInfo.ApCost = (byte)(abInfo.ApCost + myEffect.PrimaryValue);
         }
 
-        private static void SetAPCost(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void SetAPCost(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             abInfo.ApCost = (byte)myEffect.PrimaryValue;
         }
 
-        private static void MultiplyAPCost(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void MultiplyAPCost(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             abInfo.ApCost = (byte)(abInfo.ApCost * (100 + myEffect.PrimaryValue) * 0.01f);
         }
 
-        private static void MultiplyRange(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void MultiplyRange(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             abInfo.Range = (ushort)(abInfo.Range * (100 + myEffect.PrimaryValue) * 0.01f);
         }
 
-        private static void ModifyDamageBonus(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyDamageBonus(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in abInfo.CommandInfo)
             {
@@ -820,7 +820,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyArmorPenFactor(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyArmorPenFactor(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in abInfo.CommandInfo)
             {
@@ -834,7 +834,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyDamageType(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyDamageType(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in abInfo.CommandInfo)
             {
@@ -849,7 +849,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyCriticalHitRate(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyCriticalHitRate(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in abInfo.CommandInfo)
             {
@@ -863,7 +863,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyCriticalDamage(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyCriticalDamage(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in abInfo.CommandInfo)
             {
@@ -877,7 +877,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyDefensibility(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyDefensibility(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in abInfo.CommandInfo)
             {
@@ -891,7 +891,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void FeedingOnPain(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void FeedingOnPain(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             if (caster.PctHealth < 76)
                 abInfo.ApCost = (byte)(abInfo.ApCost * (caster.PctHealth / 25 + 1) * 0.25f);
@@ -901,7 +901,7 @@ namespace WorldServer.World.Abilities
 
         #region CommandModifiers
 
-        private static void SwitchDamage(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void SwitchDamage(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -912,7 +912,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ResourceSwitchDamage(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ResourceSwitchDamage(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -920,7 +920,7 @@ namespace WorldServer.World.Abilities
                 cmd.DamageInfo = AbilityMgr.GetExtraDamageFor(myEffect.Affecting, (byte)myEffect.PrimaryValue, (byte)(Math.Max(0, ((Player)caster).CrrInterface.GetCurrentResourceLevel((byte)myEffect.SecondaryValue) - 1)));
         }
 
-        private static void ModifyCommandDamageBonus(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyCommandDamageBonus(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -932,7 +932,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyCommandCritChance(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyCommandCritChance(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -940,7 +940,7 @@ namespace WorldServer.World.Abilities
                 cmd.DamageInfo.CriticalHitRate += (byte)myEffect.PrimaryValue;
         }
 
-        private static void SetUndefendable(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void SetUndefendable(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in abInfo.CommandInfo)
             {
@@ -957,7 +957,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void SetCommandRadius(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void SetCommandRadius(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -965,7 +965,7 @@ namespace WorldServer.World.Abilities
                 cmd.EffectRadius = (byte)myEffect.PrimaryValue;
         }
 
-        private static void DragonGunRange(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void DragonGunRange(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             byte myRes = ((Player)caster).CrrInterface.CareerResource;
 
@@ -995,7 +995,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyCommandArmorPen(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyCommandArmorPen(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1006,7 +1006,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyCommandArmorPenScale(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyCommandArmorPenScale(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1017,7 +1017,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void MultiplyCommandRadius(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void MultiplyCommandRadius(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1025,12 +1025,12 @@ namespace WorldServer.World.Abilities
                 cmd.EffectRadius = (byte)(cmd.EffectRadius * (100 + (ushort)myEffect.PrimaryValue) * 0.01f);
         }
 
-        private static void ModifyAPCostByCareerResource(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyAPCostByCareerResource(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             abInfo.ApCost = (byte)(abInfo.ApCost * (1f - myEffect.PrimaryValue * 0.01f * ((Player)caster).CrrInterface.CareerResource));
         }
 
-        private static void SwitchCommandParams(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void SwitchCommandParams(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1041,7 +1041,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void MultiplyCommandParamByResourceLevel(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void MultiplyCommandParamByResourceLevel(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1049,7 +1049,7 @@ namespace WorldServer.World.Abilities
                 cmd.PrimaryValue *= ((Player)caster).CrrInterface.GetCurrentResourceLevel((byte)myEffect.PrimaryValue);
         }
 
-        private static void AddResourceLevelToCommandParam(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void AddResourceLevelToCommandParam(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1057,7 +1057,7 @@ namespace WorldServer.World.Abilities
                 cmd.PrimaryValue += ((Player)caster).CrrInterface.GetCurrentResourceLevel((byte)myEffect.PrimaryValue);
         }
 
-        private static void ExclusiveCleanse(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ExclusiveCleanse(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1074,7 +1074,7 @@ namespace WorldServer.World.Abilities
         /// <para>In experimental mode, also improves the output of those spells.</para>
         /// </summary>
 
-        private static void ShifterCastTimeBonus(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ShifterCastTimeBonus(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             Player plr = caster as Player;
 
@@ -1131,7 +1131,7 @@ namespace WorldServer.World.Abilities
         /// <summary>
         /// <para>Reduces the cooldown of spells empowered by the healer shifter mechanic of Archmage and Shaman.</para>
         /// </summary>
-        private static void ShifterCooldownChange(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ShifterCooldownChange(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             Player plr = caster as Player;
 
@@ -1166,7 +1166,7 @@ namespace WorldServer.World.Abilities
         /// <summary>
         /// <para>In experimental mode, improves the damage scaling and spell level of spells empowered by the healer shifter mechanic of Archmage and Shaman.</para>
         /// </summary>
-        private static void ShifterStatChange(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ShifterStatChange(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             Player plr = caster as Player;
 
@@ -1329,7 +1329,7 @@ namespace WorldServer.World.Abilities
         }
 
         // Grants additional effectiveness based on mechanic to AM/Shaman instant casts
-        private static void ShifterDamageBonus(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ShifterDamageBonus(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             Player plr = caster as Player;
 
@@ -1386,7 +1386,7 @@ namespace WorldServer.World.Abilities
         /// Adds an ability command chain to this ability's list.
         /// The ability chain to add is pulled from the ability's default list.
         /// </summary>
-        private static void AddAbilityCommand(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void AddAbilityCommand(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = AbilityMgr.GetAbilityCommand(caster, abInfo.Entry, (byte)myEffect.PrimaryValue);
 
@@ -1396,7 +1396,7 @@ namespace WorldServer.World.Abilities
             abInfo.AddAbilityCommand(cmd);
         }
 
-        private static void AddAbilityCommandWithDamage(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void AddAbilityCommandWithDamage(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = AbilityMgr.GetAbilityCommand(caster, abInfo.Entry, (byte)myEffect.PrimaryValue);
 
@@ -1412,7 +1412,7 @@ namespace WorldServer.World.Abilities
         /// Appends an ability command to an existing chain.
         /// The ability command to use is pulled from the modifier effect's default list.
         /// </summary>
-        private static void AppendAbilityCommand(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void AppendAbilityCommand(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = AbilityMgr.GetAbilityCommand(caster, myEffect.Entry, (byte)myEffect.PrimaryValue, (byte)myEffect.SecondaryValue);
 
@@ -1427,7 +1427,7 @@ namespace WorldServer.World.Abilities
             abInfo.AppendAbilityCommand(cmd, myEffect.TargetCommandID);
         }
 
-        private static void AppendAbilityCommandFromBase(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void AppendAbilityCommandFromBase(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = AbilityMgr.GetAbilityCommand(caster, myEffect.Affecting, (byte)myEffect.PrimaryValue, (byte)myEffect.SecondaryValue);
 
@@ -1437,7 +1437,7 @@ namespace WorldServer.World.Abilities
             abInfo.AppendAbilityCommand(cmd, myEffect.TargetCommandID);
         }
 
-        private static void AppendAbilityCommandWithDamage(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void AppendAbilityCommandWithDamage(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = AbilityMgr.GetAbilityCommand(caster, myEffect.Entry, (byte)myEffect.PrimaryValue, (byte)myEffect.SecondaryValue);
 
@@ -1449,14 +1449,14 @@ namespace WorldServer.World.Abilities
             abInfo.AppendAbilityCommandWithDamage(cmd, myEffect.TargetCommandID);
         }
 
-        private static void DeleteAbilityCommand(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void DeleteAbilityCommand(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             abInfo.DeleteCommand((byte)myEffect.PrimaryValue, (byte)myEffect.SecondaryValue);
         }
 
         #endregion Add/Remove
 
-        private static void ModifyMaxTargets(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyMaxTargets(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1464,7 +1464,7 @@ namespace WorldServer.World.Abilities
                 cmd.MaxTargets = (byte)myEffect.PrimaryValue;
         }
 
-        private static void ModifyTargetType(Unit caster, AbilityInfo abInfo, AbilityModifierEffect myEffect)
+        private static void ModifyTargetType(Unit caster, AbilityInfo abInfo, ability_modifiers myEffect)
         {
             AbilityCommandInfo cmd = abInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1479,7 +1479,7 @@ namespace WorldServer.World.Abilities
 
         #region BuffModifiers
 
-        private static void SwitchBuffDamage(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void SwitchBuffDamage(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             BuffCommandInfo cmd = buffInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1490,7 +1490,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyBuffCommandDamageBonus(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ModifyBuffCommandDamageBonus(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             BuffCommandInfo cmd = buffInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1504,7 +1504,7 @@ namespace WorldServer.World.Abilities
 
         #region General Mods
 
-        private static void ModifyBuffDamageBonus(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ModifyBuffDamageBonus(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in buffInfo.CommandInfo)
             {
@@ -1520,7 +1520,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyBuffArmorPenFactor(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ModifyBuffArmorPenFactor(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in buffInfo.CommandInfo)
             {
@@ -1534,7 +1534,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyBuffCriticalHitRate(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ModifyBuffCriticalHitRate(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in buffInfo.CommandInfo)
             {
@@ -1548,7 +1548,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyBuffCriticalDamage(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ModifyBuffCriticalDamage(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in buffInfo.CommandInfo)
             {
@@ -1562,7 +1562,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyBuffDamageType(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ModifyBuffDamageType(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in buffInfo.CommandInfo)
             {
@@ -1577,7 +1577,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyBuffDefensibility(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ModifyBuffDefensibility(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             foreach (var cmdinfo in buffInfo.CommandInfo)
             {
@@ -1593,7 +1593,7 @@ namespace WorldServer.World.Abilities
 
         #endregion General Mods
 
-        private static void ModifyBuffCommandArmorPenScale(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ModifyBuffCommandArmorPenScale(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             BuffCommandInfo cmd = buffInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1604,7 +1604,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void AddResourceLevelToDuration(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void AddResourceLevelToDuration(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             //in the case for WE we will add the combo points times secondary value to add to a duration
             if (myEffect.PrimaryValue == 1)
@@ -1613,12 +1613,12 @@ namespace WorldServer.World.Abilities
                 buffInfo.Duration += ((Player)caster).CrrInterface.GetCurrentResourceLevel((byte)myEffect.SecondaryValue);
         }
 
-        private static void SetDurationToResourceLevel(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void SetDurationToResourceLevel(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             buffInfo.Duration = (uint)(((Player)caster).CrrInterface.GetCurrentResourceLevel(1) * myEffect.SecondaryValue);
         }
 
-        private static void ResourceBuffSwitchDamage(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ResourceBuffSwitchDamage(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             BuffCommandInfo cmd = buffInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1626,21 +1626,21 @@ namespace WorldServer.World.Abilities
                 cmd.DamageInfo = AbilityMgr.GetExtraDamageFor(myEffect.Affecting, (byte)myEffect.PrimaryValue, (byte)(Math.Max(0, ((Player)caster).CrrInterface.GetCurrentResourceLevel((byte)myEffect.SecondaryValue) - 1)));
         }
 
-        private static void ResourceBuffIncreaseCritical(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ResourceBuffIncreaseCritical(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             BuffCommandInfo cmd = buffInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
             cmd.DamageInfo.CriticalHitRate += (byte)(5 * ((Player)caster).CrrInterface.GetCurrentResourceLevel((byte)myEffect.SecondaryValue));
         }
 
-        private static void SetEventChance(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void SetEventChance(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             BuffCommandInfo cmd = buffInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
             cmd.EventChance = (byte)myEffect.PrimaryValue;
         }
 
-        private static void SetAuraPropagation(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void SetAuraPropagation(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             buffInfo.AuraPropagation = "Foe";
             if (myEffect.PrimaryValue == 40)
@@ -1650,7 +1650,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void SwitchBuffCommandParams(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void SwitchBuffCommandParams(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             BuffCommandInfo cmd = buffInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1666,13 +1666,13 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void SetStackLevel(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void SetStackLevel(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             buffInfo.InitialStacks = (byte)myEffect.PrimaryValue;
             buffInfo.MaxStack = (byte)buffInfo.InitialStacks;
         }
 
-        private static void MultiplyBuffCommandParamsByResourceLevel(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void MultiplyBuffCommandParamsByResourceLevel(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             BuffCommandInfo cmd = buffInfo.CommandInfo[myEffect.TargetCommandID].GetSubcommand(myEffect.TargetCommandSequence);
 
@@ -1688,13 +1688,13 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ModifyStacksByCareerResource(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ModifyStacksByCareerResource(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             buffInfo.InitialStacks += ((Player)caster).CrrInterface.CareerResource;
             buffInfo.MaxStack = (byte)buffInfo.InitialStacks;
         }
 
-        private static void SwitchDuration(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void SwitchDuration(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             if (myEffect.SecondaryValue == 0)
                 buffInfo.Duration = (ushort)myEffect.PrimaryValue;
@@ -1710,7 +1710,7 @@ namespace WorldServer.World.Abilities
 
         #region Add/Remove
 
-        private static void AddBuffCommand(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void AddBuffCommand(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             BuffCommandInfo cmd = AbilityMgr.GetBuffCommand(buffInfo.Entry, (byte)myEffect.PrimaryValue);
 
@@ -1720,7 +1720,7 @@ namespace WorldServer.World.Abilities
             buffInfo.AddBuffCommand(cmd);
         }
 
-        private static void AppendBuffCommand(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void AppendBuffCommand(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             BuffCommandInfo cmd = AbilityMgr.GetBuffCommand(myEffect.Entry, (byte)myEffect.PrimaryValue, (byte)myEffect.SecondaryValue);
 
@@ -1737,7 +1737,7 @@ namespace WorldServer.World.Abilities
                 cmd.DamageInfo.Entry = buffInfo.Entry;
         }
 
-        private static void DeleteBuffCommand(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void DeleteBuffCommand(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             buffInfo.DeleteCommand((byte)myEffect.PrimaryValue, (byte)myEffect.SecondaryValue);
         }
@@ -1746,7 +1746,7 @@ namespace WorldServer.World.Abilities
 
         #region Healer shifter mechanic
 
-        private static void ShifterBuffParamBonus(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ShifterBuffParamBonus(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             Player plr = caster as Player;
 
@@ -1779,7 +1779,7 @@ namespace WorldServer.World.Abilities
             }
         }
 
-        private static void ShifterBuffDamageBonus(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ShifterBuffDamageBonus(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             Player plr = caster as Player;
 
@@ -1826,7 +1826,7 @@ namespace WorldServer.World.Abilities
 
         #endregion Healer shifter mechanic
 
-        private static void FuriousReprisalSetup(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void FuriousReprisalSetup(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             buffInfo.Duration = 5;
 
@@ -1842,7 +1842,7 @@ namespace WorldServer.World.Abilities
             buffInfo.AddBuffCommand(cmd);
         }
 
-        private static void ContractDoT(Unit caster, BuffInfo buffInfo, AbilityModifierEffect myEffect)
+        private static void ContractDoT(Unit caster, BuffInfo buffInfo, ability_modifiers myEffect)
         {
             Player player = caster as Player;
 

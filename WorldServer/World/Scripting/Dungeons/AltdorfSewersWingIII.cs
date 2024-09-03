@@ -228,7 +228,7 @@ namespace WorldServer
         {
             GameObject_proto proto = GameObjectService.GetGameObjectProto(2000441);
 
-            GameObject_spawn spawn = new GameObject_spawn
+            gameobject_spawns spawn = new gameobject_spawns
             {
                 Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                 WorldX = 137348,
@@ -253,7 +253,7 @@ namespace WorldServer
 
             for (int i = 0; i < 6; i++) // We want 6 nurglings
             {
-                Creature_spawn Spawn = new Creature_spawn();
+                creature_spawns Spawn = new creature_spawns();
                 Spawn.Guid = (uint)CreatureService.GenerateCreatureSpawnGUID();
                 Spawn.BuildFromProto(Proto);
                 Spawn.WorldO = Creature.Heading;
@@ -277,7 +277,7 @@ namespace WorldServer
 
             for (int i = 0; i < 6; i++)
             {
-                Creature_spawn Spawn = new Creature_spawn();
+                creature_spawns Spawn = new creature_spawns();
                 Spawn.Guid = (uint)CreatureService.GenerateCreatureSpawnGUID();
                 Spawn.BuildFromProto(Proto);
                 Spawn.WorldO = Creature.Heading;
@@ -301,7 +301,7 @@ namespace WorldServer
 
             for (int i = 0; i < 6; i++)
             {
-                Creature_spawn Spawn = new Creature_spawn();
+                creature_spawns Spawn = new creature_spawns();
                 Spawn.Guid = (uint)CreatureService.GenerateCreatureSpawnGUID();
                 Spawn.BuildFromProto(Proto);
                 Spawn.WorldO = Creature.Heading;

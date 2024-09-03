@@ -14,16 +14,16 @@ namespace WorldServer.World.Objects
     {
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public new Creature_spawn Spawn;
+        public new creature_spawns Spawn;
         public uint ProtoEntryId { get; set; }
         protected new byte Scale { get; set; }
         public new ushort Ranged { get; set; }
         public new ushort Model1 { get; set; }
         public new ushort Model2 { get; set; }
 
-        public List<Waypoint> Waypoints { get; set; }
+        public List<waypoints> Waypoints { get; set; }
 
-        public AdvancedCreature(Creature_spawn spawn)
+        public AdvancedCreature(creature_spawns spawn)
         {
             if (spawn == null)
                 throw new ArgumentNullException("NULL spawn passed to AdvancedCreature.");

@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.SacellumDungeonsWestWingSacellum1
     {
         #region Constructors
 
-        public SimpleGoremane(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleGoremane(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

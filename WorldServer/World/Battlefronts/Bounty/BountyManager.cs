@@ -30,7 +30,7 @@ namespace WorldServer.World.Battlefronts.Bounty
 
         public bool AddCharacterBounty(uint targetCharacterId, int additionalContribution)
         {
-            BountyLogger.Trace($"+++ Adding Character Bounty {targetCharacterId} value {additionalContribution}");
+            BountyLogger.Trace($"+++ Adding characters Bounty {targetCharacterId} value {additionalContribution}");
             var bounty = GetBounty(targetCharacterId);
             if (bounty != null)
             {
@@ -45,7 +45,7 @@ namespace WorldServer.World.Battlefronts.Bounty
         }
 
         /// <summary>
-        /// Remove Character from Bountry Dictionary
+        /// Remove characters from Bountry Dictionary
         /// </summary>
         /// <param name="characterId"></param>
         public void RemoveCharacter(uint characterId)
@@ -72,7 +72,7 @@ namespace WorldServer.World.Battlefronts.Bounty
                     // player can sometimes be null - this is really unlikely here, but just incase.
                     if (player == null)
                     {
-                        BountyLogger.Warn($"Player not found in BountyDictionary, tried to create, but got nothing. Character : {targetCharacterId}");
+                        BountyLogger.Warn($"Player not found in BountyDictionary, tried to create, but got nothing. characters : {targetCharacterId}");
                         return new CharacterBounty();
                     }
                     if (this.BountyDictionary.TryAdd(targetCharacterId, new CharacterBounty(player)))
@@ -81,7 +81,7 @@ namespace WorldServer.World.Battlefronts.Bounty
                     }
                     else
                     {
-                        BountyLogger.Warn($"Player not found in BountyDictionary, tried to create, but adding failed. Character : {targetCharacterId}");
+                        BountyLogger.Warn($"Player not found in BountyDictionary, tried to create, but adding failed. characters : {targetCharacterId}");
                         return new CharacterBounty();
                     }
                 }

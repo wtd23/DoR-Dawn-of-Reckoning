@@ -24,11 +24,11 @@ namespace WorldServer.World.Guild
     {
         public static int MaxAllianceGUID = 1;
 
-        public static Dictionary<uint, Guild_Alliance_info> Alliances = new Dictionary<uint, Guild_Alliance_info>();
+        public static Dictionary<uint, guild_alliance_info> Alliances = new Dictionary<uint, guild_alliance_info>();
 
         public static uint CreateAlliance(string name)
         {
-            Guild_Alliance_info alli = new Guild_Alliance_info
+            guild_alliance_info alli = new guild_alliance_info
             {
                 Name = name,
                 AllianceId = (uint)Interlocked.Increment(ref MaxAllianceGUID)
@@ -148,7 +148,7 @@ namespace WorldServer.World.Guild
 
         private void CreateGuild()
         {
-            Guild_info info = new Guild_info
+            guild_info info = new guild_info
             {
                 Name = _name,
                 Motd = "",
@@ -158,13 +158,13 @@ namespace WorldServer.World.Guild
                 Xp = 0,
                 CreateDate = TCPManager.GetTimeStamp(),
                 GuildId = Guild.GenerateMaxGuildId(),
-                Members = new Dictionary<uint, Guild_member>(),
-                Ranks = new Dictionary<byte, Guild_rank>(),
-                Logs = new List<Guild_log>()
+                Members = new Dictionary<uint, guild_members>(),
+                Ranks = new Dictionary<byte, guild_ranks>(),
+                Logs = new List<guild_logs>()
             };
             CharMgr.Database.AddObject(info);
 
-            Guild_rank rank0 = new Guild_rank
+            guild_ranks rank0 = new guild_ranks
             {
                 GuildId = info.GuildId,
                 RankId = 0,
@@ -175,7 +175,7 @@ namespace WorldServer.World.Guild
             CharMgr.Database.AddObject(rank0);
             info.Ranks.Add(0, rank0);
 
-            Guild_rank rank1 = new Guild_rank
+            guild_ranks rank1 = new guild_ranks
             {
                 GuildId = info.GuildId,
                 RankId = 1,
@@ -188,7 +188,7 @@ namespace WorldServer.World.Guild
 
             for (byte i = 2; i < 8; i++)
             {
-                Guild_rank rankUnused = new Guild_rank
+                guild_ranks rankUnused = new guild_ranks
                 {
                     GuildId = info.GuildId,
                     RankId = i,
@@ -200,7 +200,7 @@ namespace WorldServer.World.Guild
                 info.Ranks.Add(i, rankUnused);
             }
 
-            Guild_rank rank8 = new Guild_rank
+            guild_ranks rank8 = new guild_ranks
             {
                 GuildId = info.GuildId,
                 RankId = 8,
@@ -211,7 +211,7 @@ namespace WorldServer.World.Guild
             CharMgr.Database.AddObject(rank8);
             info.Ranks.Add(8, rank8);
 
-            Guild_rank rank9 = new Guild_rank
+            guild_ranks rank9 = new guild_ranks
             {
                 GuildId = info.GuildId,
                 RankId = 9,
@@ -224,7 +224,7 @@ namespace WorldServer.World.Guild
 
             foreach (Player plr in _invites.Keys)
             {
-                Guild_member member = new Guild_member
+                guild_members member = new guild_members
                 {
                     CharacterId = plr.Info.CharacterId,
                     GuildId = info.GuildId
@@ -306,7 +306,7 @@ namespace WorldServer.World.Guild
         {
             foreach (Guild guild in Guilds)
             {
-                foreach (Guild_member mem in guild.Info.Members.Values)
+                foreach (guild_members mem in guild.Info.Members.Values)
                 {
                     if (mem.CharacterId == id)
                         return guild;
@@ -316,7 +316,7 @@ namespace WorldServer.World.Guild
             return null;
         }
 
-        public static List<Guild> GetGuilds(Realms realm, byte style, byte atmostphere, byte myLevelCareer, byte level, byte career, ushort pop, byte online, byte guildRank)
+        public static List<Guild> GetGuilds(SetRealms realm, byte style, byte atmostphere, byte myLevelCareer, byte level, byte career, ushort pop, byte online, byte guildRank)
         {
             List<Guild> guilds = new List<Guild>();
 
@@ -378,9 +378,9 @@ namespace WorldServer.World.Guild
             Out.WriteUInt32((uint)guild.Info.Members.Count); //total members
             Out.WriteUInt32((uint)guild.OnlineMembers.Count); // online
             Out.WriteShortString("");
-            List<Guild_member> recruiters = guild.Info.Members.Values.Where(m => m.GuildRecruiter).Take(5).ToList();
+            List<guild_members> recruiters = guild.Info.Members.Values.Where(m => m.GuildRecruiter).Take(5).ToList();
             Out.WriteByte((byte)recruiters.Count); // Recruiters Count
-            foreach (Guild_member recruiter in recruiters)
+            foreach (guild_members recruiter in recruiters)
             {
                 Out.WriteShortString(recruiter.Member.Name);
             }
@@ -413,7 +413,7 @@ namespace WorldServer.World.Guild
             HasPermissionsByte(ref Byte, ref bit, (byte)permission);
         }
 
-        public static bool HasPermissions(Guild_rank rank, byte command)
+        public static bool HasPermissions(guild_ranks rank, byte command)
         {
             int Byte = 0;
             int bit = 0;
@@ -425,7 +425,7 @@ namespace WorldServer.World.Guild
             return (permissionBytes[Byte - 1] & (1 << bit)) != 0;
         }
 
-        public static bool HasPermissions(Guild_rank rank, GuildPermissions permission)
+        public static bool HasPermissions(guild_ranks rank, GuildPermissions permission)
         {
             return HasPermissions(rank, (byte)permission);
         }
@@ -451,7 +451,7 @@ namespace WorldServer.World.Guild
         public byte StandardBearerMax;
         public List<Player> OnlineMembers = new List<Player>();
         public List<Player> GuildVaultUser = new List<Player>();
-        public Guild_info Info;
+        public guild_info Info;
         private ushort[,] _banners = { { 1, 0, 0, 0 }, { 1, 0, 0, 0 }, { 1, 0, 0, 0 } };
         private long[] _bannerlock = { 0, 0, 0 };
 
@@ -465,7 +465,7 @@ namespace WorldServer.World.Guild
         private byte _heraldryColor2 = 2;
         private byte _heraldryShape = 1;
 
-        public Guild(Guild_info info)
+        public Guild(guild_info info)
         {
             this.Info = info;
 
@@ -478,7 +478,7 @@ namespace WorldServer.World.Guild
 
             if (string.IsNullOrEmpty(info.Heraldry))
             {
-                Character tmp = CharMgr.GetCharacter(info.LeaderId, false);
+                characters tmp = CharMgr.GetCharacter(info.LeaderId, false);
                 if (tmp.Realm == 1)
                 {
                     _heraldryEmblem = 1;
@@ -560,7 +560,7 @@ namespace WorldServer.World.Guild
             if (Info.AllianceId > 0)
                 SendAlliance(plr);
 
-            foreach (Guild_log log in Info.Logs)
+            foreach (guild_logs log in Info.Logs)
                 SendGuildLog(log, false, plr);
 
             SendGuildRecruitment(plr);
@@ -602,7 +602,7 @@ namespace WorldServer.World.Guild
             Out.WriteByte(1);
             Out.WriteByte((byte)Info.Ranks.Count);
 
-            foreach (Guild_rank rank in Info.Ranks.Values)
+            foreach (guild_ranks rank in Info.Ranks.Values)
             {
                 Out.WriteByte(rank.RankId);
                 Out.WriteByte(0);
@@ -626,7 +626,7 @@ namespace WorldServer.World.Guild
             buffer.Position = 0;
             bool first = true;
 
-            foreach (Guild_member member in Info.Members.Values)
+            foreach (guild_members member in Info.Members.Values)
             {
                 if (member.Member == null)
                     continue;
@@ -680,7 +680,7 @@ namespace WorldServer.World.Guild
             buffer.Position = 0;
             bool first = true;
 
-            foreach (Guild_member member in Info.Members.Values)
+            foreach (guild_members member in Info.Members.Values)
             {
                 if (count >= 40)
                 {
@@ -732,7 +732,7 @@ namespace WorldServer.World.Guild
             buffer.Position = 0;
         }
 
-        public void SendMember(Player plr, Guild_member guildPlr)
+        public void SendMember(Player plr, guild_members guildPlr)
         {
             if (plr != null)
                 GuildLogger.Debug($"{plr.Name}");
@@ -774,8 +774,8 @@ namespace WorldServer.World.Guild
         public void SendGuildXp(Player plr)
         {
             LogGuildBug(plr);
-            Guild_Xp xpCurr = GuildService.GetGuild_Xp(Info.Level);
-            Guild_Xp xpNext = GuildService.GetGuild_Xp((byte)(Info.Level + 1));
+            guild_xp xpCurr = GuildService.GetGuild_Xp(Info.Level);
+            guild_xp xpNext = GuildService.GetGuild_Xp((byte)(Info.Level + 1));
 
             uint soFar = Info.Level >= MaxGuildLevel ? Info.Xp : (Info.Xp - xpCurr.Xp);
             uint next = Info.Level >= MaxGuildLevel ? Info.Xp : xpNext.Xp;
@@ -838,7 +838,7 @@ namespace WorldServer.World.Guild
         {
             foreach (uint guildid in Alliance.Alliances[Info.AllianceId].Members)
             {
-                List<Guild_member> officers = new List<Guild_member>();
+                List<guild_members> officers = new List<guild_members>();
 
                 Guild gl = GetGuild(guildid);
                 if (gl == null)
@@ -846,7 +846,7 @@ namespace WorldServer.World.Guild
                     continue;
                 }
 
-                foreach (KeyValuePair<uint, Guild_member> gm in gl.Info.Members)
+                foreach (KeyValuePair<uint, guild_members> gm in gl.Info.Members)
                 {
                     if (gm.Value.AllianceOfficer || gm.Value.CharacterId == gl.Info.LeaderId)
                         officers.Add(gm.Value);
@@ -867,7 +867,7 @@ namespace WorldServer.World.Guild
                 Out.WriteUInt32((uint)gl.Info.CreateDate);   // created
                 Out.WriteByte(gl.Info.Level);   // guild rank
                 Out.Fill(0, 4);
-                foreach (Guild_member member in officers)
+                foreach (guild_members member in officers)
                 {
                     Out.WriteUInt32(member.CharacterId);
                     Out.WriteByte(0x00);
@@ -926,7 +926,7 @@ namespace WorldServer.World.Guild
                     return;
 
                 byte freeslot = 1;
-                Guild_event val;
+                guild_event val;
 
                 for (byte i = 1; i < MaxEvents + 1; i++)
                 {
@@ -937,7 +937,7 @@ namespace WorldServer.World.Guild
                     }
                 }
 
-                Guild_event gev = new Guild_event();
+                guild_event gev = new guild_event();
                 gev.SlotId = freeslot;
                 gev.GuildId = Info.GuildId;
                 gev.CharacterId = player;
@@ -960,7 +960,7 @@ namespace WorldServer.World.Guild
         {
             lock (Info.Event)
             {
-                Guild_event events;
+                guild_event events;
 
                 if (Info.Event.TryGetValue(key, out events))
 
@@ -981,7 +981,7 @@ namespace WorldServer.World.Guild
         {
             lock (Info.Event)
             {
-                Guild_event events;
+                guild_event events;
 
                 if (!Info.Event.TryGetValue(key, out events))
                     return;
@@ -1016,7 +1016,7 @@ namespace WorldServer.World.Guild
         {
             lock (Info.Event)
             {
-                Guild_event events;
+                guild_event events;
 
                 if (!Info.Event.TryGetValue(key, out events))
                     return;
@@ -1043,7 +1043,7 @@ namespace WorldServer.World.Guild
         {
             lock (Info.Event)
             {
-                Guild_event events;
+                guild_event events;
 
                 if (!Info.Event.TryGetValue(key, out events))
                     return;
@@ -1070,7 +1070,7 @@ namespace WorldServer.World.Guild
         {
             lock (Info.Event)
             {
-                Guild_event events;
+                guild_event events;
 
                 if (!Info.Event.TryGetValue(eventid, out events))
                     return;
@@ -1098,7 +1098,7 @@ namespace WorldServer.World.Guild
         {
             lock (Info.Event)
             {
-                Guild_event events;
+                guild_event events;
 
                 if (!Info.Event.TryGetValue(key, out events))
                     return;
@@ -1127,7 +1127,7 @@ namespace WorldServer.World.Guild
         public void SendEvents(Player Plr)
         {
             LogGuildBug(Plr);
-            List<Guild_event> allievents = new List<Guild_event>();
+            List<guild_event> allievents = new List<guild_event>();
 
             if (Info.AllianceId > 0)
                 foreach (uint alli in Alliance.Alliances[Info.AllianceId].Members)
@@ -1137,7 +1137,7 @@ namespace WorldServer.World.Guild
 
                     Guild gl = GetGuild(alli);
 
-                    foreach (KeyValuePair<byte, Guild_event> evn in gl.Info.Event)
+                    foreach (KeyValuePair<byte, guild_event> evn in gl.Info.Event)
                     {
                         if (evn.Value.Alliance)
                         {
@@ -1150,7 +1150,7 @@ namespace WorldServer.World.Guild
             Out.WriteByte(0x10);
             Out.WriteByte((byte)(Info.Event.Count + allievents.Count));
             Out.WriteByte(0);
-            foreach (KeyValuePair<byte, Guild_event> evn in Info.Event)
+            foreach (KeyValuePair<byte, guild_event> evn in Info.Event)
             {
                 Out.WriteByte(evn.Key);
                 Out.WriteUInt32(Info.GuildId);
@@ -1172,7 +1172,7 @@ namespace WorldServer.World.Guild
                 Out.WriteByte(0);
             }
             if (Info.AllianceId > 0)
-                foreach (Guild_event evn in allievents)
+                foreach (guild_event evn in allievents)
                 {
                     Out.WriteByte(evn.SlotId);
                     Out.WriteUInt32(evn.GuildId);
@@ -1318,10 +1318,10 @@ namespace WorldServer.World.Guild
                     Out.WriteByte(0);
                     Out.WriteByte((byte)Info.Vaults[i].Count);
                     Out.WriteByte(0);
-                    foreach (KeyValuePair<ushort, GuildVaultItem> gvi in Info.Vaults[i])
+                    foreach (KeyValuePair<ushort, guild_vault_item> gvi in Info.Vaults[i])
                     {
                         Out.WriteByte((byte)gvi.Key);
-                        Item.BuildItem(ref Out, null, null, new MailItem(gvi.Value.Entry, gvi.Value._Talismans, gvi.Value.PrimaryDye, gvi.Value.SecondaryDye, gvi.Value.Counts), 0, 0);
+                        Item.BuildItem(ref Out, null, null, new mail_item(gvi.Value.Entry, gvi.Value._Talismans, gvi.Value.PrimaryDye, gvi.Value.SecondaryDye, gvi.Value.Counts), 0, 0);
                         Out.WriteByte(0);
                     }
                     plr.SendPacket(Out);
@@ -1624,7 +1624,7 @@ namespace WorldServer.World.Guild
             }
 
             uint money = 0;
-            Character tmp = CharMgr.GetCharacter(Info.LeaderId, false);
+            characters tmp = CharMgr.GetCharacter(Info.LeaderId, false);
             if ((tmp.Realm == 1 && _heraldryEmblem == 1 && _heraldryPattern == 1 && _heraldryColor1 == 1 && _heraldryColor2 == 1 && _heraldryShape == 1) || (tmp.Realm == 2 && _heraldryEmblem == 2 && _heraldryPattern == 100 && _heraldryColor1 == 2 && _heraldryColor2 == 2 && _heraldryShape == 1))
                 money = 100000;
             else
@@ -1675,7 +1675,7 @@ namespace WorldServer.World.Guild
             return (byte)_banners[banner, 0];
         }
 
-        public void SendGuildLog(Guild_log log, bool all, Player plr)
+        public void SendGuildLog(guild_logs log, bool all, Player plr)
         {
             LogGuildBug(plr);
             PacketOut Out = new PacketOut((byte)Opcodes.F_GUILD_DATA);
@@ -1708,7 +1708,7 @@ namespace WorldServer.World.Guild
                 plr.SendPacket(Out);
         }
 
-        public void SendGuildPlayerContributed(Player plr, Guild_member guildPlr)
+        public void SendGuildPlayerContributed(Player plr, guild_members guildPlr)
         {
             LogGuildBug(plr);
             PacketOut Out = new PacketOut((byte)Opcodes.F_GUILD_DATA);
@@ -1879,7 +1879,7 @@ namespace WorldServer.World.Guild
                     return;
                 }
 
-                GuildVaultItem gv;
+                guild_vault_item gv;
 
                 if (!Info.Vaults[sourceVault - 1].TryGetValue(sourceSlot, out gv))
                 {
@@ -1890,7 +1890,7 @@ namespace WorldServer.World.Guild
                 Info.Vaults[sourceVault - 1].Remove(sourceSlot);
                 CharMgr.Database.DeleteObject(gv);
 
-                GuildVaultItem newItem = new GuildVaultItem
+                guild_vault_item newItem = new guild_vault_item
                 {
                     Counts = gv.Counts,
                     GuildId = Info.GuildId,
@@ -1941,7 +1941,7 @@ namespace WorldServer.World.Guild
                         for (byte y = 0; y < Info.guildvaultpurchased[i] && !freeslot; y++)
                         {
                             bool taken = false;
-                            foreach (KeyValuePair<ushort, GuildVaultItem> gvl in Info.Vaults[destVault - 1])
+                            foreach (KeyValuePair<ushort, guild_vault_item> gvl in Info.Vaults[destVault - 1])
                                 if (y == gvl.Key)
                                 {
                                     taken = true;
@@ -1964,7 +1964,7 @@ namespace WorldServer.World.Guild
                     return;
                 }
 
-                GuildVaultItem gv = new GuildVaultItem
+                guild_vault_item gv = new guild_vault_item
                 {
                     Counts = item.Count,
                     GuildId = Info.GuildId,
@@ -2007,7 +2007,7 @@ namespace WorldServer.World.Guild
 
             lock (Info.Vaults)
             {
-                GuildVaultItem gv;
+                guild_vault_item gv;
 
                 if (!Info.Vaults[sourceVault - 1].TryGetValue(sourceSlot, out gv))
                 {
@@ -2036,7 +2036,7 @@ namespace WorldServer.World.Guild
             if (!CanTakeFrom(plr, vault))
                 return;
 
-            GuildVaultItem gv;
+            guild_vault_item gv;
 
             lock (Info.Vaults)
             {
@@ -2049,7 +2049,7 @@ namespace WorldServer.World.Guild
         public void ReleaseVaultItemLock(Player plr, byte vault, byte slot)
         {
             LogGuildBug(plr);
-            GuildVaultItem gv;
+            guild_vault_item gv;
 
             lock (Info.Vaults)
             {
@@ -2195,10 +2195,10 @@ namespace WorldServer.World.Guild
         {
             lock (Info.Members)
             {
-                Guild_member player;
+                guild_members player;
                 byte officers = 0;
 
-                foreach (KeyValuePair<uint, Guild_member> gm in Info.Members)
+                foreach (KeyValuePair<uint, guild_members> gm in Info.Members)
                 {
                     if (gm.Value.AllianceOfficer)
                         officers++;
@@ -2222,7 +2222,7 @@ namespace WorldServer.World.Guild
 
         public void ADemote(Player Plr, string text)
         {
-            Guild_member player;
+            guild_members player;
             if (Info.Members.TryGetValue(CharMgr.GetCharacter(Player.AsCharacterName(text), true).CharacterId, out player))
             {
                 if (player.AllianceOfficer)
@@ -2300,7 +2300,7 @@ namespace WorldServer.World.Guild
         public void JoinGuild(Player plr)
         {
             LogGuildBug(plr);
-            Guild_member member = new Guild_member
+            guild_members member = new guild_members
             {
                 CharacterId = plr.Info.CharacterId,
                 GuildId = plr.GldInterface.Guild.Info.GuildId,
@@ -2318,7 +2318,7 @@ namespace WorldServer.World.Guild
             SendGuildInfo(plr);
         }
 
-        public void LeaveGuild(Guild_member member, bool kicked)
+        public void LeaveGuild(guild_members member, bool kicked)
         {
             Info.Members.Remove(member.CharacterId);
             CharMgr.Database.DeleteObject(member);
@@ -2399,7 +2399,7 @@ namespace WorldServer.World.Guild
             // Assign a new leader!
             else if (member.CharacterId == Info.LeaderId)
             {
-                Guild_member newLeader = Info.Members.Count > 1 ? Info.Members.Values.OrderByDescending(m => m.RankId).First() : null;
+                guild_members newLeader = Info.Members.Count > 1 ? Info.Members.Values.OrderByDescending(m => m.RankId).First() : null;
                 if (newLeader != null)
                 {
                     newLeader.RankId = 9;
@@ -2481,7 +2481,7 @@ namespace WorldServer.World.Guild
                 return;
 
             Info.Xp += xp;
-            Guild_Xp xpNext = GuildService.GetGuild_Xp((byte)(Info.Level + 1));
+            guild_xp xpNext = GuildService.GetGuild_Xp((byte)(Info.Level + 1));
 
             bool force = false;
             if (Info.Xp >= xpNext.Xp)
@@ -2532,7 +2532,7 @@ namespace WorldServer.World.Guild
 
         public void AddGuildLog(byte type, string text)
         {
-            Guild_log log = new Guild_log();
+            guild_logs log = new guild_logs();
             log.GuildId = Info.GuildId;
             log.Time = (uint)TCPManager.GetTimeStamp();
             log.Type = type;
@@ -2574,7 +2574,7 @@ namespace WorldServer.World.Guild
                 return;
             }
 
-            Guild_rank rank = Info.Ranks[rankId];
+            guild_ranks rank = Info.Ranks[rankId];
 
             if (rank == null)
             {
@@ -2586,7 +2586,7 @@ namespace WorldServer.World.Guild
                 rank.Enabled = true;
             else
             {
-                foreach (Guild_member guildPlr in Info.Members.Values)
+                foreach (guild_members guildPlr in Info.Members.Values)
                 {
                     if (guildPlr.RankId == rank.RankId)
                     {
@@ -2615,7 +2615,7 @@ namespace WorldServer.World.Guild
                 return;
             }
 
-            Guild_member member = Info.Members[characterId];
+            guild_members member = Info.Members[characterId];
 
             // Can only promote people who are 2 ranks below you
             if (member.RankId > Info.Members[plr.CharacterId].RankId - 2)
@@ -2645,7 +2645,7 @@ namespace WorldServer.World.Guild
                 return;
             }
 
-            Guild_member member = Info.Members[characterId];
+            guild_members member = Info.Members[characterId];
 
             // Can only demote people who are below you
             if (member.RankId >= Info.Members[plr.CharacterId].RankId)
@@ -2671,7 +2671,7 @@ namespace WorldServer.World.Guild
                 return;
             }
 
-            Character Char = CharMgr.GetCharacter(Player.AsCharacterName(name), false);
+            characters Char = CharMgr.GetCharacter(Player.AsCharacterName(name), false);
             uint characterId = Char?.CharacterId ?? 0;
             if (!Info.Members.ContainsKey(characterId))
             {
@@ -2679,7 +2679,7 @@ namespace WorldServer.World.Guild
                 return;
             }
 
-            Guild_member member = Info.Members[characterId];
+            guild_members member = Info.Members[characterId];
 
             // Can only kick people who are below you
             if (member.RankId >= Info.Members[plr.CharacterId].RankId)
@@ -2705,8 +2705,8 @@ namespace WorldServer.World.Guild
                 return;
             }
 
-            Guild_member member = Info.Members[characterId];
-            Guild_member us = Info.Members[plr.CharacterId];
+            guild_members member = Info.Members[characterId];
+            guild_members us = Info.Members[plr.CharacterId];
             // Double check that we are the leader
             if (us.RankId != 9 && Info.LeaderId != us.CharacterId)
             {
@@ -2734,7 +2734,7 @@ namespace WorldServer.World.Guild
         {
             lock (_leaderChange)
             {
-                Character chara = CharMgr.GetCharacter(newLeaderName, false);
+                characters chara = CharMgr.GetCharacter(newLeaderName, false);
 
                 if (chara == null)
                 {
@@ -2742,12 +2742,12 @@ namespace WorldServer.World.Guild
                     return;
                 }
 
-                Guild_member newLeader;
+                guild_members newLeader;
 
                 // Forced leader assignment, so we will add the character to this guild if required.
                 if (!Info.Members.ContainsKey(chara.CharacterId))
                 {
-                    int isinGuild = CharMgr.Database.GetObjectCount<Guild_member>($"CharacterId={chara.CharacterId}");
+                    int isinGuild = CharMgr.Database.GetObjectCount<guild_members>($"CharacterId={chara.CharacterId}");
 
                     if (isinGuild > 0)
                     {
@@ -2756,7 +2756,7 @@ namespace WorldServer.World.Guild
                     }
 
                     // Add the player directly to the guild
-                    newLeader = new Guild_member
+                    newLeader = new guild_members
                     {
                         CharacterId = chara.CharacterId,
                         GuildId = Info.GuildId,
@@ -2784,7 +2784,7 @@ namespace WorldServer.World.Guild
                 newLeader = Info.Members[chara.CharacterId];
 
                 // Demote any existing guild leaders (hooray for bugs)
-                foreach (Guild_member member in Info.Members.Values)
+                foreach (guild_members member in Info.Members.Values)
                 {
                     if (member.RankId == 9)
                     {
@@ -2854,7 +2854,7 @@ namespace WorldServer.World.Guild
                 return;
             }
 
-            Guild_member member = Info.Members[characterId];
+            guild_members member = Info.Members[characterId];
 
             member.PublicNote = note;
 
@@ -2878,7 +2878,7 @@ namespace WorldServer.World.Guild
                 return;
             }
 
-            Guild_member member = Info.Members[characterId];
+            guild_members member = Info.Members[characterId];
 
             member.OfficerNote = note;
 
@@ -2903,7 +2903,7 @@ namespace WorldServer.World.Guild
                 return;
             }
 
-            Guild_member member = Info.Members[characterId];
+            guild_members member = Info.Members[characterId];
 
             member.GuildRecruiter = !member.GuildRecruiter;
 
@@ -2921,7 +2921,7 @@ namespace WorldServer.World.Guild
                 return;
             }
 
-            Guild_rank rank = Info.Ranks[rankId];
+            guild_ranks rank = Info.Ranks[rankId];
 
             if (rank == null)
             {
@@ -2990,7 +2990,7 @@ namespace WorldServer.World.Guild
             if (int.Parse(value) < 0 || int.Parse(value) > 100)
                 return;
 
-            Guild_member member = Info.Members[plr.CharacterId];
+            guild_members member = Info.Members[plr.CharacterId];
             member.Tithe = (byte)int.Parse(value);
             CharMgr.Database.SaveObject(member);
 
@@ -3040,7 +3040,7 @@ namespace WorldServer.World.Guild
                 return;
             }
 
-            Guild_member member = Info.Members[characterId];
+            guild_members member = Info.Members[characterId];
 
             member.StandardBearer = !member.StandardBearer;
 
@@ -3070,7 +3070,7 @@ namespace WorldServer.World.Guild
 
             lock (Info.Members)
             {
-                foreach (KeyValuePair<uint, Guild_member> gm in Info.Members)
+                foreach (KeyValuePair<uint, guild_members> gm in Info.Members)
                 {
                     if (gm.Value.StandardBearer)
                         beares++;
@@ -3082,7 +3082,7 @@ namespace WorldServer.World.Guild
                     return;
                 }
 
-                Guild_member member = Info.Members[characterId];
+                guild_members member = Info.Members[characterId];
 
                 member.StandardBearer = !member.StandardBearer;
 

@@ -12,7 +12,7 @@ namespace WorldServer.World.Map
         public RegionMgr Region { get; private set; }
         public ushort X { get; private set; }
         public ushort Y { get; private set; }
-        public CellSpawns Spawns { get; private set; }
+        public cell_spawns Spawns { get; private set; }
         public bool Active { get; private set; }
         public bool Loaded { get; private set; }
 
@@ -69,16 +69,16 @@ namespace WorldServer.World.Map
 
             Log.Debug(ToString(), "Loading... ");
 
-            foreach (Creature_spawn spawn in Spawns.CreatureSpawns)
+            foreach (creature_spawns spawn in Spawns.CreatureSpawns)
                 Region.CreateCreature(spawn);
 
-            foreach (GameObject_spawn spawn in Spawns.GameObjectSpawns)
+            foreach (gameobject_spawns spawn in Spawns.GameObjectSpawns)
                 Region.CreateGameObject(spawn);
 
-            foreach (Chapter_Info spawn in Spawns.ChapterSpawns)
+            foreach (chapter_infos spawn in Spawns.ChapterSpawns)
                 Region.CreateChapter(spawn);
 
-            foreach (PQuest_Info quest in Spawns.PublicQuests)
+            foreach (pquest_info quest in Spawns.PublicQuests)
                 Region.CreatePQuest(quest);
         }
 

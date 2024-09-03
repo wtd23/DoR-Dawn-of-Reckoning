@@ -1348,8 +1348,6 @@
         <member name="P:FakeItEasy.Configuration.ArgumentCollection.ArgumentNames">
             <summary>
               Gets the names of the arguments in the list.
-              It's possible to declare methods with anonymous parameters (for example, in F#),
-              in which case the argument names will be <c>null</c>.
             </summary>
         </member>
         <member name="P:FakeItEasy.Configuration.ArgumentCollection.Item(System.Int32)">

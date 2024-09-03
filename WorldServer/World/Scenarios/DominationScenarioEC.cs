@@ -60,7 +60,7 @@ namespace WorldServer.World.Scenarios
             new Point3D(15945,52568,25567)
         };
 
-        public DominationScenarioEC(Scenario_Info info, int tier)
+        public DominationScenarioEC(scenario_infos info, int tier)
             : base(info, tier)
         {
         }
@@ -88,8 +88,8 @@ namespace WorldServer.World.Scenarios
         {
             var players = Region.WorldQuery<Player>(new Point3D((int)_portals[2].Item1, (int)_portals[2].Item2, (int)_portals[2].Item3), 400);
 
-            var orderCount = players.Count(e => e.Realm == Realms.REALMS_REALM_ORDER && !e.IsDead);
-            var destroCount = players.Count(e => e.Realm == Realms.REALMS_REALM_DESTRUCTION && !e.IsDead);
+            var orderCount = players.Count(e => e.Realm == SetRealms.REALMS_REALM_ORDER && !e.IsDead);
+            var destroCount = players.Count(e => e.Realm == SetRealms.REALMS_REALM_DESTRUCTION && !e.IsDead);
 
             if (orderCount > destroCount)
                 GivePoints(1, (uint)orderCount * 2);

@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.The_Lost_Vale
     {
         #region Constructors
 
-        public SimpleLargtheDevourer(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleLargtheDevourer(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

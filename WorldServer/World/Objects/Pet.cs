@@ -34,7 +34,7 @@ namespace WorldServer.World.Objects
         public readonly ushort PetId;
         public Player Owner { get; }
 
-        public bool IsStationary { get; }
+        public new bool IsStationary { get; }
 
         private bool _ownerUILinked;
 
@@ -54,8 +54,12 @@ namespace WorldServer.World.Objects
 
         public bool IsVanity = false;
 
-        public Pet(ushort petId, Creature_spawn spawn, Player owner, byte aiMode, bool isStationary, bool isCombative) : base(spawn)
+        public Pet(ushort petId, creature_spawns spawn, Player owner, byte aiMode, bool isStationary, bool isCombative) : base(spawn)
         {
+            if (isStationary == true)
+            {
+                CanWalk = !isStationary;
+            }
             PetId = petId;
             Owner = owner;
             IsStationary = isStationary;
@@ -76,7 +80,7 @@ namespace WorldServer.World.Objects
                 case 5: AiInterface.SetBrain(new AggressiveBrain(this)); break;
             }
             Realm = owner.Realm;
-            Faction = (byte)(owner.Realm == Realms.REALMS_REALM_DESTRUCTION ? 8 : 6);
+            Faction = (byte)(owner.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 8 : 6);
 
             Owner.SendStats();
 
@@ -126,7 +130,7 @@ namespace WorldServer.World.Objects
             switch (Spawn.Proto.Model1)
             {
                 // White Lion
-                // War Lions
+                // War Lion
                 case 132:
                 case 133:
                 case 134:
@@ -136,18 +140,6 @@ namespace WorldServer.World.Objects
                     itemWoundsMod = 1f;
                     _weaponDamageContribution = WeaponDamageContribution.MainHand;
                     break;
-
-                // Beastmaster
-                case 1156: // War Manticore
-                case 1086: // Harpy
-                case 1142: // Giant Scorpion
-                case 1272: // Hydra
-                    StsInterface.Load(CharMgr.GetCharacterInfoStats((byte)CareerLine.CAREERLINE_WAR_MANTICORE, Math.Min(Level, (byte)40)));
-                    woundsMod = 1f;
-                    itemWoundsMod = 1f;
-                    _weaponDamageContribution = WeaponDamageContribution.MainHand;
-                    break;
-
                 // Squig
                 case 136:
                     StsInterface.Load(CharMgr.GetCharacterInfoStats((byte)CareerLine.CAREERLINE_SQUIG, Math.Min(Level, (byte)40)));
@@ -279,9 +271,7 @@ namespace WorldServer.World.Objects
                 return false;
             }
 
-            Unit attacker = obj as Unit;
-
-            if (attacker == null)
+            if (!(obj is Unit attacker))
             {
                 Log.Error("Pet", "Object is NULL in Attack()");
                 return false;
@@ -570,8 +560,7 @@ namespace WorldServer.World.Objects
             if (!CbtInterface.IsAttacking && Owner != null
                 && _ownerUILinked && !IsStationary && !death)
             {
-                IPetCareerInterface petCareer = Owner.CrrInterface as IPetCareerInterface;
-                if (petCareer != null)
+                if (Owner.CrrInterface is IPetCareerInterface petCareer)
                     petCareer.SummonPet(PetId);
             }
             if (!_ownerUILinked || Owner == null)

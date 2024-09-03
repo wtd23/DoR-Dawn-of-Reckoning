@@ -12,12 +12,12 @@ namespace WorldServer.World.Interfaces
 {
     public class TokInterface : BaseInterface
     {
-        private readonly Dictionary<ushort, Character_tok> _tokUnlocks = new Dictionary<ushort, Character_tok>();
-        private readonly Dictionary<ushort, Character_tok_kills> _tokKillCount = new Dictionary<ushort, Character_tok_kills>();
+        private readonly Dictionary<ushort, characters_toks> _tokUnlocks = new Dictionary<ushort, characters_toks>();
+        private readonly Dictionary<ushort, characters_toks_kills> _tokKillCount = new Dictionary<ushort, characters_toks_kills>();
 
         private bool _loaded;
 
-        public void Load(List<Character_tok> toks, List<Character_tok_kills> toksKills)
+        public void Load(List<characters_toks> toks, List<characters_toks_kills> toksKills)
         {
             if (toks != null)
             {
@@ -27,7 +27,7 @@ namespace WorldServer.World.Interfaces
                     _tokUnlocks.Clear();
                 }
 
-                foreach (Character_tok tok in toks)
+                foreach (characters_toks tok in toks)
                 {
                     if (!_tokUnlocks.ContainsKey(tok.TokEntry))
                         _tokUnlocks.Add(tok.TokEntry, tok);
@@ -42,23 +42,23 @@ namespace WorldServer.World.Interfaces
                     toksKills.Clear();
                 }
 
-                foreach (Character_tok_kills tok in toksKills)
+                foreach (characters_toks_kills tok in toksKills)
                 {
                     if (!_tokKillCount.ContainsKey(tok.NPCEntry))
                         _tokKillCount.Add(tok.NPCEntry, tok);
                 }
             }
 
-            Character_tok_kills kills;
+            characters_toks_kills kills;
             if (!_tokKillCount.TryGetValue(495, out kills))
             {
                 uint totalcount = 0;
 
-                foreach (KeyValuePair<ushort, Character_tok_kills> k in _tokKillCount)
+                foreach (KeyValuePair<ushort, characters_toks_kills> k in _tokKillCount)
                 {
                     totalcount += k.Value.Count;
                 }
-                kills = new Character_tok_kills
+                kills = new characters_toks_kills
                 {
                     NPCEntry = 495,
                     CharacterId = GetPlayer().CharacterId,
@@ -76,7 +76,7 @@ namespace WorldServer.World.Interfaces
 
         public override void Save()
         {
-            foreach (KeyValuePair<ushort, Character_tok> Kp in _tokUnlocks)
+            foreach (KeyValuePair<ushort, characters_toks> Kp in _tokUnlocks)
                 CharMgr.Database.SaveObject(Kp.Value);
         }
 
@@ -111,7 +111,7 @@ namespace WorldServer.World.Interfaces
             }
         }
 
-        public void AddTok(Tok_Info Info)
+        public void AddTok(tok_infos Info)
         {
             if (!_loaded)
             {
@@ -135,7 +135,7 @@ namespace WorldServer.World.Interfaces
                 return;
             }
 
-            Tok_Info Info = TokService.GetTok(Entry);
+            tok_infos Info = TokService.GetTok(Entry);
 
             if (Info == null)
                 return;
@@ -145,7 +145,7 @@ namespace WorldServer.World.Interfaces
 
             SendTok(Entry, true);
 
-            Character_tok Tok = new Character_tok
+            characters_toks Tok = new characters_toks
             {
                 TokEntry = Entry,
                 CharacterId = GetPlayer().CharacterId,
@@ -160,18 +160,18 @@ namespace WorldServer.World.Interfaces
             if (itemEquipedToK)
             {
                 // Selects item we equiped from DB
-                Item_Info tokItemUnlock2 = WorldMgr.Database.SelectObject<Item_Info>("career=" + GetPlayer().Info.CareerFlags + " AND TokUnlock=" + Entry);
+                item_infos tokItemUnlock2 = WorldMgr.Database.SelectObject<item_infos>("career=" + GetPlayer().Info.CareerFlags + " AND TokUnlock=" + Entry);
 
                 if (tokItemUnlock2 != null && tokItemUnlock2.TokUnlock != 0 && tokItemUnlock2.TokUnlock2 != 0)
                 {
                     // Selects secondary ToK we want to setup if we completed full set
-                    IList<Item_Info> tokItems = WorldMgr.Database.SelectObjects<Item_Info>("career=" + GetPlayer().Info.CareerFlags + " AND TokUnlock2 = " + tokItemUnlock2.TokUnlock2);
+                    IList<item_infos> tokItems = WorldMgr.Database.SelectObjects<item_infos>("career=" + GetPlayer().Info.CareerFlags + " AND TokUnlock2 = " + tokItemUnlock2.TokUnlock2);
                     int count = tokItems.Count();
 
                     // If there is more than 0 items with complete set unlock we proceed
                     if (count > 0)
                     {
-                        foreach (Item_Info tokItem in tokItems)
+                        foreach (item_infos tokItem in tokItems)
                         {
                             if (HasTok(tokItem.TokUnlock))
                             {
@@ -184,14 +184,14 @@ namespace WorldServer.World.Interfaces
                             // Tok is send to player
                             SendTok((ushort)tokItemUnlock2.TokUnlock2, true);
 
-                            Character_tok Tok2 = new Character_tok
+                            characters_toks Tok2 = new characters_toks
                             {
                                 TokEntry = (ushort)tokItemUnlock2.TokUnlock2,
                                 CharacterId = GetPlayer().CharacterId,
                                 Count = 1
                             };
 
-                            Tok_Info InfoSetTok = TokService.GetTok((ushort)tokItemUnlock2.TokUnlock2);
+                            tok_infos InfoSetTok = TokService.GetTok((ushort)tokItemUnlock2.TokUnlock2);
 
                             // ToK is added to the book
                             _tokUnlocks.Add((ushort)tokItemUnlock2.TokUnlock2, Tok2);
@@ -200,14 +200,14 @@ namespace WorldServer.World.Interfaces
                             // Adding reward from final ToK - Title
                             SendTok((ushort)InfoSetTok.Rewards, true);
 
-                            Character_tok Tok2Title = new Character_tok
+                            characters_toks Tok2Title = new characters_toks
                             {
                                 TokEntry = (ushort)InfoSetTok.Rewards,
                                 CharacterId = GetPlayer().CharacterId,
                                 Count = 1
                             };
 
-                            Tok_Info TokInfoTitle = TokService.GetTok((ushort)InfoSetTok.Rewards);
+                            tok_infos TokInfoTitle = TokService.GetTok((ushort)InfoSetTok.Rewards);
 
                             _tokUnlocks.Add((ushort)InfoSetTok.Rewards, Tok2Title);
                             GetPlayer().AddXp(TokInfoTitle.Xp, false, false);
@@ -280,7 +280,7 @@ namespace WorldServer.World.Interfaces
         {
             // total kills  01 EF 00 00 C5 17
             Out.WriteUInt32((UInt32)_tokKillCount.Count);
-            foreach (KeyValuePair<ushort, Character_tok_kills> entry in _tokKillCount)
+            foreach (KeyValuePair<ushort, characters_toks_kills> entry in _tokKillCount)
             {
                 Out.WriteUInt16(entry.Key);
                 Out.WriteUInt32(entry.Value.Count);
@@ -299,11 +299,11 @@ namespace WorldServer.World.Interfaces
 
         public void AddKill(ushort type)
         {
-            Tok_Bestary TB = TokService.GetTokBestary(type);
+            tok_bestiary TB = TokService.GetTokBestary(type);
             if (TB == null)
                 return;
 
-            Character_tok_kills kills;
+            characters_toks_kills kills;
             if (_tokKillCount.TryGetValue(TB.Bestary_ID, out kills))
             {
                 kills.Count++;
@@ -312,7 +312,7 @@ namespace WorldServer.World.Interfaces
             }
             else
             {
-                kills = new Character_tok_kills
+                kills = new characters_toks_kills
                 {
                     NPCEntry = TB.Bestary_ID,
                     CharacterId = GetPlayer().CharacterId,
@@ -369,7 +369,7 @@ namespace WorldServer.World.Interfaces
 
         public void CheckTokKills(ushort type, uint count)
         {
-            Tok_Bestary TB = TokService.GetTokBestary(type);
+            tok_bestiary TB = TokService.GetTokBestary(type);
             if (TB == null)
                 return;
 
@@ -470,7 +470,7 @@ namespace WorldServer.World.Interfaces
 
         private void FixTokKills(ushort Entry)
         {
-            Tok_Info Info = TokService.GetTok(Entry);
+            tok_infos Info = TokService.GetTok(Entry);
 
             if (Info == null)
                 return;
@@ -478,7 +478,7 @@ namespace WorldServer.World.Interfaces
             if (Info.Realm != 0 && Info.Realm != _Owner.GetPlayer().Info.Realm)
                 return;
 
-            Character_tok Tok = new Character_tok
+            characters_toks Tok = new characters_toks
             {
                 TokEntry = Entry,
                 CharacterId = GetPlayer().CharacterId,
@@ -505,7 +505,7 @@ namespace WorldServer.World.Interfaces
         public void FixTokItems()
         {
             //IList<Item_Info> tokItems = WorldMgr.Database.SelectObjects<Item_Info>("career=" + GetPlayer().Info.CareerFlags + " AND TokUnlock2 = " + item.Info.TokUnlock2);
-            List<Item_Info> tokItems = new List<Item_Info>();
+            List<item_infos> tokItems = new List<item_infos>();
 
             for (ushort i = 10; i < 35; i++)
             {
@@ -513,23 +513,23 @@ namespace WorldServer.World.Interfaces
                 {
                     Item item = GetPlayer().ItmInterface.GetItemInSlot(i);
                     if (item != null)
-                        tokItems.Add(WorldMgr.Database.SelectObject<Item_Info>("entry =" + item.Info.Entry));
+                        tokItems.Add(WorldMgr.Database.SelectObject<item_infos>("entry =" + item.Info.Entry));
                 }
             }
 
-            foreach (Item_Info item in tokItems)
+            foreach (item_infos item in tokItems)
             {
                 if (item != null && item.TokUnlock2 != 0 && !HasTok(item.TokUnlock2))
                 {
-                    IList<Item_Info> currentSet = WorldMgr.Database.SelectObjects<Item_Info>("career=" + GetPlayer().Info.CareerFlags + " AND TokUnlock2 = " + item.TokUnlock2);
+                    IList<item_infos> currentSet = WorldMgr.Database.SelectObjects<item_infos>("career=" + GetPlayer().Info.CareerFlags + " AND TokUnlock2 = " + item.TokUnlock2);
 
                     int count = currentSet.Count();
 
-                    foreach (Item_Info itm in currentSet)
+                    foreach (item_infos itm in currentSet)
                     {
                         if (count > 0)
                         {
-                            foreach (Item_Info setItem in currentSet)
+                            foreach (item_infos setItem in currentSet)
                             {
                                 if (HasTok(setItem.TokUnlock))
                                     count--;
@@ -541,14 +541,14 @@ namespace WorldServer.World.Interfaces
                             // Tok is send to player
                             SendTok((ushort)item.TokUnlock2, true);
 
-                            Character_tok Tok2 = new Character_tok
+                            characters_toks Tok2 = new characters_toks
                             {
                                 TokEntry = (ushort)item.TokUnlock2,
                                 CharacterId = GetPlayer().CharacterId,
                                 Count = 1
                             };
 
-                            Tok_Info InfoSetTok = TokService.GetTok((ushort)item.TokUnlock2);
+                            tok_infos InfoSetTok = TokService.GetTok((ushort)item.TokUnlock2);
 
                             // ToK is added to the book
                             _tokUnlocks.Add((ushort)item.TokUnlock2, Tok2);
@@ -557,14 +557,14 @@ namespace WorldServer.World.Interfaces
                             // Adding reward from final ToK - Title
                             SendTok((ushort)InfoSetTok.Rewards, true);
 
-                            Character_tok Tok2Title = new Character_tok
+                            characters_toks Tok2Title = new characters_toks
                             {
                                 TokEntry = (ushort)InfoSetTok.Rewards,
                                 CharacterId = GetPlayer().CharacterId,
                                 Count = 1
                             };
 
-                            Tok_Info TokInfoTitle = TokService.GetTok((ushort)InfoSetTok.Rewards);
+                            tok_infos TokInfoTitle = TokService.GetTok((ushort)InfoSetTok.Rewards);
 
                             _tokUnlocks.Add((ushort)InfoSetTok.Rewards, Tok2Title);
                             GetPlayer().AddXp(TokInfoTitle.Xp, false, false);

@@ -392,8 +392,8 @@ namespace WorldServer.World.Objects
             {
                 _health = value;
                 StateDirty = true;
-                if (this is Player)
-                    ((Player)this).SendHealth();
+                if (this is Player player)
+                    player.SendHealth();
             }
         }
 
@@ -1164,7 +1164,7 @@ namespace WorldServer.World.Objects
         public byte Faction; // Faction Flag
         public byte FactionId; // FactionFlag/8
         public bool Aggressive;
-        public Realms Realm { get; set; } = Realms.REALMS_REALM_NEUTRAL;
+        public SetRealms Realm { get; set; } = SetRealms.REALMS_REALM_NEUTRAL;
 
         public void SetFaction(byte newFaction)
         {
@@ -1176,11 +1176,11 @@ namespace WorldServer.World.Objects
             Rank = (byte)(Faction / 2);
 
             if (FactionId >= 8 && FactionId <= 15)
-                Realm = Realms.REALMS_REALM_ORDER;
+                Realm = SetRealms.REALMS_REALM_ORDER;
             else if (FactionId >= 16 && FactionId <= 23)
-                Realm = Realms.REALMS_REALM_DESTRUCTION;
+                Realm = SetRealms.REALMS_REALM_DESTRUCTION;
             else
-                Realm = Realms.REALMS_REALM_NEUTRAL;
+                Realm = SetRealms.REALMS_REALM_NEUTRAL;
 
             Faction = newFaction;
 
@@ -1271,6 +1271,11 @@ namespace WorldServer.World.Objects
         public virtual void Mount(ushort mountID)
         {
             MountID = mountID;
+            SendMount();
+        }
+
+        public void HaveMount()
+        {
             SendMount();
         }
 
@@ -1439,7 +1444,7 @@ namespace WorldServer.World.Objects
             return false;
         }
 
-        public virtual void ApplyKnockback(Unit caster, AbilityKnockbackInfo kbInfo)
+        public virtual void ApplyKnockback(Unit caster, ability_knockback_info kbInfo)
         {
         }
 

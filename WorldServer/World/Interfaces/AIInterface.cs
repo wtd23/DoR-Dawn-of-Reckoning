@@ -432,7 +432,7 @@ namespace WorldServer.World.Interfaces
 
             if (CombatInterface.IsEnemy(GetUnit(), unit))
             {
-                if ((unit.Realm == Realms.REALMS_REALM_NEUTRAL && !unit.Aggressive) || (!unit.IsPlayer() && !unit.Aggressive) || (!GetUnit().IsPlayer() && !GetUnit().Aggressive) || (unit is Creature && ((Creature)unit).Entry == 47) /*|| (unit is Creature && !unit.IsPlayer() && !unit.IsGameObject() && IsNeutralFaction(unit as Creature))*/)
+                if ((unit.Realm == SetRealms.REALMS_REALM_NEUTRAL && !unit.Aggressive) || (!unit.IsPlayer() && !unit.Aggressive) || (!GetUnit().IsPlayer() && !GetUnit().Aggressive) || (unit is Creature && ((Creature)unit).Entry == 47) /*|| (unit is Creature && !unit.IsPlayer() && !unit.IsGameObject() && IsNeutralFaction(unit as Creature))*/)
                     return true;
 
                 lock (RangedEnemies)
@@ -546,9 +546,9 @@ namespace WorldServer.World.Interfaces
 
         #region Waypoints
 
-        private List<Waypoint> _Waypoints = new List<Waypoint>();
+        private List<waypoints> _Waypoints = new List<waypoints>();
 
-        public List<Waypoint> Waypoints
+        public List<waypoints> Waypoints
         {
             get { return _Waypoints; }
             set
@@ -557,8 +557,8 @@ namespace WorldServer.World.Interfaces
             }
         }
 
-        public Waypoint CurrentWaypoint;
-        public byte CurrentWaypointType = Waypoint.Loop;
+        public waypoints CurrentWaypoint;
+        public byte CurrentWaypointType = waypoints.Loop;
         public bool IsWalkingBack; // False : Running on waypooints Start to End
         public int CurrentWaypointID = -1;
         public long NextAllowedMovementTime;
@@ -568,7 +568,7 @@ namespace WorldServer.World.Interfaces
         // Waypoints
         private static readonly object WaypointsTableLock = new object();
 
-        public void AddWaypoint(Waypoint AddWp)
+        public void AddWaypoint(waypoints AddWp)
         {
             //System.Diagnostics.Trace.Assert(_Owner.Name != "Heinz Lutzen");
 
@@ -577,7 +577,7 @@ namespace WorldServer.World.Interfaces
                 // If there are no waypoints - create a waypoint where the target is
                 if (Waypoints.Count == 0)
                 {
-                    Waypoint StartWp = new Waypoint
+                    waypoints StartWp = new waypoints
                     {
                         CreatureSpawnGUID = _Owner.GetCreature().Spawn.Guid,
                         GameObjectSpawnGUID = _Owner.Oid,
@@ -647,12 +647,12 @@ namespace WorldServer.World.Interfaces
             //return fullRange;
         }
 
-        public void SaveWaypoint(Waypoint SaveWp)
+        public void SaveWaypoint(waypoints SaveWp)
         {
             WaypointService.DatabaseSaveWaypoint(SaveWp);
         }
 
-        public void RemoveWaypoint(Waypoint RemoveWp)
+        public void RemoveWaypoint(waypoints RemoveWp)
         {
             switch (Waypoints.Count)
             {
@@ -663,7 +663,7 @@ namespace WorldServer.World.Interfaces
                 case 2:
                     lock (WaypointsTableLock)
                     {
-                        foreach (Waypoint Wp in Waypoints)
+                        foreach (waypoints Wp in Waypoints)
                         {
                             WaypointService.DatabaseDeleteWaypoint(Wp);
                         }
@@ -675,7 +675,7 @@ namespace WorldServer.World.Interfaces
                     lock (WaypointsTableLock)
                     {
                         int Index = -1;
-                        foreach (Waypoint Wp in Waypoints)
+                        foreach (waypoints Wp in Waypoints)
                         {
                             if (Wp.GUID == RemoveWp.GUID)
                             {
@@ -711,7 +711,7 @@ namespace WorldServer.World.Interfaces
             RemoveWaypoint(GetWaypoint(WaypointGUID));
         }
 
-        public void RandomizeWaypoint(Waypoint RandomWp)
+        public void RandomizeWaypoint(waypoints RandomWp)
         {
             if (_Owner.GetCreature() != null)
             {
@@ -724,9 +724,9 @@ namespace WorldServer.World.Interfaces
             }
         }
 
-        public Waypoint GetWaypoint(int WaypointGUID)
+        public waypoints GetWaypoint(int WaypointGUID)
         {
-            foreach (Waypoint Wp in Waypoints)
+            foreach (waypoints Wp in Waypoints)
             {
                 if (Wp.GUID == WaypointGUID)
                 {
@@ -789,7 +789,7 @@ namespace WorldServer.World.Interfaces
 
             if (CurrentWaypointID < 0)
             {
-                if (CurrentWaypointType == Waypoint.Loop)
+                if (CurrentWaypointType == waypoints.Loop)
                 {
                     IsWalkingBack = false;
                     CurrentWaypointID = 0;
@@ -797,7 +797,7 @@ namespace WorldServer.World.Interfaces
             }
             else if (CurrentWaypointID >= Waypoints.Count)
             {
-                if (CurrentWaypointType == Waypoint.Loop)
+                if (CurrentWaypointType == waypoints.Loop)
                 {
                     IsWalkingBack = true;
                     CurrentWaypointID = Waypoints.Count - 2;

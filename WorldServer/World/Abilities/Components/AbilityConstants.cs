@@ -10,7 +10,7 @@ namespace WorldServer.World.Abilities.Components
         {
         }
 
-        public AbilityConstants(DBAbilityInfo dbObj)
+        public AbilityConstants(abilities dbObj)
         {
             Entry = dbObj.Entry;
             CareerLine = dbObj.CareerLine;
@@ -40,11 +40,11 @@ namespace WorldServer.World.Abilities.Components
             AIRange = dbObj.AIRange;
         }
 
-        public static List<AbilityConstants> Convert(List<DBAbilityInfo> dbObjs)
+        public static List<AbilityConstants> Convert(List<abilities> dbObjs)
         {
             List<AbilityConstants> objects = new List<AbilityConstants>();
 
-            foreach (DBAbilityInfo dbObj in dbObjs)
+            foreach (abilities dbObj in dbObjs)
                 objects.Add(new AbilityConstants(dbObj));
 
             return objects;

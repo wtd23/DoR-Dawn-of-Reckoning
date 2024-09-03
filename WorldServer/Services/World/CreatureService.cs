@@ -16,10 +16,10 @@ namespace WorldServer.Services.World
     {
         private static Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         public static Dictionary<uint, Creature_proto> CreatureProtos;
-        public static IList<BossSpawn> BossSpawns;
-        public static IList<BossSpawnAbilities> BossSpawnAbilities;
-        public static IList<BossSpawnPhase> BossSpawnPhases;
-        public static List<CreatureSmartAbilities> CreatureSmartAbilities;
+        public static IList<boss_spawn> BossSpawns;
+        public static IList<boss_spawn_abilities> BossSpawnAbilities;
+        public static IList<boss_spawn_phases> BossSpawnPhases;
+        public static List<creature_smart_abilities> CreatureSmartAbilities;
 
         #region Creature Proto
 
@@ -38,7 +38,7 @@ namespace WorldServer.Services.World
                     proto.Model1 = proto.Model2 = 1;
 
                 if (proto.CreatureType == 0 && proto.CreatureSubType == 0)
-                    proto.SetCreatureTypesAndSubTypes();
+                    proto.CreatureType = proto.CreatureSubType = 0;
 
                 if (proto.MinLevel > proto.MaxLevel)
                     proto.MinLevel = proto.MaxLevel;
@@ -253,7 +253,7 @@ namespace WorldServer.Services.World
 
         #region Creature spawn
 
-        public static Dictionary<uint, Creature_spawn> CreatureSpawns;
+        public static Dictionary<uint, creature_spawns> CreatureSpawns;
         public static int MaxCreatureGUID;
 
         public static int GenerateCreatureSpawnGUID()
@@ -266,14 +266,14 @@ namespace WorldServer.Services.World
         {
             Log.Debug("WorldMgr", "Loading Boss_Spawns...");
 
-            BossSpawns = Database.SelectAllObjects<BossSpawn>();
+            BossSpawns = Database.SelectAllObjects<boss_spawn>();
             Log.Success("LoadBossSpawns", "Loaded " + BossSpawns.Count + " BossSpawns");
 
-            BossSpawnAbilities = Database.SelectAllObjects<BossSpawnAbilities>();
-            Log.Success("LoadBossSpawns", "Loaded " + BossSpawnAbilities.Count + " BossSpawnAbilities");
+            BossSpawnAbilities = Database.SelectAllObjects<boss_spawn_abilities>();
+            Log.Success("LoadBossSpawns", "Loaded " + BossSpawnAbilities.Count + " Boss_spawn_abilities");
 
-            BossSpawnPhases = Database.SelectAllObjects<BossSpawnPhase>();
-            Log.Success("LoadBossSpawnPhases", "Loaded " + BossSpawnPhases.Count + " BossSpawnPhase");
+            BossSpawnPhases = Database.SelectAllObjects<boss_spawn_phases>();
+            Log.Success("LoadBossSpawnPhases", "Loaded " + BossSpawnPhases.Count + " Boss_phases");
         }
 
         [LoadingFunction(true)]
@@ -283,9 +283,9 @@ namespace WorldServer.Services.World
 
             //Added parameter Enabled = 1, this will allow to disable spawn without removing it from DB.
             //Enabled = 1 means that creature will spawn, Enabled = 0 means it will not spawn.
-            CreatureSpawns = Database.MapAllObjects<uint, Creature_spawn>("Guid", "Enabled = 1", 100000);
+            CreatureSpawns = Database.MapAllObjects<uint, creature_spawns>("Guid", "Enabled = 1", 100000);
 
-            foreach (Creature_spawn Spawn in CreatureSpawns.Values)
+            foreach (creature_spawns Spawn in CreatureSpawns.Values)
             {
                 if (Spawn.Guid > MaxCreatureGUID)
                     MaxCreatureGUID = (int)Spawn.Guid;
@@ -293,30 +293,30 @@ namespace WorldServer.Services.World
 
             Log.Success("LoadCreatureSpawns", "Loaded " + CreatureSpawns.Count + " Creature_Spawns");
 
-            CreatureSmartAbilities = (List<CreatureSmartAbilities>)Database.SelectAllObjects<CreatureSmartAbilities>();
-            Log.Success("CreatureSmartAbilities", "Loaded " + CreatureSmartAbilities.Count + " CreatureSmartAbilities");
+            CreatureSmartAbilities = (List<creature_smart_abilities>)Database.SelectAllObjects<creature_smart_abilities>();
+            Log.Success("Creature_smart_abilities", "Loaded " + CreatureSmartAbilities.Count + " Creature_smart_abilities");
         }
 
         #endregion Creature spawn
 
         #region CreatureText
 
-        private static Dictionary<uint, List<Creature_text>> _creatureTexts = new Dictionary<uint, List<Creature_text>>();
+        private static Dictionary<uint, List<creature_texts>> _creatureTexts = new Dictionary<uint, List<creature_texts>>();
 
         [LoadingFunction(true)]
         public static void LoadCreatureTexts()
         {
-            _creatureTexts = new Dictionary<uint, List<Creature_text>>();
+            _creatureTexts = new Dictionary<uint, List<creature_texts>>();
 
             Log.Debug("WorldMgr", "Loading Creature_texts...");
 
-            IList<Creature_text> texts = Database.SelectAllObjects<Creature_text>();
+            IList<creature_texts> texts = Database.SelectAllObjects<creature_texts>();
 
             int count = 0;
-            foreach (Creature_text text in texts)
+            foreach (creature_texts text in texts)
             {
                 if (!_creatureTexts.ContainsKey(text.Entry))
-                    _creatureTexts.Add(text.Entry, new List<Creature_text>());
+                    _creatureTexts.Add(text.Entry, new List<creature_texts>());
 
                 _creatureTexts[text.Entry].Add(text);
                 ++count;
@@ -327,7 +327,7 @@ namespace WorldServer.Services.World
 
         public static void AddCreatureText(uint protoEntry, string text)
         {
-            Creature_text creatureText = new Creature_text
+            creature_texts creatureText = new creature_texts
             {
                 Text = text,
                 Entry = protoEntry
@@ -336,7 +336,7 @@ namespace WorldServer.Services.World
             Database.AddObject(creatureText);
 
             if (!_creatureTexts.ContainsKey(protoEntry))
-                _creatureTexts.Add(protoEntry, new List<Creature_text>());
+                _creatureTexts.Add(protoEntry, new List<creature_texts>());
             _creatureTexts[protoEntry].Add(creatureText);
         }
 
@@ -357,21 +357,21 @@ namespace WorldServer.Services.World
 
         #region CreatureItems
 
-        public static Dictionary<uint, List<Creature_item>> _CreatureItems;
+        public static Dictionary<uint, List<creature_items>> _CreatureItems;
 
         [LoadingFunction(true)]
         public static void LoadCreatureItems()
         {
             Log.Debug("WorldMgr", "Loading Creature_Items...");
 
-            _CreatureItems = new Dictionary<uint, List<Creature_item>>();
-            IList<Creature_item> Items = Database.SelectAllObjects<Creature_item>();
+            _CreatureItems = new Dictionary<uint, List<creature_items>>();
+            IList<creature_items> Items = Database.SelectAllObjects<creature_items>();
 
             if (Items != null)
-                foreach (Creature_item Item in Items)
+                foreach (creature_items Item in Items)
                 {
                     if (!_CreatureItems.ContainsKey(Item.Entry))
-                        _CreatureItems.Add(Item.Entry, new List<Creature_item>());
+                        _CreatureItems.Add(Item.Entry, new List<creature_items>());
 
                     _CreatureItems[Item.Entry].Add(Item);
                 }
@@ -379,15 +379,15 @@ namespace WorldServer.Services.World
             Log.Success("LoadCreatureItems", "Loaded " + (Items != null ? Items.Count : 0) + " Creature_Items");
         }
 
-        public static List<Creature_item> GetCreatureItems(uint Entry)
+        public static List<creature_items> GetCreatureItems(uint Entry)
         {
-            List<Creature_item> L;
+            List<creature_items> L;
 
             lock (_CreatureItems)
             {
                 if (!_CreatureItems.TryGetValue(Entry, out L))
                 {
-                    L = new List<Creature_item>();
+                    L = new List<creature_items>();
                     _CreatureItems.Add(Entry, L);
                 }
             }
@@ -397,7 +397,7 @@ namespace WorldServer.Services.World
 
         public static void RemoveCreatureItem(uint Entry, ushort Slot)
         {
-            List<Creature_item> Items = GetCreatureItems(Entry);
+            List<creature_items> Items = GetCreatureItems(Entry);
             Items.RemoveAll(info =>
             {
                 if (info.SlotId == Slot)
@@ -409,11 +409,11 @@ namespace WorldServer.Services.World
             });
         }
 
-        public static void AddCreatureItem(Creature_item Item)
+        public static void AddCreatureItem(creature_items Item)
         {
             RemoveCreatureItem(Item.Entry, Item.SlotId);
 
-            List<Creature_item> Items = GetCreatureItems(Item.Entry);
+            List<creature_items> Items = GetCreatureItems(Item.Entry);
             Items.Add(Item);
             Database.AddObject(Item);
         }
@@ -422,23 +422,23 @@ namespace WorldServer.Services.World
 
         #region CreatureStats
 
-        public static Dictionary<uint, List<Creature_stats>> _CreatureStats;
+        public static Dictionary<uint, List<creature_stats>> _CreatureStats;
 
         [LoadingFunction(true)]
         public static void LoadCreatureStats()
         {
             Log.Debug("WorldMgr", "Loading Creature_stats...");
 
-            _CreatureStats = new Dictionary<uint, List<Creature_stats>>();
-            IList<Creature_stats> Stats = Database.SelectAllObjects<Creature_stats>();
+            _CreatureStats = new Dictionary<uint, List<creature_stats>>();
+            IList<creature_stats> Stats = Database.SelectAllObjects<creature_stats>();
 
             if (Stats != null)
             {
-                foreach (Creature_stats statInfo in Stats)
+                foreach (creature_stats statInfo in Stats)
                 {
                     if (!_CreatureStats.ContainsKey(statInfo.ProtoEntry))
                     {
-                        List<Creature_stats> stat = new List<Creature_stats>(1) { statInfo };
+                        List<creature_stats> stat = new List<creature_stats>(1) { statInfo };
                         _CreatureStats.Add(statInfo.ProtoEntry, stat);
                     }
                     else
@@ -449,15 +449,15 @@ namespace WorldServer.Services.World
             Log.Success("LoadCreatureStats", "Loaded " + (Stats != null ? Stats.Count : 0) + " Creature_stats");
         }
 
-        public static List<Creature_stats> GetCreatureStats(uint CreatureProto)
+        public static List<creature_stats> GetCreatureStats(uint CreatureProto)
         {
-            List<Creature_stats> L;
+            List<creature_stats> L;
 
             lock (_CreatureStats)
             {
                 if (!_CreatureStats.TryGetValue(CreatureProto, out L))
                 {
-                    L = new List<Creature_stats>();
+                    L = new List<creature_stats>();
                     _CreatureStats.Add(CreatureProto, L);
                 }
             }
@@ -469,30 +469,30 @@ namespace WorldServer.Services.World
 
         #region LootGroups
 
-        public static Dictionary<uint, Loot_Group> LootGroups = new Dictionary<uint, Loot_Group>();
-        public static Dictionary<uint, List<Loot_Group_Item>> LootGroupItems = new Dictionary<uint, List<Loot_Group_Item>>();
+        public static Dictionary<uint, loot_groups> LootGroups = new Dictionary<uint, loot_groups>();
+        public static Dictionary<uint, List<loot_group_items>> LootGroupItems = new Dictionary<uint, List<loot_group_items>>();
 
         [LoadingFunction(true)]
         public static void LoadLootGroups()
         {
-            IList<Loot_Group> dbLootGroups = Database.SelectAllObjects<Loot_Group>();
-            IList<Loot_Group_Item> dbLootGroupItems = Database.SelectAllObjects<Loot_Group_Item>();
+            IList<loot_groups> dbLootGroups = Database.SelectAllObjects<loot_groups>();
+            IList<loot_group_items> dbLootGroupItems = Database.SelectAllObjects<loot_group_items>();
 
             if (dbLootGroupItems != null)
             {
                 // Pre-load each loot group item into a dictionary, where the key is the LootGroupID
                 // and the value is a List of Loot Group Items belonging to the keyed Loot Group.
-                foreach (Loot_Group_Item lgi in dbLootGroupItems)
+                foreach (loot_group_items lgi in dbLootGroupItems)
                 {
                     if (!LootGroupItems.ContainsKey(lgi.LootGroupID))
-                        LootGroupItems.Add(lgi.LootGroupID, new List<Loot_Group_Item>());
+                        LootGroupItems.Add(lgi.LootGroupID, new List<loot_group_items>());
                     LootGroupItems[lgi.LootGroupID].Add(lgi);
                 }
             }
 
             if (dbLootGroups != null)
             {
-                foreach (Loot_Group lg in dbLootGroups)
+                foreach (loot_groups lg in dbLootGroups)
                 {
                     Log.Debug("WorldMgr.LoadLootGroups", "Loading LootGroup #" + lg.Entry + " ...");
                     // Since not all loot groups will have items assigned, we have to make sure we don't load empty loot groups into
@@ -502,7 +502,7 @@ namespace WorldServer.Services.World
                         lg.LootGroupItems = LootGroupItems[lg.Entry];
                     }
                     else
-                        lg.LootGroupItems = new List<Loot_Group_Item>();
+                        lg.LootGroupItems = new List<loot_group_items>();
 
                     LootGroups.Add(lg.Entry, lg);
                 }
@@ -511,18 +511,18 @@ namespace WorldServer.Services.World
             }
         }
 
-        public static Loot_Group GetLootGroup(uint entry)
+        public static loot_groups GetLootGroup(uint entry)
         {
             if (LootGroups.ContainsKey(entry))
                 return LootGroups[entry];
             return null;
         }
 
-        public static List<Loot_Group> GetLootGroupsByEvent(byte killEvent)
+        public static List<loot_groups> GetLootGroupsByEvent(byte killEvent)
         {
-            List<Loot_Group> candidates = new List<Loot_Group>();
+            List<loot_groups> candidates = new List<loot_groups>();
 
-            foreach (Loot_Group lg in LootGroups.Values)
+            foreach (loot_groups lg in LootGroups.Values)
             {
                 if ((lg.DropEvent & killEvent) == killEvent)
                     candidates.Add(lg);
@@ -540,9 +540,9 @@ namespace WorldServer.Services.World
         [LoadingFunction(true)]
         public static void LoadButcheryGroups()
         {
-            IList<Loot_Group_Butcher> butcheryEntries = Database.SelectAllObjects<Loot_Group_Butcher>();
+            IList<loot_group_butchering> butcheryEntries = Database.SelectAllObjects<loot_group_butchering>();
 
-            foreach (Loot_Group_Butcher butcherInfo in butcheryEntries)
+            foreach (loot_group_butchering butcherInfo in butcheryEntries)
             {
                 if (!ButcheryEntries.ContainsKey(butcherInfo.CreatureSubType))
                     ButcheryEntries.Add(butcherInfo.CreatureSubType, new List<uint>());

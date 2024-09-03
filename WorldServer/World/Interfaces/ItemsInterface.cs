@@ -102,7 +102,7 @@ namespace WorldServer.World.Interfaces
 
         private Player _playerOwner;
 
-        public void Load(List<CharacterItem> playerItems)
+        public void Load(List<characters_items> playerItems)
         {
             if (IsLoad)
                 return;
@@ -111,7 +111,7 @@ namespace WorldServer.World.Interfaces
 
             Items = new Item[OVERFLOW_END_SLOT];
 
-            foreach (CharacterItem item in playerItems)
+            foreach (characters_items item in playerItems)
                 if (item.SlotId < Items.Length)
                 {
                     Item itm = new Item(_Owner);
@@ -182,7 +182,7 @@ namespace WorldServer.World.Interfaces
             base.Load();
         }
 
-        public void Load(List<Creature_item> creatureItems)
+        public void Load(List<creature_items> creatureItems)
         {
             if (IsLoad)
                 return;
@@ -192,7 +192,7 @@ namespace WorldServer.World.Interfaces
             else
                 Items = new Item[MAX_EQUIPMENT_SLOT];
 
-            foreach (Creature_item Item in creatureItems)
+            foreach (creature_items Item in creatureItems)
             {
                 if (Item.SlotId < Items.Length)
                 {
@@ -209,7 +209,7 @@ namespace WorldServer.World.Interfaces
             }
         }
 
-        public void AddCreatureItem(Creature_item item)
+        public void AddCreatureItem(creature_items item)
         {
             if (item.SlotId < Items.Length)
             {
@@ -290,7 +290,7 @@ namespace WorldServer.World.Interfaces
 
         #region Stats
 
-        public bool CanUseItemType(Item_Info item, ushort slotId = 0, byte career = 0)
+        public bool CanUseItemType(item_infos item, ushort slotId = 0, byte career = 0)
         {
             // Career restrictions.
             if (item.Career != 0 && (item.Career & (1 << _playerOwner.Info.CareerLine - 1)) == 0)
@@ -646,16 +646,16 @@ namespace WorldServer.World.Interfaces
             _playerOwner.ItmInterface.DeleteItem(slot, 1);
         }
 
-        public List<Chapter_Reward> GetChapterRewards(byte Tier, Chapter_Info Info)
+        public List<chapter_rewards> GetChapterRewards(byte Tier, chapter_infos Info)
         {
-            List<Chapter_Reward> items = new List<Chapter_Reward>();
+            List<chapter_rewards> items = new List<chapter_rewards>();
 
             if (Tier == 1)
             {
                 if (Info.T1Rewards == null)
                     return items;
 
-                foreach (Chapter_Reward CR in Info.T1Rewards)
+                foreach (chapter_rewards CR in Info.T1Rewards)
                 {
                     if (CR.Item.Race == 0 || ((CR.Item.Race & (1 << _playerOwner.Info.Race - 1)) > 0))
                         if (CR.Item.Career == 0 || ((CR.Item.Career & (1 << _playerOwner.Info.CareerLine - 1)) > 0))
@@ -673,7 +673,7 @@ namespace WorldServer.World.Interfaces
                 if (Info.T2Rewards == null)
                     return items;
 
-                foreach (Chapter_Reward CR in Info.T2Rewards)
+                foreach (chapter_rewards CR in Info.T2Rewards)
                 {
                     if (CR.Item.Race == 0 || ((CR.Item.Race & (1 << _playerOwner.Info.Race - 1)) > 0))
                         if (CR.Item.Career == 0 || ((CR.Item.Career & (1 << _playerOwner.Info.CareerLine - 1)) > 0))
@@ -691,7 +691,7 @@ namespace WorldServer.World.Interfaces
                 if (Info.T3Rewards == null)
                     return items;
 
-                foreach (Chapter_Reward CR in Info.T3Rewards)
+                foreach (chapter_rewards CR in Info.T3Rewards)
                 {
                     if (CR.Item.Race == 0 || ((CR.Item.Race & (1 << _playerOwner.Info.Race - 1)) > 0))
                         if (CR.Item.Career == 0 || ((CR.Item.Career & (1 << _playerOwner.Info.CareerLine - 1)) > 0))
@@ -831,7 +831,7 @@ namespace WorldServer.World.Interfaces
                 Talisman tali = Itm.GetTalisman(i);
                 if (tali != null)
                 {
-                    Item_Info taliInfo = ItemService.GetItem_Info(tali.Entry);
+                    item_infos taliInfo = ItemService.GetItem_Info(tali.Entry);
                     foreach (KeyValuePair<byte, ushort> Stats in taliInfo._Stats)
                         Plr.StsInterface.AddItemBonusStat((Stats)Stats.Key, Stats.Value);
 
@@ -875,7 +875,7 @@ namespace WorldServer.World.Interfaces
                 Talisman tali = Itm.GetTalisman(i);
                 if (tali != null)
                 {
-                    Item_Info taliInfo = ItemService.GetItem_Info(tali.Entry);
+                    item_infos taliInfo = ItemService.GetItem_Info(tali.Entry);
                     foreach (KeyValuePair<byte, ushort> Stats in taliInfo._Stats)
                         Plr.StsInterface.RemoveItemBonusStat((Stats)Stats.Key, Stats.Value);
 
@@ -903,7 +903,7 @@ namespace WorldServer.World.Interfaces
         /// Iterates over the given item to apply its effects on player.
         /// </summary>
         /// <param name="item">Item to apply effects of</param>
-        private void ApplyItemEffects(Item_Info item)
+        private void ApplyItemEffects(item_infos item)
         {
             foreach (ushort effectEntry in item.EffectsList)
             {
@@ -918,7 +918,7 @@ namespace WorldServer.World.Interfaces
         /// Iterates over the given item to remove its effects on player.
         /// </summary>
         /// <param name="item">Item to remove effects of</param>
-        private void RemoveItemEffects(Item_Info item)
+        private void RemoveItemEffects(item_infos item)
         {
             foreach (ushort effectEntry in item.EffectsList)
             {
@@ -1019,7 +1019,7 @@ namespace WorldServer.World.Interfaces
         /// </summary>
         /// <param name="info">If null then this will search only the main inventory; otherwise, this will also search the preferred bags (if any) for the item type 'info.Type'.</param>
         /// <param name="overflow">Whether or not to include the overflow slots.</param>
-        public ushort GetTotalFreeInventorySlot(Item_Info info = null, bool overflow = false)
+        public ushort GetTotalFreeInventorySlot(item_infos info = null, bool overflow = false)
         {
             ushort count = 0;
             SlotRange range;
@@ -1056,7 +1056,7 @@ namespace WorldServer.World.Interfaces
             return 0;
         }
 
-        public ushort GetFreeInventorySlot(Item_Info info, bool overflow = false)
+        public ushort GetFreeInventorySlot(item_infos info, bool overflow = false)
         {
             ushort slot;
 
@@ -1090,7 +1090,7 @@ namespace WorldServer.World.Interfaces
          *    by startIndex, SlotCount.
          */
 
-        private void AddStacksInRange(List<ushort> stacks, Item_Info info, ushort startIndex, ushort stopIndex)
+        private void AddStacksInRange(List<ushort> stacks, item_infos info, ushort startIndex, ushort stopIndex)
         {
             for (ushort slot = startIndex; slot < stopIndex; slot++)
                 if (Items[slot] != null && Items[slot].Info.Entry == info.Entry)
@@ -1153,7 +1153,7 @@ namespace WorldServer.World.Interfaces
         /// Some types of items go into specific inventory areas by default;
         /// this function tells which area (if any) is best for the given item.
         ///</Summary>
-        private bool GetItemPreferredRange(out SlotRange range, Item_Info info)
+        private bool GetItemPreferredRange(out SlotRange range, item_infos info)
         {
             if (info.Type == (byte)Item.ItemType.Currency)
             {
@@ -1356,7 +1356,7 @@ namespace WorldServer.World.Interfaces
             if (id == 0)
                 return;
 
-            Item_Set set = ItemService.GetItem_Set(id);
+            item_sets set = ItemService.GetItem_Set(id);
 
             if (set == null)
                 return;
@@ -1394,7 +1394,7 @@ namespace WorldServer.World.Interfaces
             if (id == 0)
                 return;
 
-            Item_Set set = ItemService.GetItem_Set(id);
+            item_sets set = ItemService.GetItem_Set(id);
 
             if (set == null)
                 return;
@@ -1672,7 +1672,7 @@ namespace WorldServer.World.Interfaces
         /// Creates a list of all stacks containing the given item.
         /// stacks are identified by inventory slot index.
         ///</summary>
-        private List<ushort> GetStackItem(Item_Info info)
+        private List<ushort> GetStackItem(item_infos info)
         {
             List<ushort> infos = new List<ushort>();
 
@@ -1688,12 +1688,12 @@ namespace WorldServer.World.Interfaces
             return infos;
         }
 
-        public ItemResult CreateItem(Item_Info info, ushort count, ushort bagSlot = 0, bool overflow = false)
+        public ItemResult CreateItem(item_infos info, ushort count, ushort bagSlot = 0, bool overflow = false)
         {
             return CreateItem(info, count, new List<Talisman>(), 0, 0, false, bagSlot, overflow);
         }
 
-        public ItemResult CreateItem(Item_Info info, ushort count, List<Talisman> talismans, ushort PrimaryDye, ushort SecondaryDye, bool boundToPlayer, ushort bagSlot = 0, bool overflow = false)
+        public ItemResult CreateItem(item_infos info, ushort count, List<Talisman> talismans, ushort PrimaryDye, ushort SecondaryDye, bool boundToPlayer, ushort bagSlot = 0, bool overflow = false)
         {
             if (info == null)
                 return ItemResult.RESULT_ITEMID_INVALID;
@@ -1788,17 +1788,17 @@ namespace WorldServer.World.Interfaces
 
         public ItemResult CreateItem(uint itemId, ushort count, bool overflow = false, ushort bagSlot = 0)
         {
-            Item_Info info = ItemService.GetItem_Info(itemId);
+            item_infos info = ItemService.GetItem_Info(itemId);
 
             return CreateItem(info, count, bagSlot, overflow);
         }
 
-        //public ItemResult CreateExistingItem(Item_Info info, ushort count, CharacterItem itm, ushort bagSlot = 0, bool overflow = false)
+        //public ItemResult CreateExistingItem(Item_Info info, ushort count, characters_items itm, ushort bagSlot = 0, bool overflow = false)
         //{
         //    return CreateExistingItem(info, count, itm, new List<Talisman>(), 0, 0, bagSlot, overflow);
         //}
 
-        //public ItemResult CreateExistingItem(Item_Info info, ushort count, CharacterItem itm, List<Talisman> talismans, ushort PrimaryDye, ushort SecondaryDye, ushort bagSlot = 0, bool overflow = false)
+        //public ItemResult CreateExistingItem(Item_Info info, ushort count, characters_items itm, List<Talisman> talismans, ushort PrimaryDye, ushort SecondaryDye, ushort bagSlot = 0, bool overflow = false)
         //{
         //    if (info == null)
         //        return ItemResult.RESULT_ITEMID_INVALID;
@@ -1894,7 +1894,7 @@ namespace WorldServer.World.Interfaces
 
         private static bool IsEquipmentSlot(ushort slot) => slot < MAX_EQUIPMENT_SLOT;
 
-        public static bool CanUse(Item_Info info, Player plr, bool ignoreTempRestrictions, bool sendMessage)
+        public static bool CanUse(item_infos info, Player plr, bool ignoreTempRestrictions, bool sendMessage)
         {
             uint skills = info.Skills << 1;
             long playerSkill = plr._Value.Skills;
@@ -2014,7 +2014,7 @@ namespace WorldServer.World.Interfaces
 
             if (itemType == Item.ItemType.Quest)
             {
-                // Quest items must never be moved outside of the quest item inventory range
+                // quests items must never be moved outside of the quest item inventory range
                 return IsQuestItemInventorySlot(slot);
             }
 
@@ -2839,13 +2839,13 @@ namespace WorldServer.World.Interfaces
                 return;
 
             string[] items = itm.Info.Craftresult.Split(';');
-            Item_Info RepItemInfo = null;
+            item_infos RepItemInfo = null;
             uint itemlvl = 0;
             byte rarety = 0;
 
             foreach (string ritem in items)
             {
-                Item_Info RitemInfo = ItemService.GetItem_Info(uint.Parse(ritem));
+                item_infos RitemInfo = ItemService.GetItem_Info(uint.Parse(ritem));
                 rarety = RitemInfo.Rarity;
                 itemlvl = RitemInfo.MinRank;
                 if (ItemsInterface.CanUse(RitemInfo, _Owner.GetPlayer(), false, false))
@@ -2996,7 +2996,7 @@ namespace WorldServer.World.Interfaces
             if (_itemSets != null)
                 foreach (KeyValuePair<uint, byte> itemSet in _itemSets)
                 {
-                    Item_Set itemSetInfo = ItemService.GetItem_Set(itemSet.Key);
+                    item_sets itemSetInfo = ItemService.GetItem_Set(itemSet.Key);
 
                     if (itemSetInfo == null)
                     {
@@ -3039,7 +3039,7 @@ namespace WorldServer.World.Interfaces
             if (_itemSets != null)
                 foreach (KeyValuePair<uint, byte> itemSet in _itemSets)
                 {
-                    Item_Set itemSetInfo = ItemService.GetItem_Set(itemSet.Key);
+                    item_sets itemSetInfo = ItemService.GetItem_Set(itemSet.Key);
 
                     if (itemSetInfo == null)
                     {
@@ -3243,7 +3243,7 @@ namespace WorldServer.World.Interfaces
             List<KeyValuePair<uint, byte>> items = new List<KeyValuePair<uint, byte>>();
             var results = from pqitems in PQuestService._PQLoot_Crafting where (pqitems.PQCraftingBag_ID == Craftingtype) select pqitems;
 
-            foreach (PQuest_Loot_Crafting crafts in results)
+            foreach (pquest_loot_crafting crafts in results)
                 items.Add(new KeyValuePair<uint, byte>(crafts.ItemID, crafts.Count));
 
             return items;

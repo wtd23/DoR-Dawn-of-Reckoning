@@ -34,7 +34,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         {
             lock (Player._Players)
             {
-                return Player._Players.Count(x => x.Realm == Realms.REALMS_REALM_DESTRUCTION && !x.IsDisposed && x.IsInWorld() && x != null && x.Region.RegionId == regionId && x.CbtInterface.IsPvp);
+                return Player._Players.Count(x => x.Realm == SetRealms.REALMS_REALM_DESTRUCTION && !x.IsDisposed && x.IsInWorld() && x != null && x.Region.RegionId == regionId && x.CbtInterface.IsPvp);
             }
         }
 
@@ -42,7 +42,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         {
             lock (Player._Players)
             {
-                return Player._Players.Count(x => x.Realm == Realms.REALMS_REALM_ORDER && !x.IsDisposed && x.IsInWorld() && x != null && x.Region.RegionId == regionId && x.CbtInterface.IsPvp);
+                return Player._Players.Count(x => x.Realm == SetRealms.REALMS_REALM_ORDER && !x.IsDisposed && x.IsInWorld() && x != null && x.Region.RegionId == regionId && x.CbtInterface.IsPvp);
             }
         }
 
@@ -50,7 +50,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         {
             lock (Player._Players)
             {
-                return Player._Players.Count(x => x.Realm == Realms.REALMS_REALM_DESTRUCTION && !x.IsDisposed && x.IsInWorld() && !x.IsAFK && !x.IsAutoAFK && x != null && x.ZoneId == zoneID && x.CbtInterface.IsPvp);
+                return Player._Players.Count(x => x.Realm == SetRealms.REALMS_REALM_DESTRUCTION && !x.IsDisposed && x.IsInWorld() && !x.IsAFK && !x.IsAutoAFK && x != null && x.ZoneId == zoneID && x.CbtInterface.IsPvp);
             }
         }
 
@@ -58,7 +58,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         {
             lock (Player._Players)
             {
-                return Player._Players.Count(x => x.Realm == Realms.REALMS_REALM_ORDER && !x.IsDisposed && x.IsInWorld() && !x.IsAFK && !x.IsAutoAFK && x != null && x.ZoneId == zoneID && x.CbtInterface.IsPvp);
+                return Player._Players.Count(x => x.Realm == SetRealms.REALMS_REALM_ORDER && !x.IsDisposed && x.IsInWorld() && !x.IsAFK && !x.IsAutoAFK && x != null && x.ZoneId == zoneID && x.CbtInterface.IsPvp);
             }
         }
 
@@ -66,7 +66,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         {
             lock (Player._Players)
             {
-                return Player._Players.Where(x => x.Realm == Realms.REALMS_REALM_ORDER && !x.IsDisposed && x.IsInWorld() && !x.IsAFK && !x.IsAutoAFK && x != null && x.ZoneId == zoneId && x.CbtInterface.IsPvp).ToList();
+                return Player._Players.Where(x => x.Realm == SetRealms.REALMS_REALM_ORDER && !x.IsDisposed && x.IsInWorld() && !x.IsAFK && !x.IsAutoAFK && x != null && x.ZoneId == zoneId && x.CbtInterface.IsPvp).ToList();
             }
         }
 
@@ -74,7 +74,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         {
             lock (Player._Players)
             {
-                return Player._Players.Where(x => x.Realm == Realms.REALMS_REALM_DESTRUCTION && !x.IsDisposed && x.IsInWorld() && !x.IsAFK && !x.IsAutoAFK && x != null && x.ZoneId == zoneId && x.CbtInterface.IsPvp).ToList();
+                return Player._Players.Where(x => x.Realm == SetRealms.REALMS_REALM_DESTRUCTION && !x.IsDisposed && x.IsInWorld() && !x.IsAFK && !x.IsAutoAFK && x != null && x.ZoneId == zoneId && x.CbtInterface.IsPvp).ToList();
             }
         }
 
@@ -146,7 +146,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// <returns></returns>
         public static Tuple<ConcurrentDictionary<Player, int>, ConcurrentDictionary<Player, int>, ConcurrentDictionary<Player, int>>
             SegmentEligiblePlayers(
-                IEnumerable<KeyValuePair<uint, int>> allContributingPlayers, Realms lockingRealm, IContributionManager contributionManager, bool updateHonor = true, bool updateAnalytics = true)
+                IEnumerable<KeyValuePair<uint, int>> allContributingPlayers, SetRealms lockingRealm, IContributionManager contributionManager, bool updateHonor = true, bool updateAnalytics = true)
         {
             var winningRealmPlayers = new ConcurrentDictionary<Player, int>();
             var losingRealmPlayers = new ConcurrentDictionary<Player, int>();
@@ -200,7 +200,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         {
             var roc = (infoHonorPoints - oldHonorPoints);
 
-            var honorHistory = new HonorHistory
+            var honorHistory = new honor_history
             {
                 CharacterId = playerCharacterId,
                 CharacterName = playerName,

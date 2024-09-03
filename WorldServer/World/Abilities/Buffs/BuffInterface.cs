@@ -140,7 +140,7 @@ namespace WorldServer.World.Abilities.Buffs
                 if (_playerOwner != null)
                 {
                     if (_playerOwner.Info.Buffs == null)
-                        _playerOwner.Info.Buffs = new List<CharacterSavedBuff>();
+                        _playerOwner.Info.Buffs = new List<characters_saved_buffs>();
                     else
                         LoadSavedBuffs();
                 }
@@ -909,7 +909,7 @@ namespace WorldServer.World.Abilities.Buffs
 
         private void LoadSavedBuffs()
         {
-            List<CharacterSavedBuff> buffList = _playerOwner.Info.Buffs;
+            List<characters_saved_buffs> buffList = _playerOwner.Info.Buffs;
 
             if (buffList.Count == 0)
                 return;
@@ -941,7 +941,7 @@ namespace WorldServer.World.Abilities.Buffs
             if (_playerOwner == null)
                 return;
 
-            foreach (CharacterSavedBuff buffSave in _playerOwner.Info.Buffs)
+            foreach (characters_saved_buffs buffSave in _playerOwner.Info.Buffs)
             {
                 if (buffSave.BuffId == b.Entry)
                 {
@@ -953,7 +953,7 @@ namespace WorldServer.World.Abilities.Buffs
                 }
             }
 
-            CharacterSavedBuff save = new CharacterSavedBuff { CharacterId = _playerOwner.Info.CharacterId, BuffId = b.Entry, Level = b.BuffLevel, StackLevel = b.StackLevel, EndTimeSeconds = (uint)TCPManager.GetTimeStamp() + b.Duration };
+            characters_saved_buffs save = new characters_saved_buffs { CharacterId = _playerOwner.Info.CharacterId, BuffId = b.Entry, Level = b.BuffLevel, StackLevel = b.StackLevel, EndTimeSeconds = (uint)TCPManager.GetTimeStamp() + b.Duration };
 
             _playerOwner.Info.Buffs.Add(save);
             CharMgr.Database.AddObject(save);
@@ -964,7 +964,7 @@ namespace WorldServer.World.Abilities.Buffs
             if (_playerOwner == null)
                 return;
 
-            List<CharacterSavedBuff> buffList = _playerOwner.Info.Buffs;
+            List<characters_saved_buffs> buffList = _playerOwner.Info.Buffs;
 
             if (buffList.Count == 0)
                 return;
@@ -1033,7 +1033,7 @@ namespace WorldServer.World.Abilities.Buffs
                 buff.InvokeResourceEvent(eventID, oldVal, ref change);
         }
 
-        public void NotifyItemEvent(byte eventID, Item_Info myItemInfo)
+        public void NotifyItemEvent(byte eventID, item_infos myItemInfo)
         {
             if (_buffCombatSubs[eventID - 1].Count == 0)
                 return;

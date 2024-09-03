@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances
         private uint bossId = 0;
         private Instance Instance = null;
 
-        public InstanceSpawn(Creature_spawn spawn, uint bossId, Instance instance) : base(spawn)
+        public InstanceSpawn(creature_spawns spawn, uint bossId, Instance instance) : base(spawn)
         {
             EvtInterface.AddEventNotify(EventName.OnEnterCombat, OnEnterCombat);
             EvtInterface.AddEventNotify(EventName.OnLeaveCombat, OnLeaveCombat);

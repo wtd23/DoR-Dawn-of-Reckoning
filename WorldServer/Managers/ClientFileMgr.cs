@@ -71,8 +71,8 @@ namespace WorldServer.Managers
         public ushort ZoneId;
         public string Folder;
         public List<AreaInfluence> Influences;
-        public List<Zone_Area> Areas;
-        public List<PQuest_Info> PQAreas;
+        public List<zone_areas> Areas;
+        public List<pquest_info> PQAreas;
         public Color[,] HeightMapOffset;
         public Color[,] HeightMapTerrain;
         public byte[,] AreaPixels = new byte[1024, 1024];
@@ -211,7 +211,7 @@ namespace WorldServer.Managers
             }
         }
 
-        public Zone_Area GetZoneAreaFor(ushort pinX, ushort pinY, ushort zoneId, ushort pinz = 0)
+        public zone_areas GetZoneAreaFor(ushort pinX, ushort pinY, ushort zoneId, ushort pinz = 0)
         {
             byte areaId = AreaPixels[pinX >> 6, pinY >> 6];
             // Log.Error("areaid", "    " + areaId);
@@ -225,7 +225,7 @@ namespace WorldServer.Managers
             }
             if (Areas == null)
                 return null;
-            foreach (Zone_Area info in Areas)
+            foreach (zone_areas info in Areas)
                 if (info.PieceId == areaId)
                     return info;
             return null;

@@ -26,7 +26,7 @@ namespace WorldServer.World.Objects
         public int ShotCount = MAX_SHOTS;
         public long SiegeLifeSpan = (int)TimeSpan.FromMinutes(5).TotalMilliseconds;
 
-        public Siege(Creature_spawn spawn, Player owner, SiegeType type, BattleFrontKeep keep = null) : base(spawn)
+        public Siege(creature_spawns spawn, Player owner, SiegeType type, BattleFrontKeep keep = null) : base(spawn)
         {
             _type = type;
             SiegeInterface = AddInterface<SiegeInterface>();
@@ -39,8 +39,8 @@ namespace WorldServer.World.Objects
         {
             Creature_proto proto = CreatureService.GetCreatureProto(entry);
 
-            Creature_spawn spawn = null;
-            spawn = new Creature_spawn
+            creature_spawns spawn = null;
+            spawn = new creature_spawns
             {
                 Guid = (uint)CreatureService.GenerateCreatureSpawnGUID(),
                 WorldO = plr.Heading,
@@ -220,7 +220,7 @@ namespace WorldServer.World.Objects
             {
                 _nextAreaCheckTime = msTick + 2000;
 
-                Zone_Area newArea = Zone.ClientInfo.GetZoneAreaFor((ushort)X, (ushort)Y, Zone.ZoneId, (ushort)Z);
+                zone_areas newArea = Zone.ClientInfo.GetZoneAreaFor((ushort)X, (ushort)Y, Zone.ZoneId, (ushort)Z);
 
                 if (newArea == null || !newArea.IsRvR)
                     OutOfAreaDecay();
@@ -575,7 +575,7 @@ namespace WorldServer.World.Objects
 
             if (killer.CurrentArea != null && killer.CurrentArea.IsRvR)
             {
-                influenceId = (killer.Realm == Realms.REALMS_REALM_DESTRUCTION) ? (ushort)killer.CurrentArea.DestroInfluenceId : (ushort)killer.CurrentArea.OrderInfluenceId;
+                influenceId = (killer.Realm == SetRealms.REALMS_REALM_DESTRUCTION) ? (ushort)killer.CurrentArea.DestroInfluenceId : (ushort)killer.CurrentArea.OrderInfluenceId;
                 totalInfluence = (uint)(100 * (1f + killer.AAOBonus));
             }
 

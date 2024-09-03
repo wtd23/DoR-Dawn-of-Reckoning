@@ -31,7 +31,7 @@ namespace WorldServer.Managers.Commands
 
             plr.Teleport((ushort)zoneID, (uint)worldX, (uint)worldY, (ushort)worldZ, 0);
 
-            GMCommandLog log = new GMCommandLog();
+            gm_commands_logs log = new gm_commands_logs();
             log.PlayerName = plr.Name;
             log.AccountId = (uint)plr.Client._Account.AccountId;
             log.Command = "TELEPORT TO " + zoneID + " " + worldX + " " + worldY;
@@ -68,7 +68,7 @@ namespace WorldServer.Managers.Commands
         /// <returns>True if command was correctly handled, false if operation was canceled</returns>
         public static bool TeleportObjective(Player plr, ref List<string> values)
         {
-            IList<BattleFront_Objective> BattleFrontObjectives = WorldMgr.Database.SelectAllObjects<BattleFront_Objective>();
+            IList<battlefront_objectives> BattleFrontObjectives = WorldMgr.Database.SelectAllObjects<battlefront_objectives>();
             var respawnToTravelTo = GetInt(ref values);
 
             var BattleFrontObjective = BattleFrontObjectives.SingleOrDefault(x => x.Entry == respawnToTravelTo);
@@ -106,7 +106,7 @@ namespace WorldServer.Managers.Commands
 
             plr.Teleport(target.Region, target.Zone.ZoneId, (uint)target.WorldPosition.X, (uint)target.WorldPosition.Y, (ushort)target.WorldPosition.Z, target.Heading);
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -155,7 +155,7 @@ namespace WorldServer.Managers.Commands
                     ((Player)player).IsSummoned = false;
                 }, 30000, 1, target);
 
-                GMCommandLog log = new GMCommandLog();
+                gm_commands_logs log = new gm_commands_logs();
                 log.PlayerName = plr.Name;
                 log.AccountId = (uint)plr.Client._Account.AccountId;
                 log.Command = "SUMMON PLAYER " + target.Name + " TO " + plr.Zone.ZoneId + " " + plr._Value.WorldX + " " + plr._Value.WorldY;
@@ -184,7 +184,7 @@ namespace WorldServer.Managers.Commands
             int worldY = GetInt(ref values);
             int worldZ = GetInt(ref values);
 
-            Zone_Info zone = ZoneService.GetZone_Info((ushort)zoneID);
+            zone_infos zone = ZoneService.GetZone_Info((ushort)zoneID);
             if (zone == null)
                 zone = ZoneService._Zone_Info[0];
 
@@ -197,7 +197,7 @@ namespace WorldServer.Managers.Commands
 
             var player = Player.GetPlayer(playerName);
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,

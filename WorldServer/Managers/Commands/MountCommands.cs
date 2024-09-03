@@ -23,7 +23,7 @@ namespace WorldServer.Managers.Commands
 
             int entry = GetInt(ref values);
 
-            Mount_Info info = new Mount_Info();
+            mount_infos info = new mount_infos();
 
             info.Entry = (uint)entry;
             target.Mount((ushort)info.Entry);
@@ -48,11 +48,11 @@ namespace WorldServer.Managers.Commands
             int speed = GetInt(ref values);
             string name = GetString(ref values);
 
-            Mount_Info info = WorldMgr.Database.SelectObject<Mount_Info>("Entry=" + entry);
+            mount_infos info = WorldMgr.Database.SelectObject<mount_infos>("Entry=" + entry);
 
             if (info == null)
             {
-                info = new Mount_Info();
+                info = new mount_infos();
                 info.Entry = (uint)entry;
                 info.Speed = (ushort)speed;
                 info.Name = name;
@@ -104,10 +104,10 @@ namespace WorldServer.Managers.Commands
             if (target == null || target.IsDead)
                 return false;
 
-            List<Mount_Info> mounts = WorldMgr.Database.SelectAllObjects<Mount_Info>() as List<Mount_Info>;
+            List<mount_infos> mounts = WorldMgr.Database.SelectAllObjects<mount_infos>() as List<mount_infos>;
 
             uint i = 1;
-            foreach (Mount_Info info in mounts)
+            foreach (mount_infos info in mounts)
             {
                 if (info.Id != i)
                 {

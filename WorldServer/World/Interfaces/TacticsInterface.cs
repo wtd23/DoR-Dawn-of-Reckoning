@@ -479,7 +479,7 @@ namespace WorldServer.World.Interfaces
                         _abilityPreCastModifiers[mod.Affecting].Add(mod);
                     }
 
-                    for (AbilityModifierEffect effect = mod.Effect; effect != null; effect = effect.nextMod)
+                    for (ability_modifiers effect = mod.Effect; effect != null; effect = effect.nextMod)
                         b.AddBuffParameter(effect.BuffLine, effect.PrimaryValue);
                 }
 
@@ -512,7 +512,7 @@ namespace WorldServer.World.Interfaces
                         _abilityModifiers[mod.Affecting].Add(mod);
                     }
 
-                    for (AbilityModifierEffect effect = mod.Effect; effect != null; effect = effect.nextMod)
+                    for (ability_modifiers effect = mod.Effect; effect != null; effect = effect.nextMod)
                         b.AddBuffParameter(effect.BuffLine, effect.PrimaryValue);
                 }
 
@@ -545,7 +545,7 @@ namespace WorldServer.World.Interfaces
                         _buffModifiers[mod.Affecting].Add(mod);
                     }
 
-                    for (AbilityModifierEffect effect = mod.Effect; effect != null; effect = effect.nextMod)
+                    for (ability_modifiers effect = mod.Effect; effect != null; effect = effect.nextMod)
                         b.AddBuffParameter(effect.BuffLine, effect.PrimaryValue);
                 }
 
@@ -587,7 +587,7 @@ namespace WorldServer.World.Interfaces
                         _abilityPreCastModifiers[mod.Affecting].Add(mod);
                     }
 
-                    for (AbilityModifierEffect effect = mod.Effect; effect != null; effect = effect.nextMod)
+                    for (ability_modifiers effect = mod.Effect; effect != null; effect = effect.nextMod)
                         buff.AddBuffParameter(effect.BuffLine, effect.PrimaryValue);
                 }
             }
@@ -618,7 +618,7 @@ namespace WorldServer.World.Interfaces
                         _abilityModifiers[mod.Affecting].Add(mod);
                     }
 
-                    for (AbilityModifierEffect effect = mod.Effect; effect != null; effect = effect.nextMod)
+                    for (ability_modifiers effect = mod.Effect; effect != null; effect = effect.nextMod)
                         buff.AddBuffParameter(effect.BuffLine, effect.PrimaryValue);
                 }
             }
@@ -649,7 +649,7 @@ namespace WorldServer.World.Interfaces
                         _buffModifiers[mod.Affecting].Add(mod);
                     }
 
-                    for (AbilityModifierEffect effect = mod.Effect; effect != null; effect = effect.nextMod)
+                    for (ability_modifiers effect = mod.Effect; effect != null; effect = effect.nextMod)
                         buff.AddBuffParameter(effect.BuffLine, effect.PrimaryValue);
                 }
             }

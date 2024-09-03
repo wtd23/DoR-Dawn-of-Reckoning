@@ -12,7 +12,7 @@ namespace WorldServer.World.Objects.PublicQuests
         private readonly PQuestObjective _objective;
         private readonly PublicQuest _publicQuest;
 
-        public PQuestCreature(Creature_spawn spawn, PQuestObjective objective, PublicQuest publicQuest) : base(spawn)
+        public PQuestCreature(creature_spawns spawn, PQuestObjective objective, PublicQuest publicQuest) : base(spawn)
         {
             _objective = objective;
             _publicQuest = publicQuest;

@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.TomboftheVultureLord
     {
         #region Constructors
 
-        public SimpleHighPriestHerakh2(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleHighPriestHerakh2(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

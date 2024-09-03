@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.WarpbladeTunnels2
     {
         #region Constructors
 
-        public SimpleGreySeerQuoltik(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleGreySeerQuoltik(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

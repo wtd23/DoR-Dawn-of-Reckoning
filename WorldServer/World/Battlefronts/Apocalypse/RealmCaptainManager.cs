@@ -25,65 +25,68 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
         public static void DetermineCaptains(IBattleFrontManager battleFrontManager, RegionMgr region)
         {
-            var status = battleFrontManager.GetActiveCampaign().ActiveBattleFrontStatus;
-            lock (status)
+            BattleFrontStatus status = battleFrontManager.GetActiveCampaign(region);
+            if (status != null)
             {
-                Logger.Trace($"Checking for new Realm Captains...");
-                if (status.RegionId == region.RegionId)
+                lock (status)
                 {
-                    var zonePlayers = Player._Players.Where(x => !x.IsDisposed
-                                                                 && x.IsInWorld()
-                                                                 && x.CbtInterface.IsPvp
-                                                                 && x.ScnInterface.Scenario == null
-                                                                 && x.ZoneId == status.ZoneId).ToList();
-
-                    if (zonePlayers.Count < REALM_CAPTAIN_MINIMUM_PLAYERS)
+                    Logger.Trace($"Checking for new Realm Captains...");
+                    if (status.RegionId == region.RegionId)
                     {
-                        Logger.Trace($"Zone Players = {zonePlayers} - not enough for a Realm Captain to spawn");
-                        return;
-                    }
+                        var zonePlayers = Player._Players.Where(x => !x.IsDisposed
+                                                                     && x.IsInWorld()
+                                                                     && x.CbtInterface.IsPvp
+                                                                     && x.ScnInterface.Scenario == null
+                                                                     && (x.ZoneId == status.DestroZoneId || x.ZoneId == status.OrderZoneId)).ToList();
 
-                    var realmCaptains = status.ContributionManagerInstance.GetHigestContributors(
-                        REALM_CAPTAIN_MINIMUM_CONTRIBUTION, zonePlayers);
-
-                    MarkPlayerAsRealmCaptain(status.DestructionRealmCaptain, Player._Players, UNMARK_PLAYER_REALM_CAPTAIN);
-                    MarkPlayerAsRealmCaptain(status.OrderRealmCaptain, Player._Players, UNMARK_PLAYER_REALM_CAPTAIN);
-
-                    status.RemoveAsRealmCaptain(status.DestructionRealmCaptain);
-                    status.RemoveAsRealmCaptain(status.OrderRealmCaptain);
-
-                    RemoveRealmCaptainBuffs(status.DestructionRealmCaptain);
-                    RemoveRealmCaptainBuffs(status.OrderRealmCaptain);
-
-                    // Destruction
-                    if (realmCaptains[0] != null)
-                    {
-                        status.SetAsRealmCaptain(realmCaptains[0]);
-
-                        MarkPlayerAsRealmCaptain(realmCaptains[0], zonePlayers, MARK_PLAYER_REALM_CAPTAIN);
-
-                        if (StaticRandom.Instance.Next(100) < REALM_CAPTAIN_TELL_CHANCE)
+                        if (zonePlayers.Count < REALM_CAPTAIN_MINIMUM_PLAYERS)
                         {
-                            foreach (var player in zonePlayers.Where(x => x.Realm == Realms.REALMS_REALM_ORDER))
+                            Logger.Trace($"Zone Players = {zonePlayers} - not enough for a Realm Captain to spawn");
+                            return;
+                        }
+
+                        var realmCaptains = status.ContributionManagerInstance.GetHigestContributors(
+                            REALM_CAPTAIN_MINIMUM_CONTRIBUTION, zonePlayers);
+
+                        MarkPlayerAsRealmCaptain(status.DestructionRealmCaptain, Player._Players, UNMARK_PLAYER_REALM_CAPTAIN);
+                        MarkPlayerAsRealmCaptain(status.OrderRealmCaptain, Player._Players, UNMARK_PLAYER_REALM_CAPTAIN);
+
+                        status.RemoveAsRealmCaptain(status.DestructionRealmCaptain);
+                        status.RemoveAsRealmCaptain(status.OrderRealmCaptain);
+
+                        RemoveRealmCaptainBuffs(status.DestructionRealmCaptain);
+                        RemoveRealmCaptainBuffs(status.OrderRealmCaptain);
+
+                        // Destruction
+                        if (realmCaptains[0] != null)
+                        {
+                            status.SetAsRealmCaptain(realmCaptains[0]);
+
+                            MarkPlayerAsRealmCaptain(realmCaptains[0], zonePlayers, MARK_PLAYER_REALM_CAPTAIN);
+
+                            if (StaticRandom.Instance.Next(100) < REALM_CAPTAIN_TELL_CHANCE)
                             {
-                                player.SendMessage(
-                                    $"A captain has emerged from the ranks of the enemy. Take the head of {realmCaptains[0].Name}!",
-                                    ChatLogFilters.CHATLOGFILTERS_RVR);
+                                foreach (var player in zonePlayers.Where(x => x.Realm == SetRealms.REALMS_REALM_ORDER))
+                                {
+                                    player.SendMessage(
+                                        $"A captain has emerged from the ranks of the enemy. Take the head of {realmCaptains[0].Name}!",
+                                        ChatLogFilters.CHATLOGFILTERS_RVR);
+                                }
                             }
                         }
-                    }
-                    // Order
-                    if (realmCaptains[1] != null)
-                    {
-                        status.SetAsRealmCaptain(realmCaptains[1]);
-                        MarkPlayerAsRealmCaptain(realmCaptains[1], zonePlayers, MARK_PLAYER_REALM_CAPTAIN);
-                        if (StaticRandom.Instance.Next(100) < REALM_CAPTAIN_TELL_CHANCE)
+                        // Order
+                        if (realmCaptains[1] != null)
                         {
-                            foreach (var player in zonePlayers.Where(x => x.Realm == Realms.REALMS_REALM_DESTRUCTION))
+                            status.SetAsRealmCaptain(realmCaptains[1]);
+                            MarkPlayerAsRealmCaptain(realmCaptains[1], zonePlayers, MARK_PLAYER_REALM_CAPTAIN);
+                            if (StaticRandom.Instance.Next(100) < REALM_CAPTAIN_TELL_CHANCE)
                             {
-                                player.SendMessage(
-                                    $"A captain has emerged from the ranks of the enemy. Take the head of {realmCaptains[1].Name}!",
-                                    ChatLogFilters.CHATLOGFILTERS_RVR);
+                                foreach (var player in zonePlayers.Where(x => x.Realm == SetRealms.REALMS_REALM_DESTRUCTION))
+                                {
+                                    player.SendMessage(
+                                        $"A captain has emerged from the ranks of the enemy. Take the head of {realmCaptains[1].Name}!",
+                                        ChatLogFilters.CHATLOGFILTERS_RVR);
+                                }
                             }
                         }
                     }
@@ -130,9 +133,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
         public static bool IsPlayerRealmCaptain(uint characterId)
         {
-            var status = WorldMgr.UpperTierCampaignManager.GetActiveCampaign().ActiveBattleFrontStatus;
-            return status.DestructionRealmCaptain?.CharacterId == characterId ||
-                   status.OrderRealmCaptain?.CharacterId == characterId;
+            return WorldMgr.ScalingCampaignManager.IsPlayerRealmCaptain(characterId);
         }
 
         public static void ApplyRealmCaptainBuff(Player plr, ushort infoSpellId)

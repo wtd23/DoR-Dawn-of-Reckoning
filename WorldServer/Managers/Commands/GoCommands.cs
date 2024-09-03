@@ -24,7 +24,7 @@ namespace WorldServer.Managers.Commands
 
             plr.UpdateWorldPosition();
 
-            GameObject_spawn spawn = new GameObject_spawn();
+            gameobject_spawns spawn = new gameobject_spawns();
             spawn.Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID();
             spawn.BuildFromProto(proto);
             spawn.WorldO = plr._Value.WorldO;
@@ -57,7 +57,7 @@ namespace WorldServer.Managers.Commands
                 return;
             }
 
-            GameObject_spawn spawn = new GameObject_spawn
+            gameobject_spawns spawn = new gameobject_spawns
             {
                 Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                 WorldX = worldX,

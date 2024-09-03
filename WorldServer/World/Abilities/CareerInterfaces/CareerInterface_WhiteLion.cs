@@ -2,19 +2,26 @@
 using System;
 using WorldServer.World.Abilities.Buffs;
 using WorldServer.World.Objects;
+using WorldServer.World.Positions;
 
 namespace WorldServer.World.Abilities.CareerInterfaces
 {
     internal class CareerInterface_WhiteLion : CareerInterface, IPetCareerInterface
     {
-        public Pet myPet { get; set; }
+        public Pet myPet
+        { get { return _myPet; } set { _myPet = value; } }
+
+        private byte _AIMode = 5;
 
         // This is variable that store current pet health
         private uint currentHealth;
 
-        public byte AIMode { get; set; } = 5;
+        public byte AIMode
+        { get { return _AIMode; } set { _AIMode = value; } }
 
-        public string myPetName { get; set; }
+        private ushort _currentPetID;
+
+        public string MyPetName { get; set; }
 
         private static readonly ushort[] _petTrainBuffs = { 3954, 3955, 3951 };
 
@@ -54,6 +61,7 @@ namespace WorldServer.World.Abilities.CareerInterfaces
         }
 
         private bool _summoning;
+        private Pet _myPet;
 
         public void SummonPet(ushort myID)
         {
@@ -64,88 +72,43 @@ namespace WorldServer.World.Abilities.CareerInterfaces
                 _summoning = true; // Happens when pet is automatically reset after zone change
                 if (myPet != null)
                 {
-                    myPet.Destroy();
+                    myPet.ReceiveDamage(myPet, uint.MaxValue);
                     myPet = null;
                 }
                 if (myPlayer.Zone == null)
                     return;
 
-                ushort model1;
-                byte faction;
-                string name;
+                _currentPetID = myID;
 
-                if (myPlayer.Realm == GameData.Realms.REALMS_REALM_ORDER)
+                Creature_proto Proto = new Creature_proto { Faction = 65 };
+
+                if (myID == 9159)
                 {
-                    model1 = (ushort)(132 + ((myPlayer.Level - 1) * 0.1f));
-                    faction = 65;
                     if (myPlayer.Level < 16)
-                        name = "Lion Cub";
+                        Proto.Name = myPlayer.Name + "'s Lion Cub";
                     else
-                        name = "War Lion";
-                }
-                else
-                {
-                    Random rand = new Random();
-                    switch (rand.Next(1, 4))
-                    {
-                        case 1:
-                            model1 = 1156;
-                            faction = 129;
-                            name = "War Manticore";
-                            break;
-
-                        case 2:
-                            model1 = 1142;
-                            faction = 129;
-                            name = "War Scorpion";
-                            break;
-
-                        case 3:
-                            model1 = 1086;
-                            faction = 129;
-                            name = "Vicious Harpy";
-                            break;
-
-                        default:
-                            model1 = 1272;
-                            faction = 129;
-                            name = "Hydra Wyrmling";
-                            break;
-                    }
+                        Proto.Name = myPlayer.Name + "'s War Lion";
+                    Proto.Model1 = (ushort)(132 + ((myPlayer.Level - 1) * 0.1f)); ;
+                    Proto.Ranged = 10;
                 }
 
                 if (myPlayer.Info.PetModel != 0)
                 {
-                    model1 = myPlayer.Info.PetModel;
+                    Proto.Model1 = myPlayer.Info.PetModel;
                 }
 
-                if (!String.IsNullOrEmpty(myPlayer.Info.PetName))
-                    myPetName = myPlayer.Info.PetName;
+                if (!string.IsNullOrEmpty(myPlayer.Info.PetName))
+                    MyPetName = myPlayer.Info.PetName;
 
-                Creature_proto Proto = new Creature_proto
-                {
-                    Name = string.IsNullOrEmpty(myPetName) ? name : myPetName,
-                    Ranged = 0,
-                    Faction = faction,
-                    Model1 = model1
-                };
-
-                Creature_spawn Spawn = new Creature_spawn();
-                if (model1 == 1272)
-                {
-                    Proto.MinScale = 15;
-                    Proto.MaxScale = 15;
-                }
-                else
-                {
-                    Proto.MinScale = 50;
-                    Proto.MaxScale = 50;
-                }
+                creature_spawns Spawn = new creature_spawns();
+                Proto.MinScale = 50;
+                Proto.MaxScale = 50;
                 Spawn.BuildFromProto(Proto);
                 Spawn.WorldO = myPlayer._Value.WorldO;
-                Spawn.WorldY = myPlayer._Value.WorldY;
+                Point3D offset = WorldUtils.GetForward(myPlayer, 75);
+                Spawn.WorldX = myPlayer._Value.WorldX + offset.X;
+                Spawn.WorldY = myPlayer._Value.WorldY + offset.Y;
                 Spawn.WorldZ = myPlayer._Value.WorldZ;
-                Spawn.WorldX = myPlayer._Value.WorldX;
                 Spawn.ZoneId = myPlayer.Zone.ZoneId;
                 Spawn.Icone = 18;
                 Spawn.WaypointType = 0;
@@ -163,9 +126,9 @@ namespace WorldServer.World.Abilities.CareerInterfaces
 
                 if (_careerResource != 0)
                 {
-                    //currentHealth = myPet.Health;
+                    currentHealth = myPet.Health;
                     myPet.BuffInterface.QueueBuff(new BuffQueueInfo(myPlayer, myPlayer.EffectiveLevel, AbilityMgr.GetBuffInfo(_petTrainBuffs[_careerResource - 1], myPlayer, myPet)));
-                    //myPet.EvtInterface.AddEvent(SetHealth, 100, 1);
+                    myPet.EvtInterface.AddEvent(SetHealth, 100, 1);
                 }
 
                 myPlayer.BuffInterface.NotifyPetEvent(myPet);

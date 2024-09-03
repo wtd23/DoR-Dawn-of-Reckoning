@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.Bloodwrought_Enclave
     {
         #region Constructors
 
-        public SimpleBarakustheGodslayer(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleBarakustheGodslayer(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

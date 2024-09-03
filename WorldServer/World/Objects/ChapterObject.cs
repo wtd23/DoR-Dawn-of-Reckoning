@@ -4,9 +4,9 @@ namespace WorldServer.World.Objects
 {
     public class ChapterObject : Object
     {
-        public Chapter_Info Info;
+        public chapter_infos Info;
 
-        public ChapterObject(Chapter_Info info)
+        public ChapterObject(chapter_infos info)
         {
             Info = info;
             Name = Info.Name;

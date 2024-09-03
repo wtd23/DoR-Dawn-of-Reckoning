@@ -408,7 +408,7 @@ namespace WorldServer.World.Objects
 
         public override string ToString()
         {
-            return $"(OffX = {XOffset}, OffY = {YOffset}, Heading = {Heading}, Oid = {Oid}, Name= {Name}, Radius= {BaseRadius}, Active= {_isActive})" + base.ToString();
+            return $"(OffX = {XOffset}, OffY = {YOffset}, Heading = {Heading}, Oid = {Oid}, Name= {Name}, Radius= {BaseRadius}, Active= {_isActive}, WorldPosition: {WorldPosition})" + base.ToString();
         }
 
         public ushort Heading;

@@ -19,14 +19,14 @@ namespace WorldServer.World.Objects
     {
         public bool Completed;
         public long StartTime;
-        public Item_Info Item;
+        public item_infos Item;
         public byte LootID;
 
         private readonly List<Player> _playersGreeding = new List<Player>();
         private readonly List<Player> _playersNeeding = new List<Player>();
         private readonly List<Player> _playersPassing = new List<Player>();
 
-        public LootRoll(byte lootID, Item_Info item)
+        public LootRoll(byte lootID, item_infos item)
         {
             LootID = lootID;
             Item = item;
@@ -297,7 +297,7 @@ namespace WorldServer.World.Objects
         private Player _mainAssist;
         public bool PartyOpen { get; set; }
 
-        public Realms Realm { get; private set; }
+        public SetRealms Realm { get; private set; }
 
         public Group()
         {

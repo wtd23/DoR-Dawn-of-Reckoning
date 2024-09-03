@@ -1,4 +1,5 @@
 ﻿using Common;
+using GameData;
 using System.Collections.Generic;
 using System.Linq;
 using WorldServer.Services.World;
@@ -444,8 +445,7 @@ namespace WorldServer.World.Objects.Instances.Gunbad
 
         public override void SetRandomTarget()
         {
-            Creature c = Obj as Creature;
-            if (c != null)
+            if (Obj is Creature c)
             {
                 if (c.PlayersInRange.Count > 0)
                 {
@@ -459,12 +459,11 @@ namespace WorldServer.World.Objects.Instances.Gunbad
                         player = obj as Player;
                         if (player != null && !player.IsDead)
                         {
-                            haveTarget = true;
                             c.MvtInterface.TurnTo(player);
                             c.StsInterface.Speed = 123;
                             c.MvtInterface.SetBaseSpeed(123);
                             c.AddCrowdControlImmunity((int)GameData.CrowdControlTypes.All); // This should grant immunity to CC
-                            c.MvtInterface.Follow(player, 5, 10);
+                            c.MvtInterface.Follow(player, Constants.UNITS_TO_FEET_MIN, Constants.UNITS_TO_FEET_MAX);
                             c.AiInterface.CurrentBrain.AddHatred(player, true, 100000);
 
                             c.Say("*** A horde of wild squigs chase " + player.Name + "! ***", SystemData.ChatLogFilters.CHATLOGFILTERS_MONSTER_SAY);
@@ -537,7 +536,7 @@ namespace WorldServer.World.Objects.Instances.Gunbad
             {
                 Creature_proto Proto = CreatureService.GetCreatureProto((uint)Entry);
 
-                Creature_spawn Spawn = new Creature_spawn();
+                creature_spawns Spawn = new creature_spawns();
                 Spawn.Guid = (uint)CreatureService.GenerateCreatureSpawnGUID();
                 Spawn.BuildFromProto(Proto);
                 Spawn.WorldO = (int)O;
@@ -550,7 +549,7 @@ namespace WorldServer.World.Objects.Instances.Gunbad
 
                 foreach (Player player in Obj.PlayersInRange)
                 {
-                    if (player.Realm == GameData.Realms.REALMS_REALM_ORDER)
+                    if (player.Realm == GameData.SetRealms.REALMS_REALM_ORDER)
                         count++;
                     else
                         count--;

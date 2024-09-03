@@ -16,16 +16,16 @@ namespace WorldServer.World.Interfaces
     {
         private Player _player;
 
-        private readonly Dictionary<uint, Character_social> _friendCharacterIds = new Dictionary<uint, Character_social>();
-        private readonly Dictionary<uint, Character_social> _ignoreCharacterIds = new Dictionary<uint, Character_social>();
+        private readonly Dictionary<uint, characters_socials> _friendCharacterIds = new Dictionary<uint, characters_socials>();
+        private readonly Dictionary<uint, characters_socials> _ignoreCharacterIds = new Dictionary<uint, characters_socials>();
 
-        public List<Character_social> GetFriendList()
+        public List<characters_socials> GetFriendList()
         {
             lock (_friendCharacterIds)
                 return _friendCharacterIds.Values.ToList();
         }
 
-        public List<Character_social> GetIgnoreList()
+        public List<characters_socials> GetIgnoreList()
         {
             lock (_ignoreCharacterIds)
                 return _ignoreCharacterIds.Values.ToList();
@@ -83,7 +83,7 @@ namespace WorldServer.World.Interfaces
                 return base.Load();
 
             if (_player.Info.Socials == null)
-                _player.Info.Socials = new List<Character_social>();
+                _player.Info.Socials = new List<characters_socials>();
             else
             {
                 lock (_player.Info.Socials)
@@ -92,7 +92,7 @@ namespace WorldServer.World.Interfaces
 
                     for (int i = 0; i < socialCount; ++i)
                     {
-                        Character_social social = _player.Info.Socials[i];
+                        characters_socials social = _player.Info.Socials[i];
 
                         if (social.Ignore == 1)
                         {
@@ -205,7 +205,7 @@ namespace WorldServer.World.Interfaces
             string charName = Player.AsCharacterName(name);
             uint characterId = CharMgr.GetCharacterId(charName);
 
-            // Character didn't exist
+            // characters didn't exist
             if (characterId == 0)
             {
                 _player.SendLocalizeString("", ChatLogFilters.CHATLOGFILTERS_USER_ERROR, Localized_text.TEXT_SN_LISTS_ERR_PLAYER_NOT_FOUND);
@@ -227,11 +227,11 @@ namespace WorldServer.World.Interfaces
             }
 
             // Players may not add a GM as a friend unless the GM friended them first
-            Character charInfo = CharMgr.GetCharacter(characterId, false);
+            characters charInfo = CharMgr.GetCharacter(characterId, false);
 
             if (charInfo != null && _player.GmLevel == 1)
             {
-                Account acct = Core.AcctMgr.GetAccountById(charInfo.AccountId);
+                accounts acct = Core.AcctMgr.GetAccountById(charInfo.AccountId);
 
                 if (acct != null && acct.GmLevel > 1)
                 {
@@ -246,7 +246,7 @@ namespace WorldServer.World.Interfaces
                 }
             }
 
-            Character_social social = new Character_social
+            characters_socials social = new characters_socials
             {
                 CharacterId = _player.Info.CharacterId,
                 DistName = charName,
@@ -278,7 +278,7 @@ namespace WorldServer.World.Interfaces
         {
             uint characterId = CharMgr.GetCharacterId(Player.AsCharacterName(name));
 
-            Character_social social;
+            characters_socials social;
 
             lock (_friendCharacterIds)
                 _friendCharacterIds.TryGetValue(characterId, out social);
@@ -333,7 +333,7 @@ namespace WorldServer.World.Interfaces
             string charName = Player.AsCharacterName(name);
             uint characterId = CharMgr.GetCharacterId(charName);
 
-            // Character didn't exist
+            // characters didn't exist
             if (characterId == 0)
             {
                 _player.SendLocalizeString("", ChatLogFilters.CHATLOGFILTERS_USER_ERROR, Localized_text.TEXT_SN_LISTS_ERR_PLAYER_NOT_FOUND);
@@ -357,7 +357,7 @@ namespace WorldServer.World.Interfaces
             if (HasFriend(characterId))
                 RemoveFriend(charName);
 
-            Character_social social = new Character_social
+            characters_socials social = new characters_socials
             {
                 CharacterId = _player.Info.CharacterId,
                 DistName = charName,
@@ -387,7 +387,7 @@ namespace WorldServer.World.Interfaces
 
         public void RemoveIgnore(uint characterId, string charName)
         {
-            Character_social social;
+            characters_socials social;
 
             lock (_ignoreCharacterIds)
                 social = _ignoreCharacterIds[characterId];
@@ -467,7 +467,7 @@ namespace WorldServer.World.Interfaces
             }
         }
 
-        public static void BuildPlayerInfo(ref PacketOut Out, Character_social Social, bool noHide = false)
+        public static void BuildPlayerInfo(ref PacketOut Out, characters_socials Social, bool noHide = false)
         {
             var player = Player.GetPlayer(Social.DistName);
 
@@ -494,7 +494,7 @@ namespace WorldServer.World.Interfaces
             _player.SendPacket(Out);
         }
 
-        public void SendSocialList(List<Character_social> socials, SocialListType Type)
+        public void SendSocialList(List<characters_socials> socials, SocialListType Type)
         {
             PacketOut Out = new PacketOut((byte)Opcodes.F_SOCIAL_NETWORK);
             Out.WriteUInt16(0);
@@ -502,7 +502,7 @@ namespace WorldServer.World.Interfaces
             Out.WriteByte((byte)socials.Count);
             Out.WriteByte(0);
 
-            foreach (Character_social social in socials)
+            foreach (characters_socials social in socials)
             {
                 BuildPlayerInfo(ref Out, social);
                 Out.WriteByte(0);
@@ -528,7 +528,7 @@ namespace WorldServer.World.Interfaces
             _player.SendPacket(Out);
         }
 
-        public void SendSocialList(Character_social Social, SocialListType Type)
+        public void SendSocialList(characters_socials Social, SocialListType Type)
         {
             PacketOut Out = new PacketOut((byte)Opcodes.F_SOCIAL_NETWORK);
             Out.WriteUInt16(0);

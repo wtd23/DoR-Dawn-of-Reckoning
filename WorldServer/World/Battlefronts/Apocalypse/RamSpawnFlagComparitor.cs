@@ -5,10 +5,10 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 {
     public class RamSpawnFlagComparitor : ILocationComparitor
     {
-        public Realms PlayerRealm { get; }
+        public SetRealms PlayerRealm { get; }
         public int ComparisonRange = 50;
 
-        public RamSpawnFlagComparitor(Realms playerRealm)
+        public RamSpawnFlagComparitor(SetRealms playerRealm)
         {
             PlayerRealm = playerRealm;
         }
@@ -23,7 +23,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             {
                 switch (PlayerRealm)
                 {
-                    case Realms.REALMS_REALM_DESTRUCTION:
+                    case SetRealms.REALMS_REALM_DESTRUCTION:
                         {
                             if (test.Entry == 666572)
                                 return true;
@@ -32,7 +32,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                                 break;
                             }
                         }
-                    case Realms.REALMS_REALM_ORDER:
+                    case SetRealms.REALMS_REALM_ORDER:
                         {
                             if (test.Entry == 666571)
                                 return true;

@@ -1,5 +1,6 @@
 ﻿using AccountCacher;
 using Common;
+using Common.Database.World.Battlefront;
 using FrameWork;
 using FrameWork.Misc;
 using System;
@@ -23,12 +24,12 @@ namespace WorldServer
 {
     internal class Core
     {
-        public static WorldConfigs Config;
+        public static WorldConfig Config;
         public static AccountConfig AccountConfig;
         public static RpcClient Client;
         public static AccountMgr AcctMgr => Client?.GetServerObject<AccountMgr>();
         public static TCPServer Server;
-        public static Realm Rm;
+        public static realms Rm;
         private static Timer _timer;
         private static Process m_Process;
 
@@ -79,13 +80,18 @@ namespace WorldServer
             Console.CancelKeyPress += new ConsoleCancelEventHandler(OnClose);
             m_Process = Process.GetCurrentProcess();
 
-            Log.Info("", "-------------------- World Server ---------------------", ConsoleColor.DarkRed);
-
             // WorldServer mode load
-            Debug = true;
-            HighPriority = true;
-            Dev = true;
-            LoadPhysics = true;
+            for (int i = 0; i < args.Length; ++i)
+            {
+                if (Insensitive.Equals(args[i], "-debug"))
+                    Debug = true;
+                else if (Insensitive.Equals(args[i], "-priority"))
+                    HighPriority = true;
+                else if (Insensitive.Equals(args[i], "-dev"))
+                    Dev = true;
+                else if (Insensitive.Equals(args[i], "-physics"))
+                    LoadPhysics = true;
+            }
 
             if (Dev)
             {
@@ -98,12 +104,19 @@ namespace WorldServer
 
             Version ver = Assembly.GetEntryAssembly().GetName().Version;
 
-            Utils.PushColor(ConsoleColor.Blue);
-            Console.WriteLine("DoR-Dawn-of-Reckoning Version {0}.{1}, Build {2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision);
+            Utils.PushColor(ConsoleColor.Gray);
+            Console.WriteLine("-------------------- World Server  -------------------");
+            Console.WriteLine("DagonUO Version {0}.{1}, Build {2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision);
             Console.WriteLine("Core: Running on .NET Framework Version {0}.{1}.{2}", Environment.Version.Major, Environment.Version.Minor, Environment.Version.Build);
             Utils.PopColor();
-            Console.WriteLine("DoR-Dawn-of-Reckoning");
-            Utils.PushColor(ConsoleColor.Blue);
+            Console.WriteLine("");
+            Console.WriteLine("██╗    ██╗██╗████████╗ ██████╗██╗  ██╗██╗  ██╗██████╗  █████╗ ███████╗████████╗");
+            Console.WriteLine("██║    ██║██║╚══██╔══╝██╔════╝██║  ██║██║ ██╔╝██╔══██╗██╔══██╗██╔════╝╚══██╔══╝");
+            Console.WriteLine("██║ █╗ ██║██║   ██║   ██║     ███████║█████╔╝ ██████╔╝███████║█████╗     ██║   ");
+            Console.WriteLine("╚███╔███╔╝██║   ██║   ╚██████╗██║  ██║██║  ██╗██║  ██║██║  ██║██║        ██║   ");
+            Console.WriteLine(" ╚══╝╚══╝ ╚═╝   ╚═╝    ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝        ╚═╝   ");
+            Console.WriteLine("");
+            Utils.PushColor(ConsoleColor.Gray);
             string s = Arguments;
 
             if (s.Length > 0)
@@ -117,7 +130,7 @@ namespace WorldServer
                     System.Diagnostics.Process.GetCurrentProcess().PriorityClass = System.Diagnostics.ProcessPriorityClass.AboveNormal;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //Server.Diagnostics.ExceptionLogging.LogException(ex);
             }
@@ -130,7 +143,7 @@ namespace WorldServer
             Utils.PushColor(ConsoleColor.Gray);
             // Loading all configs files
             ConfigMgr.LoadConfigs();
-            Config = ConfigMgr.GetConfig<WorldConfigs>();
+            Config = ConfigMgr.GetConfig<WorldConfig>();
             AccountConfig = ConfigMgr.GetConfig<AccountConfig>();
 
             // Loading log level from file
@@ -164,7 +177,7 @@ namespace WorldServer
             if (WorldMgr.Database == null)
                 ConsoleMgr.WaitAndExit(2000);
 
-            WorldMgr.StartingPairing = WorldMgr.Database.ExecuteQueryInt("SELECT FLOOR(RAND() * 3) + 1");
+            //WorldMgr.StartingPairing = WorldMgr.Database.ExecuteQueryInt("SELECT FLOOR(RAND() * 3) + 1");
 
             // Ensure directory structure is correct
             if (!Directory.Exists("Zones"))
@@ -197,30 +210,37 @@ namespace WorldServer
             WorldMgr.Database.ExecuteNonQuery("DELETE FROM rvr_metrics WHERE TIMESTAMP NOT BETWEEN DATE_SUB(UTC_TIMESTAMP(), INTERVAL 60 DAY) AND UTC_TIMESTAMP()");
 
             Log.Debug("Battlefront Manager", "Creating Upper Tier Campaign Manager");
-            if (RVRProgressionService._RVRProgressions.Count == 0)
+            if (RVRProgressionService.RVRProgressions.Count == 0)
             {
                 Log.Error("RVR Progression", "NO RVR Progressions in DB");
                 return;
             }
-            WorldMgr.UpperTierCampaignManager = new UpperTierCampaignManager(RVRProgressionService._RVRProgressions.Where(x => x.Tier == 4).ToList(), WorldMgr._Regions);
+            //  WorldMgr.ScalingCampaignManager = new ScalingCampaignManager(RVRProgressionService._RVRProgressions.Where(x => x.Tier == 4).ToList(), WorldMgr._Regions);
+            WorldMgr.ScalingCampaignManager = new ScalingCampaignManager(RVRProgressionService.RVRProgressions.Where(x => x.Tier != 1).ToList(), WorldMgr._Regions);
+
             Log.Debug("Battlefront Manager", "Creating Lower Tier Campaign Manager");
-            WorldMgr.LowerTierCampaignManager = new LowerTierCampaignManager(RVRProgressionService._RVRProgressions.Where(x => x.Tier == 1).ToList(), WorldMgr._Regions);
+            WorldMgr.LowerTierCampaignManager = new LowerTierCampaignManager(RVRProgressionService.RVRProgressions.Where(x => x.Tier == 1).ToList(), WorldMgr._Regions);
             Log.Debug("Battlefront Manager", "Getting Progression based upon rvr_progression.LastOpenedZone");
-            WorldMgr.UpperTierCampaignManager.GetActiveBattleFrontFromProgression();
-            WorldMgr.LowerTierCampaignManager.GetActiveBattleFrontFromProgression();
+            foreach (pairing_infos campaign in RVRProgressionService.RVRPairings)
+            {
+                WorldMgr.ScalingCampaignManager.GetActiveBattleFrontFromProgression(campaign.PairingId);
+                WorldMgr.LowerTierCampaignManager.GetActiveBattleFrontFromProgression(campaign.PairingId);
+            }
             Log.Debug("Battlefront Manager", "Attaching Campaigns to Regions");
             // Attach Battlefronts to regions
             WorldMgr.AttachCampaignsToRegions();
 
             Log.Debug("Battlefront Manager", "Locking Battlefronts");
-            WorldMgr.UpperTierCampaignManager.LockBattleFrontsAllRegions(4);
+            WorldMgr.ScalingCampaignManager.LockBattleFrontsAllRegions(4);
+            WorldMgr.ScalingCampaignManager.LockBattleFrontsAllRegions(3);
+            WorldMgr.ScalingCampaignManager.LockBattleFrontsAllRegions(2);
             WorldMgr.LowerTierCampaignManager.LockBattleFrontsAllRegions(1);
 
             Log.Debug("Battlefront Manager", "Opening Active battlefronts");
-            WorldMgr.UpperTierCampaignManager.OpenActiveBattlefront();
+            WorldMgr.ScalingCampaignManager.OpenActiveBattlefront();
             WorldMgr.LowerTierCampaignManager.OpenActiveBattlefront();
 
-            WorldMgr.UpdateRegionCaptureStatus(WorldMgr.LowerTierCampaignManager, WorldMgr.UpperTierCampaignManager);
+            WorldMgr.UpdateRegionCaptureStatus(WorldMgr.LowerTierCampaignManager, WorldMgr.ScalingCampaignManager);
 
             if (!TCPManager.Listen<TCPServer>(Rm.Port, "World"))
                 ConsoleMgr.WaitAndExit(2000);
@@ -228,11 +248,12 @@ namespace WorldServer
             Server = TCPManager.GetTcp<TCPServer>("World");
 
             AcctMgr.UpdateRealm(Client.Info, Rm.RealmId);
-            AcctMgr.UpdateRealmCharacters(Rm.RealmId, (uint)CharMgr.Database.GetObjectCount<Character>("Realm=1"), (uint)CharMgr.Database.GetObjectCount<Character>("Realm=2"));
+            AcctMgr.UpdateRealmCharacters(Rm.RealmId, (uint)CharMgr.Database.GetObjectCount<characters>("Realm=1"), (uint)CharMgr.Database.GetObjectCount<characters>("Realm=2"));
 
             // PrintCommands();
 
             ConsoleMgr.Start();
+            Console.WriteLine("-------------------- World Server ---------------------", ConsoleColor.DarkRed);
         }
 
         public static void Kill(bool restart)
@@ -270,7 +291,7 @@ namespace WorldServer
                     op.WriteLine("Server Crash Report");
                     op.WriteLine("===================");
                     op.WriteLine();
-                    op.WriteLine("DoR-Dawn-of-Reckoning Version {0}.{1}, Build {2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision);
+                    op.WriteLine("ProjectWAR Version {0}.{1}, Build {2}.{3}", ver.Major, ver.Minor, ver.Build, ver.Revision);
                     op.WriteLine("Operating System: {0}", Environment.OSVersion);
                     op.WriteLine(".NET Framework: {0}", Environment.Version);
                     op.WriteLine("Time: {0}", DateTime.Now);
@@ -293,7 +314,7 @@ namespace WorldServer
 
                             op.Write("+ {0}:", state);
 
-                            Account a = state.Client._Account;
+                            accounts a = state.Client._Account;
 
                             if (a != null)
                                 op.Write(" (account = {0})", a.Username);

@@ -30,7 +30,7 @@ namespace WorldServer.World.Objects
             Destroyed
         }
 
-        private readonly RvRObjectInfo _info;
+        private readonly rvr_objects _info;
         private readonly Vector2 _unitDirVec;
 
         private readonly HashSet<Player> _interactors = new HashSet<Player>();
@@ -38,7 +38,7 @@ namespace WorldServer.World.Objects
 
         private EConstructionState _buildState = EConstructionState.Constructing;
 
-        public RvRStructure(RvRObjectInfo info, Point3D loc, ushort rot, Player constructor)
+        public RvRStructure(rvr_objects info, Point3D loc, ushort rot, Player constructor)
         {
             // _logger.Debug($"RVRStructure constructor {info.ModelId} {info.Name} {loc.ToString()} {rot} {constructor.Name}");
 
@@ -98,7 +98,7 @@ namespace WorldServer.World.Objects
 
             int flags = 0;
 
-            if (Realm != Realms.REALMS_REALM_NEUTRAL && !IsInvulnerable)
+            if (Realm != SetRealms.REALMS_REALM_NEUTRAL && !IsInvulnerable)
                 flags |= 8; // Attackable (stops invalid target errors)
             if (plr.Realm == Realm)
                 flags |= 4; // Interactable
@@ -190,7 +190,7 @@ namespace WorldServer.World.Objects
 
             RvRStructure curStruct = plr.CbtInterface.GetCurrentTarget() as RvRStructure;
 
-            RvRObjectInfo info = BattleFrontService.GetRvRObjectInfo(entry);
+            rvr_objects info = BattleFrontService.GetRvRObjectInfo(entry);
             // _logger.Debug($"RVRStructure BattleFrontService.GetRvRObjectInfo Entry={entry} info={info.Name} {info.ModelId} {info.ObjectId}");
 
             if (curStruct != null)

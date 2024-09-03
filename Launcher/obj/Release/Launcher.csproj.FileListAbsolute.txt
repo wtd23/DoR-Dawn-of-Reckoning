@@ -13,3 +13,29 @@ C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\Launcher\obj\Release\Laun
 C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\Launcher\obj\Release\Launcher.csproj.CopyComplete
 C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\Launcher\obj\Release\Launcher.exe
 C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\Launcher\obj\Release\Launcher.pdb
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\Launcher\NLog.config
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\Launcher\NLog.xsd
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\Launcher\Launcher.exe.config
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\Launcher\Launcher.exe
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\Launcher\Launcher.pdb
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\Launcher\obj\Release\Launcher.csproj.AssemblyReference.cache
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\Launcher\obj\Release\Launcher.ApocLauncher.resources
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\Launcher\obj\Release\Launcher.Properties.Resources.resources
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\Launcher\obj\Release\Launcher.csproj.GenerateResource.cache
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\Launcher\obj\Release\Launcher.csproj.CoreCompileInputs.cache
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\Launcher\obj\Release\Launcher.csproj.Up2Date
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\Launcher\obj\Release\Launcher.exe
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\Launcher\obj\Release\Launcher.pdb
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\Launcher\NLog.config
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\Launcher\NLog.xsd
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\Launcher\Launcher.exe.config
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\Launcher\Launcher.exe
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\Launcher\Launcher.pdb
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\Launcher\obj\Release\Launcher.csproj.AssemblyReference.cache
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\Launcher\obj\Release\Launcher.ApocLauncher.resources
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\Launcher\obj\Release\Launcher.Properties.Resources.resources
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\Launcher\obj\Release\Launcher.csproj.GenerateResource.cache
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\Launcher\obj\Release\Launcher.csproj.CoreCompileInputs.cache
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\Launcher\obj\Release\Launcher.csproj.Up2Date
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\Launcher\obj\Release\Launcher.exe
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\Launcher\obj\Release\Launcher.pdb

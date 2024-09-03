@@ -212,7 +212,7 @@ namespace WorldServer.World.Objects.Instances.Gunbad
 
             foreach (Player player in Obj.PlayersInRange)
             {
-                if (player.Realm == GameData.Realms.REALMS_REALM_ORDER)
+                if (player.Realm == GameData.SetRealms.REALMS_REALM_ORDER)
                     count++;
                 else
                     count--;

@@ -1,25 +1,12 @@
-﻿/*
- * Copyright (C) 2013 APS
- *	http://AllPrivateServer.com
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- */
+﻿using FrameWork;
+using WorldServer.NetWork.Handler;
+using WorldServer.World.Abilities.Components;
+using WorldServer.World.Interfaces;
+using WorldServer.World.Objects;
+using WorldServer.World.Scripting.Mounts;
 
 namespace WorldServer.World.Scripting.Creatures
 {
-    /*
     [GeneralScript(false, "", CreatureEntry = 116, GameObjectEntry = 0)]
     public class WorldOrderMountScript : AGeneralScript
     {
@@ -28,12 +15,12 @@ namespace WorldServer.World.Scripting.Creatures
             Mount(Target);
         }
 
-        static public void Mount(Player Target)
+        public static void Mount(Player Target)
         {
-            if (Target.MvtInterface.IsMount())
+            if (Target.MvtInterface.HasUnit())
                 return;
 
-            if(Target._Info.Race == (byte)GameData.Races.RACES_DWARF)
+            if (Target.Info.Race == (byte)GameData.Races.RACES_DWARF)
                 Target.MvtInterface.CurrentMount.SetMount(8);
             else if (StaticRandom.Instance.Next(4) == 1)
                 Target.MvtInterface.CurrentMount.SetMount(180);
@@ -50,9 +37,9 @@ namespace WorldServer.World.Scripting.Creatures
             Mount(Target);
         }
 
-        static public void Mount(Player Target)
+        public static void Mount(Player Target)
         {
-            if (Target.MvtInterface.IsMount())
+            if (Target.MvtInterface.CurrentMount.IsMount())
                 return;
 
             if (StaticRandom.Instance.Next(4) == 1)
@@ -61,25 +48,25 @@ namespace WorldServer.World.Scripting.Creatures
                 Target.MvtInterface.CurrentMount.SetMount(12);
         }
     }
-    */
-    /*[GeneralScript(true, "WorldFleeAbility")]
+
+    [GeneralScript(true, "WorldFleeAbility")]
     public class WorldFleeAbilityMount : AGeneralScript
     {
-        public override void OnCastAbility(Ability Ab)
+        public override void OnCastAbility(AbilityInfo Ab)
         {
-            if (Ab.Caster.IsPlayer() && Ab.Info.Entry == 245) // Flee
+            if (Ab.Caster.IsPlayer() && Ab.ConstantInfo.Entry == 245) // Flee
             {
-                if (Ab.Caster.GetPlayer().MvtInterface.IsMount())
+                if (Ab.Caster.GetPlayer().MvtInterface.CurrentMount.IsMount())
                 {
-                    Ab.Caster.GetPlayer().MvtInterface.UnMount();
+                    Ab.Caster.GetPlayer().MvtInterface.CurrentMount.UnMount();
                     return;
                 }
 
-                if (Ab.Caster.GetPlayer().Realm == GameData.Realms.REALMS_REALM_ORDER)
+                if (Ab.Caster.GetPlayer().Realm == GameData.SetRealms.REALMS_REALM_ORDER)
                     WorldOrderMountScript.Mount(Ab.Caster.GetPlayer());
                 else
                     WorldDestructionMountScript.Mount(Ab.Caster.GetPlayer());
             }
         }
-    }*/
+    }
 }

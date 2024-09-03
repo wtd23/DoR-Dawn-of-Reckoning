@@ -838,7 +838,7 @@ namespace WorldServer.World.Abilities.Buffs
             BuffEffectInvoker.InvokeResourceCommand(this, myCommand, oldVal, ref change);
         }
 
-        public void InvokeItemEvent(byte eventID, Item_Info itmInfo)
+        public void InvokeItemEvent(byte eventID, item_infos itmInfo)
         {
             if (BuffState != (byte)EBuffState.Running)
                 return;

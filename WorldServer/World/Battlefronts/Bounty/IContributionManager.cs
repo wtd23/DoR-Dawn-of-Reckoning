@@ -29,12 +29,12 @@ namespace WorldServer.World.Battlefronts.Bounty
 
         ConcurrentDictionary<short, ContributionStage> GetContributionStageDictionary(
             List<PlayerContribution> contributionList,
-            List<ContributionDefinition> contributionFactors);
+            List<bounty_contribution_definition> contributionFactors);
 
         ConcurrentDictionary<short, ContributionStage> GetContributionStageDictionary(uint targetCharacterId);
 
         Tuple<ConcurrentDictionary<Player, int>, ConcurrentDictionary<Player, int>, ConcurrentDictionary<Player, int>>
-            DetermineEligiblePlayers(ILogger logger, Realms lockingRealm);
+            DetermineEligiblePlayers(ILogger logger, SetRealms lockingRealm);
 
         int GetMaximumContribution();
     }

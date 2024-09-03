@@ -30,10 +30,10 @@ namespace WorldServer.World.Auction
         {
             Log.Debug("WorldMgr", "Loading auctions...");
 
-            Auctions = CharMgr.Database.SelectAllObjects<Common.Auction>() as List<Common.Auction>;
+            Auctions = CharMgr.Database.SelectAllObjects<Common.auctions>() as List<Common.auctions>;
             int count = 0;
             if (Auctions != null)
-                foreach (Common.Auction auct in Auctions)
+                foreach (Common.auctions auct in Auctions)
                 {
                     auct.Seller = CharMgr.GetCharacter(auct.SellerId, false);
 
@@ -47,17 +47,17 @@ namespace WorldServer.World.Auction
 
         #endregion Auction Loading
 
-        public static List<Common.Auction> Auctions;
+        public static List<Common.auctions> Auctions;
 
         public static void SendAuctions(Player plr, string searchTerm, string sellerName, byte minLevel, byte maxLevel, byte rarity, byte career, List<byte> types, List<byte> slots, byte stat)
         {
-            List<Common.Auction> matching = new List<Common.Auction>();
-            List<Common.Auction> toRemove = new List<Common.Auction>();
+            List<Common.auctions> matching = new List<Common.auctions>();
+            List<Common.auctions> toRemove = new List<Common.auctions>();
 
             int count = 0;
             lock (Auctions)
             {
-                foreach (Common.Auction auct in Auctions)
+                foreach (Common.auctions auct in Auctions)
                     if (count < MAX_AUCTIONS_TO_SEND)
                     {
                         if (auct.Item == null)
@@ -118,7 +118,7 @@ namespace WorldServer.World.Auction
             Out.WriteByte((byte)matching.Count);// count
             Out.WriteByte(0x01);
 
-            foreach (Common.Auction auct in matching)
+            foreach (Common.auctions auct in matching)
             {
                 Out.WriteUInt64(auct.AuctionId); // id
                 Out.WriteUInt16(1); // part of the id?
@@ -129,7 +129,7 @@ namespace WorldServer.World.Auction
                 Out.FillString(auct.Seller == null ? "" : auct.Seller.Name + (auct.Seller.Sex == 1 ? "^F" : "^M"), 48);
                 Out.WriteHexStringBytes("880E39");
 
-                Item.BuildItem(ref Out, null, null, new MailItem(auct.ItemId, auct._Talismans, auct.PrimaryDye, auct.SecondaryDye, auct.Count), 0, auct.Count);
+                Item.BuildItem(ref Out, null, null, new mail_item(auct.ItemId, auct._Talismans, auct.PrimaryDye, auct.SecondaryDye, auct.Count), 0, auct.Count);
 
                 if (plr != null && plr.ItmInterface != null && auct.Item != null && auct.Item.ItemSet != 0)
                     plr.ItmInterface.SendItemSetInfoToPlayer(plr, auct.Item.ItemSet);
@@ -138,7 +138,7 @@ namespace WorldServer.World.Auction
             plr.SendPacket(Out);
         }
 
-        public static void AddAuction(Common.Auction auction)
+        public static void AddAuction(Common.auctions auction)
         {
             lock (Auctions)
                 Auctions.Add(auction);
@@ -148,7 +148,7 @@ namespace WorldServer.World.Auction
 
         public static void BuyOutAuction(Player buyer, ulong auctionId, uint price)
         {
-            Common.Auction auction;
+            Common.auctions auction;
 
             bool cancel = false;
 
@@ -188,7 +188,7 @@ namespace WorldServer.World.Auction
             {
                 if (auction.Seller != null)
                 {
-                    Character_mail sellerMail = new Character_mail
+                    characters_mails sellerMail = new characters_mails
                     {
                         Guid = CharMgr.GenerateMailGuid(),
                         CharacterId = auction.SellerId,
@@ -206,7 +206,7 @@ namespace WorldServer.World.Auction
             }
 
             // SendMail to buyer
-            Character_mail buyerMail = new Character_mail
+            characters_mails buyerMail = new characters_mails
             {
                 Guid = CharMgr.GenerateMailGuid(),
                 CharacterId = buyer.CharacterId,
@@ -218,7 +218,7 @@ namespace WorldServer.World.Auction
                 Opened = false
             };
 
-            buyerMail.Items.Add(new MailItem(auction.ItemId, auction._Talismans, auction.PrimaryDye, auction.SecondaryDye, auction.Count));
+            buyerMail.Items.Add(new mail_item(auction.ItemId, auction._Talismans, auction.PrimaryDye, auction.SecondaryDye, auction.Count));
 
             CharMgr.AddMail(buyerMail);
 
@@ -240,7 +240,7 @@ namespace WorldServer.World.Auction
             byte count = 0;
             lock (Auctions)
             {
-                foreach (Common.Auction auct in Auctions)
+                foreach (Common.auctions auct in Auctions)
                     if (sellerId == auct.SellerId)
                         count++;
             }
@@ -260,7 +260,7 @@ namespace WorldServer.World.Auction
                     if (Auctions[i].StartTime >= expireTimeStart)
                         continue;
 
-                    Common.Auction auction = Auctions[i];
+                    Common.auctions auction = Auctions[i];
 
                     if (auction.Item == null)
                         auction.Item = ItemService.GetItem_Info(auction.ItemId);
@@ -268,7 +268,7 @@ namespace WorldServer.World.Auction
                     if (auction.Item != null)
                     {
                         // return item to lister
-                        Character_mail expireMail = new Character_mail
+                        characters_mails expireMail = new characters_mails
                         {
                             Guid = CharMgr.GenerateMailGuid(),
                             CharacterId = auction.SellerId,
@@ -280,7 +280,7 @@ namespace WorldServer.World.Auction
                             Opened = false
                         };
 
-                        expireMail.Items.Add(new MailItem(auction.ItemId, auction._Talismans, auction.PrimaryDye, auction.SecondaryDye, auction.Count));
+                        expireMail.Items.Add(new mail_item(auction.ItemId, auction._Talismans, auction.PrimaryDye, auction.SecondaryDye, auction.Count));
 
                         CharMgr.AddMail(expireMail);
                     }

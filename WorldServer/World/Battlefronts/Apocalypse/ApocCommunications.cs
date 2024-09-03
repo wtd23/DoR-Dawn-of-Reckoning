@@ -23,7 +23,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             plr.SendPacket(Out);
         }
 
-        public void BuildCaptureStatus(PacketOut Out, RegionMgr region, Realms realm)
+        public void BuildCaptureStatus(PacketOut Out, RegionMgr region, SetRealms realm)
         {
             if (region == null)
                 Out.Fill(0, 3);
@@ -44,7 +44,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             //region.Campaign.WriteBattleFrontStatus(Out);
         }
 
-        public void ResetProgressionCommunications(Player plr, Realms realm, VictoryPointProgress vpp, string forceT4)
+        public void ResetProgressionCommunications(Player plr, SetRealms realm, VictoryPointProgress vpp, string forceT4)
         {
             _logger.Warn("F_CAMPAIGN_STATUS");
             PacketOut Out = new PacketOut((byte)Opcodes.F_CAMPAIGN_STATUS, 159);
@@ -167,7 +167,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             plr.SendPacket(Out);
         }
 
-        public void SendCampaignStatus(Player plr, VictoryPointProgress vpp, Realms realm)
+        public void SendCampaignStatus(Player plr, VictoryPointProgress vpp, SetRealms realm)
         {
             _logger.Trace("Send Campaign Status");
             _logger.Warn("F_CAMPAIGN_STATUS");
@@ -277,7 +277,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             }
         }
 
-        public void WriteVictoryPoints(Realms realm, PacketOut Out, VictoryPointProgress vpp)
+        public void WriteVictoryPoints(SetRealms realm, PacketOut Out, VictoryPointProgress vpp)
         {
             Out.WriteByte((byte)vpp.OrderVictoryPoints);
             Out.WriteByte((byte)vpp.DestructionVictoryPoints);
@@ -308,12 +308,12 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                         continue;
 
                     plr.SendLocalizeString(message, ChatLogFilters.CHATLOGFILTERS_RVR, Localized_text.CHAT_TAG_DEFAULT);
-                    plr.SendLocalizeString(message, plr.Realm == Realms.REALMS_REALM_ORDER ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE, Localized_text.CHAT_TAG_DEFAULT);
+                    plr.SendLocalizeString(message, plr.Realm == SetRealms.REALMS_REALM_ORDER ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE, Localized_text.CHAT_TAG_DEFAULT);
                 }
             }
         }
 
-        public void Broadcast(string message, Realms realm, RegionMgr region, int tier)
+        public void Broadcast(string message, SetRealms realm, RegionMgr region, int tier)
         {
             foreach (Player plr in region.Players)
             {
@@ -321,7 +321,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                     continue;
 
                 plr.SendLocalizeString(message, ChatLogFilters.CHATLOGFILTERS_RVR, Localized_text.CHAT_TAG_DEFAULT);
-                plr.SendLocalizeString(message, realm == Realms.REALMS_REALM_ORDER ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE, Localized_text.CHAT_TAG_DEFAULT);
+                plr.SendLocalizeString(message, realm == SetRealms.REALMS_REALM_ORDER ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE, Localized_text.CHAT_TAG_DEFAULT);
             }
         }
     }

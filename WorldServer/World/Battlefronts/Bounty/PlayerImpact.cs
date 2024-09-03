@@ -21,7 +21,7 @@ namespace WorldServer.World.Battlefronts.Bounty
 
         public override string ToString()
         {
-            return $" Character Id {CharacterId} " +
+            return $" characters Id {CharacterId} " +
                    $"ImpactValue {ImpactValue}, " +
                    $"Expiry {ExpiryTimestamp} " +
                    $"Modification {ModificationValue} ";

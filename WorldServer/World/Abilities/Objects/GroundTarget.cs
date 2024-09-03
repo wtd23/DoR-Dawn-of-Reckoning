@@ -11,7 +11,7 @@ namespace WorldServer.World.Abilities.Objects
     /// </summary>
     public class GroundTarget : Unit
     {
-        private GameObject_spawn _spawn = new GameObject_spawn();
+        private gameobject_spawns _spawn = new gameobject_spawns();
 
         public GroundTarget(Unit instigator, Point3D spawnLoc, GameObject_proto proto)
         {
@@ -19,10 +19,10 @@ namespace WorldServer.World.Abilities.Objects
             WorldPosition.X = spawnLoc.X;
             WorldPosition.Y = spawnLoc.Y;
             WorldPosition.Z = spawnLoc.Z;
-            Realm = GameData.Realms.REALMS_REALM_NEUTRAL;
+            Realm = GameData.SetRealms.REALMS_REALM_NEUTRAL;
             Level = instigator.EffectiveLevel;
             //player.Realm;
-            Faction = Realm == GameData.Realms.REALMS_REALM_ORDER ? (byte)0x41 : (byte)0x81;
+            Faction = Realm == GameData.SetRealms.REALMS_REALM_ORDER ? (byte)0x41 : (byte)0x81;
 
             Health = 1;
             MaxHealth = 1;
@@ -38,8 +38,8 @@ namespace WorldServer.World.Abilities.Objects
             WorldPosition.X = spawnLoc.X;
             WorldPosition.Y = spawnLoc.Y;
             WorldPosition.Z = spawnLoc.Z;
-            Realm = GameData.Realms.REALMS_REALM_NEUTRAL;
-            Faction = Realm == GameData.Realms.REALMS_REALM_ORDER ? (byte)0x41 : (byte)0x81;
+            Realm = GameData.SetRealms.REALMS_REALM_NEUTRAL;
+            Faction = Realm == GameData.SetRealms.REALMS_REALM_ORDER ? (byte)0x41 : (byte)0x81;
 
             Health = 1;
             MaxHealth = 1;

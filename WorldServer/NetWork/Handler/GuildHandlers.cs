@@ -59,7 +59,7 @@ namespace WorldServer.NetWork.Handler
                             return;
                         }
 
-                        Guild_member GldMem = Plr.GldInterface.Guild.Info.Members[Plr.CharacterId];
+                        guild_members GldMem = Plr.GldInterface.Guild.Info.Members[Plr.CharacterId];
 
                         Plr.GldInterface.Guild.LeaveGuild(GldMem, false);
                     }

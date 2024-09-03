@@ -10,6 +10,7 @@ namespace WorldServer.World.AI.Abilities
         // Melee range for the boss - could use baseradius perhaps?
         public static int BOSS_MELEE_RANGE = 25;
 
+        public static int NPC_DISTANCE_RANGE = 100;
         public static int NPC_MELEE_RANGE = 10;
 
         public Conditions(Unit owner, CombatInterface_Npc combat)
@@ -25,8 +26,8 @@ namespace WorldServer.World.AI.Abilities
         {
             if (Owner != null)
             {
-                //Cooler wanted 100. I'll do 50. Default RoR is 30.
-                var players = Owner.GetPlayersInRange(50, false);
+                // cooler-SAI wanted 100. I'll do 50. Default RoR is 30.
+                var players = Owner.GetPlayersInRange(100, false);
                 if (players == null)
                     return false;
                 return true;
@@ -54,6 +55,19 @@ namespace WorldServer.World.AI.Abilities
             if (Combat.CurrentTarget is Player)
             {
                 return Owner.GetDistanceToObject(Owner.CbtInterface.GetCurrentTarget()) < NPC_MELEE_RANGE;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool PlayerInDistanceRange()
+        {
+            if (!Combat.HasTarget(TargetTypes.TARGETTYPES_TARGET_ENEMY)) return false;
+            if (Combat.CurrentTarget is Player)
+            {
+                return Owner.GetDistanceToObject(Owner.CbtInterface.GetCurrentTarget()) < NPC_DISTANCE_RANGE;
             }
             else
             {

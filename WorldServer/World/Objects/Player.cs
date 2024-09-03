@@ -25,6 +25,7 @@ using WorldServer.World.Battlefronts.Keeps;
 using WorldServer.World.Interfaces;
 using WorldServer.World.Map;
 using WorldServer.World.Objects.PublicQuests;
+using WorldServer.World.Scripting.Mounts;
 using WorldServer.World.Positions;
 using WorldServer.World.Scenarios;
 using WorldServer.World.Scenarios.Objects;
@@ -84,7 +85,7 @@ namespace WorldServer.World.Objects
                     Found = true;
                     _Players.Add(newPlayer);
                     PlayersByCharId.Add(newPlayer.Info.CharacterId, newPlayer);
-                    if (newPlayer.Realm == Realms.REALMS_REALM_ORDER)
+                    if (newPlayer.Realm == SetRealms.REALMS_REALM_ORDER)
                         ++OrderCount;
                     else
                         ++DestruCount;
@@ -153,7 +154,7 @@ namespace WorldServer.World.Objects
 
                     PlayersByCharId.Remove(oldPlayer.Info.CharacterId);
 
-                    if (oldPlayer.Info.Realm == (byte)Realms.REALMS_REALM_ORDER)
+                    if (oldPlayer.Info.Realm == (byte)SetRealms.REALMS_REALM_ORDER)
                         --OrderCount;
                     else
                         --DestruCount;
@@ -186,7 +187,7 @@ namespace WorldServer.World.Objects
                 return _Players.Find(plr => plr.CharacterId == characterId);
         }
 
-        public static Player CreatePlayer(GameClient client, Character Char)
+        public static Player CreatePlayer(GameClient client, characters Char)
         {
             GameClient other = ((TCPServer)client.Server).GetClientByAccount(client, Char.AccountId);
             if (other != null)
@@ -246,8 +247,8 @@ namespace WorldServer.World.Objects
         private static readonly Logger RewardLogger = LogManager.GetLogger("RewardLogger");
         private static readonly Logger DeathLogger = LogManager.GetLogger("DeathLogger");
 
-        public Character Info;
-        public Character_value _Value;
+        public characters Info;
+        public characters_value _Value;
 
         // This is used by State of the realm
         public bool SoREnabled = false;
@@ -268,7 +269,7 @@ namespace WorldServer.World.Objects
 
         public long deathTime = 0;
 
-        public BattleFrontStatus ActiveBattleFrontStatus => GetBattlefrontManager(Region.RegionId).GetActiveCampaign().GetActiveBattleFrontStatus();
+        public BattleFrontStatus ActiveBattleFrontStatus => GetBattlefrontManager(Region.RegionId).GetActiveCampaign((ushort)ZoneId).GetActiveBattleFrontStatus((ushort)ZoneId);
         public BountyManager BountyManagerInstance => GetBattlefrontManager(Region.RegionId).BountyManagerInstance;
         public ImpactMatrixManager ImpactMatrixManager => GetPlayerImpactMatrixManager();
 
@@ -311,7 +312,7 @@ namespace WorldServer.World.Objects
 
                 int modelID = 0;
 
-                if (plr.Realm == Realms.REALMS_REALM_ORDER)
+                if (plr.Realm == SetRealms.REALMS_REALM_ORDER)
                 {
                     if (plr.Info.Race == 1)
                     {
@@ -506,7 +507,7 @@ namespace WorldServer.World.Objects
             }
         }
 
-        public Player(GameClient client, Character info)
+        public Player(GameClient client, characters info)
         {
             Client = client;
             Info = info;
@@ -517,7 +518,7 @@ namespace WorldServer.World.Objects
 			else*/
             Name = info.Name;
             GenderedName = Name + (info.Sex == 0 ? "^M" : "^F");
-            Realm = (Realms)info.Realm;
+            Realm = (SetRealms)info.Realm;
             SetPVPFlag(false);
 
             EvtInterface = AddInterface<EventInterface>();
@@ -625,7 +626,7 @@ namespace WorldServer.World.Objects
 
                         float restHours = Math.Min(168, diffSeconds * 0.00027f);
 
-                        Xp_Info curLev = XpRenownService.GetXp_Info(_Value.Level);
+                        xp_infos curLev = XpRenownService.GetXp_Info(_Value.Level);
 
                         if (curLev == null)
                             _Value.RestXp = 0;
@@ -1030,7 +1031,7 @@ namespace WorldServer.World.Objects
             {
                 CancelQuit(null, null);
 
-                CharacterInfo info = CharMgr.GetCharacterInfo(Info.Career);
+                character_info info = CharMgr.GetCharacterInfo(Info.Career);
                 Teleport(info.ZoneId, (uint)info.WorldX, (uint)info.WorldY, (ushort)info.WorldZ, (ushort)info.WorldO);
             }
             else
@@ -1043,7 +1044,7 @@ namespace WorldServer.World.Objects
                 }
                 else
                 {
-                    CharacterInfo info = CharMgr.GetCharacterInfo(Info.Career);
+                    character_info info = CharMgr.GetCharacterInfo(Info.Career);
                     Teleport(info.ZoneId, (uint)info.WorldX, (uint)info.WorldY, (ushort)info.WorldZ, (ushort)info.WorldO);
                 }
             }
@@ -1121,7 +1122,7 @@ namespace WorldServer.World.Objects
             else if (_pendingStuck || ScnInterface.Scenario != null)
             {
                 // Warp a player to their bind point on logout if they were stuck.
-                RallyPoint rallyPoint = RallyPointService.GetRallyPoint(Info.Value.RallyPoint);
+                rally_points rallyPoint = RallyPointService.GetRallyPoint(Info.Value.RallyPoint);
 
                 if (rallyPoint != null)
                 {
@@ -1131,7 +1132,7 @@ namespace WorldServer.World.Objects
                     _Value.WorldO = rallyPoint.WorldO;
                     _Value.ZoneId = rallyPoint.ZoneID;
 
-                    Zone_Info info = ZoneService.GetZone_Info(rallyPoint.ZoneID);
+                    zone_infos info = ZoneService.GetZone_Info(rallyPoint.ZoneID);
                     if (info == null)
                         return;
 
@@ -1652,20 +1653,31 @@ namespace WorldServer.World.Objects
             Out.WriteUInt16(_Value.RallyPoint);
             SendPacket(Out);
 
+            // Mount Gunbad dungeon chapter bar Temporary Fix
+            //Dwarf order side
+            Out = new PacketOut((byte)Opcodes.F_UPDATE_STATE);
+            Out.WriteUInt16(0x001F);   // area id
+            Out.WriteByte((byte)StateOpcode.ZoneEntry);
+            Out.WriteByte(2);
+            Out.WriteByte(1);
+            Out.WriteByte(1);
+            Out.Fill(0, 4);
+            SendPacket(Out);
 
             //WAR REPORT Temporary
             Out = new PacketOut((byte)Opcodes.F_WAR_REPORT);
             Out.WriteUInt16(0x0118); // id ??
             Out.Fill(0, 6);
-            Out.WriteUInt16(0x1C20);
+            Out.WriteUInt16(0x1C20);//04 B0// = 7200 seconds/ = 120 min live servers
             Out.WriteUInt16(0);
             Out.WriteByte(0);
             Out.WriteUInt32(0xB6010201);//
             Out.WriteUInt32(0x5F32F0E5);//
-            Out.WriteUInt32(0x0000000F);
+            //Objects.PublicQuests;
+            Out.WriteUInt32(0x0000000F);//00 00 00 0F //0F= objective =15//Info.PQuestId
             Out.WriteUInt16(0);
             Out.WriteByte(0);
-            Out.WriteUInt16(0x0600);
+            Out.WriteUInt16(0x0600);//= 06 00//zoneid
             SendPacket(Out);
         }
 
@@ -1868,7 +1880,7 @@ namespace WorldServer.World.Objects
             {
                 Out.WriteUInt32(Convert.ToUInt32((Convert.ToInt64(lockout.Split(':')[1]) - TCPManager.GetTimeStamp()) / 60));
                 Out.Fill(0, 2);
-                InstanceService._InstanceInfo.TryGetValue(uint.Parse(lockout.Split(':')[0].Replace("~", "")), out Instance_Info info);
+                InstanceService._InstanceInfo.TryGetValue(uint.Parse(lockout.Split(':')[0].Replace("~", "")), out instance_infos info);
                 Out.WritePascalString(info.Name);
 
                 List<string> deadBosses = new List<string>();
@@ -1881,10 +1893,10 @@ namespace WorldServer.World.Objects
                 {
                     if (i < deadBosses.Count)
                     {
-                        InstanceService._InstanceBossSpawns.TryGetValue(uint.Parse(lockout.Split(':')[0].Replace("~", "")), out List<Instance_Boss_Spawn> bosses);
+                        InstanceService._InstanceBossSpawns.TryGetValue(uint.Parse(lockout.Split(':')[0].Replace("~", "")), out List<instance_boss_spawns> bosses);
                         uint Bossentry = 0;
 
-                        foreach (Instance_Boss_Spawn bs in bosses)
+                        foreach (instance_boss_spawns bs in bosses)
                         {
                             if (bs.bossId.ToString() == deadBosses[i])
                                 Bossentry = bs.Entry;
@@ -1951,7 +1963,7 @@ namespace WorldServer.World.Objects
         private void SendRealmBonus()
         {
             PacketOut Out = new PacketOut((byte)Opcodes.F_REALM_BONUS, 3);
-            Out.WriteByte(Realm == Realms.REALMS_REALM_ORDER ? (byte)1 : (byte)2);
+            Out.WriteByte(Realm == SetRealms.REALMS_REALM_ORDER ? (byte)1 : (byte)2);
             Out.WriteUInt16(0);
 
             SendPacket(Out);
@@ -2238,7 +2250,7 @@ namespace WorldServer.World.Objects
                     if (Link[0] == "ITEM")
                     {
                         uint ItemId = uint.Parse(Link[1]);
-                        Item_Info Info = ItemService.GetItem_Info(ItemId);
+                        item_infos Info = ItemService.GetItem_Info(ItemId);
                         if (Info != null)
                         {
                             ++Count;
@@ -2263,11 +2275,11 @@ namespace WorldServer.World.Objects
                     else if (Link[0] == "QUEST")
                     {
                         ushort QuestId = ushort.Parse(Link[1]);
-                        Quest Quest = QuestService.GetQuest(QuestId);
+                        quests Quest = QuestService.GetQuest(QuestId);
                         if (Quest != null)
                         {
                             ++Count;
-                            Out.WriteByte(4); // Quest
+                            Out.WriteByte(4); // quests
                             QuestsInterface.BuildQuestInteract(Out, QuestId, 0, 0);
                             Out.WriteUInt16(0);
                             Out.WriteByte(2);
@@ -2276,7 +2288,7 @@ namespace WorldServer.World.Objects
                             Out.WriteByte(0);
                             Out.WriteByte((byte)Quest.Objectives.Count);
 
-                            foreach (Quest_Objectives Objective in Quest.Objectives)
+                            foreach (quests_objectives Objective in Quest.Objectives)
                             {
                                 Out.WriteByte(0);
                                 Out.WriteByte((byte)Objective.ObjCount);
@@ -2578,7 +2590,7 @@ namespace WorldServer.World.Objects
                     return;
                 }
 
-                Guild_member gm;
+                guild_members gm;
                 if (GldInterface.Guild.Info.Members.TryGetValue(CharacterId, out gm))
                 {
                     if (gm.StandardBearer)
@@ -2624,7 +2636,7 @@ namespace WorldServer.World.Objects
         {
             if (WeaponStance == WeaponStance.Standard)
             {
-                Creature_spawn spawn = new Creature_spawn();
+                creature_spawns spawn = new creature_spawns();
                 spawn.Guid = (uint)CreatureService.GenerateCreatureSpawnGUID();
                 Creature_proto proto = new Creature_proto();
                 proto.MinScale = 50;
@@ -2691,8 +2703,7 @@ namespace WorldServer.World.Objects
                 SendMount();
             }
 
-            Pet pet = CrrInterface.GetTargetOfInterest() as Pet;
-            if (pet != null && !pet.PendingDisposal)
+            if (CrrInterface.GetTargetOfInterest() is Pet pet && !pet.PendingDisposal)
             {
                 ((CombatInterface_Pet)pet.CbtInterface).IgnoreDamageEvents = true;
                 pet.AiInterface.Debugger?.SendClientMessage("[MR] Scaling pet speed by " + speedFactor + ".");
@@ -2714,8 +2725,7 @@ namespace WorldServer.World.Objects
 
             ItmInterface.SendBackpack(this, 13, backpackModelId);
 
-            Pet pet = CrrInterface.GetTargetOfInterest() as Pet;
-            if (pet != null && !pet.PendingDisposal)
+            if (CrrInterface.GetTargetOfInterest() is Pet pet && !pet.PendingDisposal)
             {
                 ((CombatInterface_Pet)pet.CbtInterface).IgnoreDamageEvents = true;
                 pet.AiInterface.Debugger?.SendClientMessage("[MR] Scaling pet speed by " + speedFactor + ".");
@@ -2730,8 +2740,7 @@ namespace WorldServer.World.Objects
 
             ItmInterface.SendBackpack(this, 13, 0);
 
-            Pet pet = CrrInterface.GetTargetOfInterest() as Pet;
-            if (pet != null && !pet.PendingDisposal)
+            if (CrrInterface.GetTargetOfInterest() is Pet pet && !pet.PendingDisposal)
             {
                 ((CombatInterface_Pet)pet.CbtInterface).IgnoreDamageEvents = false;
                 pet.AiInterface.Debugger?.SendClientMessage("[MR] Restoring pet speed factor to " + pet.SpeedMult + ".");
@@ -2858,7 +2867,7 @@ namespace WorldServer.World.Objects
 
         #region Xp
 
-        private Xp_Info _currentXp;
+        private xp_infos _currentXp;
 
         private uint _xpPool;
         private uint _pendingXP;
@@ -2998,11 +3007,11 @@ namespace WorldServer.World.Objects
         {
             Dictionary<byte, ushort> Diff = new Dictionary<byte, ushort>();
 
-            List<CharacterInfo_stats> newStats = CharMgr.GetCharacterInfoStats(Info.CareerLine, _Value.Level);
+            List<character_info_stats> newStats = CharMgr.GetCharacterInfoStats(Info.CareerLine, _Value.Level);
             if (newStats == null || newStats.Count <= 0)
                 return Diff;
 
-            foreach (CharacterInfo_stats stat in newStats)
+            foreach (character_info_stats stat in newStats)
             {
                 ushort Base = StsInterface.GetBaseStat(stat.StatId);
 
@@ -3020,7 +3029,7 @@ namespace WorldServer.World.Objects
 
         #region Renown
 
-        public Renown_Info CurrentRenown;
+        public renown_infos CurrentRenown;
 
         private uint _renownPool;
 
@@ -3087,10 +3096,10 @@ namespace WorldServer.World.Objects
                 return;
             }
 
-            Character_value value = _Value;
+            characters_value value = _Value;
 
             if (value == null)
-                throw new NullReferenceException("NULL Character_value for " + Name);
+                throw new NullReferenceException("NULL characters_value for " + Name);
 
             if (renown > 500000)
             {
@@ -3203,7 +3212,7 @@ namespace WorldServer.World.Objects
             if (chapter == 0)
                 return;
 
-            Chapter_Info info = ChapterService.GetChapterEntry(chapter);
+            chapter_infos info = ChapterService.GetChapterEntry(chapter);
             if (info == null)
             {
                 _logger.Debug($"chapter {chapter} not found");
@@ -3211,9 +3220,9 @@ namespace WorldServer.World.Objects
             }
 
             if (Info.Influences == null)
-                Info.Influences = new List<Characters_influence>();
+                Info.Influences = new List<characters_influences>();
 
-            Characters_influence infl = null;
+            characters_influences infl = null;
 
             infl = Info.Influences.SingleOrDefault(x => x.InfluenceId == chapter);
 
@@ -3226,7 +3235,7 @@ namespace WorldServer.World.Objects
             if (infl == null)
             {
                 _logger.Debug($"chapter influence not found - adding");
-                infl = new Characters_influence((int)Info.CharacterId, chapter, value);
+                infl = new characters_influences((int)Info.CharacterId, chapter, value);
                 Info.Influences.Add(infl);
                 CharMgr.Database.AddObject(infl);
             }
@@ -3253,7 +3262,7 @@ namespace WorldServer.World.Objects
         public void SetInfluence(ushort chapter, ushort value)
         {
             _logger.Debug($"Setting influence for {Name} to {value} for chapter {chapter}");
-            Chapter_Info info = ChapterService.GetChapterEntry(chapter);
+            chapter_infos info = ChapterService.GetChapterEntry(chapter);
             if (info == null)
             {
                 _logger.Debug($"chapter {chapter} not found");
@@ -3264,14 +3273,14 @@ namespace WorldServer.World.Objects
                 value = (ushort)info.Tier3InfluenceCount;
 
             if (Info.Influences == null)
-                Info.Influences = new List<Characters_influence>();
+                Info.Influences = new List<characters_influences>();
 
-            Characters_influence infl = Info.Influences.Find(x => x.InfluenceId == chapter);
+            characters_influences infl = Info.Influences.Find(x => x.InfluenceId == chapter);
 
             if (infl == null)
             {
                 _logger.Debug($"chapter influence not found - adding");
-                infl = new Characters_influence((int)Info.CharacterId, chapter, value);
+                infl = new characters_influences((int)Info.CharacterId, chapter, value);
                 Info.Influences.Add(infl);
                 CharMgr.Database.AddObject(infl);
             }
@@ -3308,7 +3317,7 @@ namespace WorldServer.World.Objects
             Out.WriteByte(0);
             Out.WriteByte((byte)Info.Influences.Count);
             Out.WriteByte(0);
-            foreach (Characters_influence Obj in Info.Influences)
+            foreach (characters_influences Obj in Info.Influences)
             {
                 Out.WriteByte((byte)Obj.InfluenceId);
                 Out.WriteUInt32(Obj.InfluenceCount);
@@ -3321,23 +3330,23 @@ namespace WorldServer.World.Objects
 
         public void SendInfluenceItems(byte chapter)
         {
-            Chapter_Info info = ChapterService.GetChapterEntry(chapter);
+            chapter_infos info = ChapterService.GetChapterEntry(chapter);
             if (info == null)
                 return;
 
             if (info.CreatureEntry == 0)
                 return;
 
-            Characters_influence chapterinf = null;
+            characters_influences chapterinf = null;
 
             if (Info.Influences != null)
-                foreach (Characters_influence Obj in Info.Influences)
+                foreach (characters_influences Obj in Info.Influences)
                 {
                     if (Obj.InfluenceId == chapter)
                         chapterinf = Obj;
                 }
 
-            List<Chapter_Reward> itemlist = new List<Chapter_Reward>();
+            List<chapter_rewards> itemlist = new List<chapter_rewards>();
 
             PacketOut Out = new PacketOut((byte)Opcodes.F_INFLUENCE_DETAILS, 128);
             Out.WriteByte(0);
@@ -3355,7 +3364,7 @@ namespace WorldServer.World.Objects
             Out.WriteByte(0);
             Out.WriteByte((byte)itemlist.Count);      // ammount of items
 
-            foreach (Chapter_Reward chapterReward in itemlist)
+            foreach (chapter_rewards chapterReward in itemlist)
             {
                 Item.BuildItem(ref Out, null, chapterReward.Item, null, 0, 0);
             }
@@ -3372,7 +3381,7 @@ namespace WorldServer.World.Objects
             Out.WriteByte(0);
             Out.WriteByte((byte)itemlist.Count);      // ammount of items
 
-            foreach (Chapter_Reward chapterReward in itemlist)
+            foreach (chapter_rewards chapterReward in itemlist)
             {
                 Item.BuildItem(ref Out, null, chapterReward.Item, null, 0, 0);
             }
@@ -3389,7 +3398,7 @@ namespace WorldServer.World.Objects
             Out.WriteByte(0);
             Out.WriteByte((byte)itemlist.Count);      // ammount of items
 
-            foreach (Chapter_Reward chapterReward in itemlist)
+            foreach (chapter_rewards chapterReward in itemlist)
             {
                 Item.BuildItem(ref Out, null, chapterReward.Item, null, 0, 0);
             }
@@ -3871,8 +3880,8 @@ namespace WorldServer.World.Objects
             {
                 if (regionMgr.RegionId == regionId)
                 {
-                    if (regionMgr.GetTier() == 4)
-                        return WorldMgr.UpperTierCampaignManager;
+                    if (regionMgr.GetTier() != 1)
+                        return WorldMgr.ScalingCampaignManager;
                     else
                     {
                         return WorldMgr.LowerTierCampaignManager;
@@ -3880,7 +3889,7 @@ namespace WorldServer.World.Objects
                 }
             }
             DeathLogger.Warn($"Could not locate Battlefront Manager for player {Name} in region {regionId}");
-            return WorldMgr.UpperTierCampaignManager;
+            return WorldMgr.ScalingCampaignManager;
         }
 
         private void RecordKillTracking(Player victim, Player killer, long timestamp)
@@ -3894,7 +3903,7 @@ namespace WorldServer.World.Objects
             if (killer.GldInterface == null)
                 return;
 
-            var tracker = new KillTracker
+            var tracker = new kill_tracker
             {
                 Timestamp = timestamp,
                 KillerAccountId = killer.Info.AccountId,
@@ -3959,7 +3968,7 @@ namespace WorldServer.World.Objects
 
             else
             {
-                if (Region.Campaign.PreventKillReward() || (killerPlr.Client?._Account != null && CheckKillFarm(killerPlr)))
+                if (Region.Campaign.PreventKillReward((ushort)ZoneId) || (killerPlr.Client?._Account != null && CheckKillFarm(killerPlr)))
                     return;
 
                 // Distribute Player Kill Rewards
@@ -4005,7 +4014,7 @@ namespace WorldServer.World.Objects
             if (ActiveBattleFrontStatus != null)
             {
                 // If player is not in the active zone, stop getting contribution.
-                if (ZoneId != ActiveBattleFrontStatus.ZoneId)
+                if (ZoneId != ActiveBattleFrontStatus.OrderZoneId && ZoneId != ActiveBattleFrontStatus.DestroZoneId)
                     return;
 
                 // Add contribution for this kill to the killer.
@@ -4028,7 +4037,7 @@ namespace WorldServer.World.Objects
         {
             if (killer.CurrentArea != null && killer.CurrentArea.IsRvR)
             {
-                return (killer.Realm == Realms.REALMS_REALM_DESTRUCTION) ? (ushort)killer.CurrentArea.DestroInfluenceId : (ushort)killer.CurrentArea.OrderInfluenceId;
+                return (killer.Realm == SetRealms.REALMS_REALM_DESTRUCTION) ? (ushort)killer.CurrentArea.DestroInfluenceId : (ushort)killer.CurrentArea.OrderInfluenceId;
             }
             return 0;
         }
@@ -4066,7 +4075,7 @@ namespace WorldServer.World.Objects
 
             if (killer.CurrentArea != null && killer.CurrentArea.IsRvR)
             {
-                influenceId = (killer.Realm == Realms.REALMS_REALM_DESTRUCTION) ? (ushort)killer.CurrentArea.DestroInfluenceId : (ushort)killer.CurrentArea.OrderInfluenceId;
+                influenceId = (killer.Realm == SetRealms.REALMS_REALM_DESTRUCTION) ? (ushort)killer.CurrentArea.DestroInfluenceId : (ushort)killer.CurrentArea.OrderInfluenceId;
                 totalInfluence = (uint)(100 * bonusMod * (1f + killer.AAOBonus) * deathRewardScaler);
             }
 
@@ -4607,7 +4616,7 @@ namespace WorldServer.World.Objects
         /// </summary>
         /// <param name="angle">The angle of knock, in degrees away from the horizontal.</param>
         /// <param name="power"></param>
-        public override void ApplyKnockback(Unit caster, AbilityKnockbackInfo kbInfo)
+        public override void ApplyKnockback(Unit caster, ability_knockback_info kbInfo)
         {
             if (IsImmovable || NoKnockbacks)
             {
@@ -4764,7 +4773,7 @@ namespace WorldServer.World.Objects
         /// <summary>
         /// Knocks the player backwards and grants the Immovable buff.
         /// </summary>
-        public void ApplyWindsKnockback(Unit caster, AbilityKnockbackInfo kbInfo)
+        public void ApplyWindsKnockback(Unit caster, ability_knockback_info kbInfo)
         {
             lock (MovementCCLock)
             {
@@ -4847,7 +4856,7 @@ namespace WorldServer.World.Objects
         /// <summary>
         /// Knocks the player backwards, but will not apply Immovable.
         /// </summary>
-        public void ApplySelfKnockback(AbilityKnockbackInfo kbInfo)
+        public void ApplySelfKnockback(ability_knockback_info kbInfo)
         {
             if (NoKnockbacks)
                 return;
@@ -5104,7 +5113,7 @@ namespace WorldServer.World.Objects
             return false;
         }
 
-        public bool ShouldBolster(int tier, bool isScenario, Zone_Area newArea)
+        public bool ShouldBolster(int tier, bool isScenario, zone_areas newArea)
         {
             if (tier == 0 || tier > 4)
                 return false;
@@ -5135,7 +5144,7 @@ namespace WorldServer.World.Objects
             return Level >= Constants.MinTierLevel[tier - 1] && Level != Constants.MaxTierLevel[tier - 1];
         }
 
-        public void TryBolster(int curTier, Zone_Area newArea)
+        public void TryBolster(int curTier, zone_areas newArea)
         {
             if (curTier == 0)
                 curTier = ScnInterface.Scenario?.Tier ?? Zone.Info.Tier;
@@ -5271,7 +5280,7 @@ namespace WorldServer.World.Objects
                     if (Level == 40)
                         return;
 
-                    World_Settings Settings = WorldMgr.Database.SelectObject<World_Settings>("SettingId = 1");
+                    world_settings Settings = WorldMgr.Database.SelectObject<world_settings>("SettingId = 1");
 
                     if (Settings != null)
                         newMaxLevel = (byte)Settings.Setting;
@@ -5288,9 +5297,9 @@ namespace WorldServer.World.Objects
             else if (AdjustedLevel < Level)
                 _adjustedRenown = 0;
 
-            List<CharacterInfo_stats> newStats = CharMgr.GetCharacterInfoStats(Info.CareerLine, newMaxLevel == 0 ? Level : newMaxLevel);
+            List<character_info_stats> newStats = CharMgr.GetCharacterInfoStats(Info.CareerLine, newMaxLevel == 0 ? Level : newMaxLevel);
 
-            foreach (CharacterInfo_stats stat in newStats)
+            foreach (character_info_stats stat in newStats)
                 StsInterface.SetBaseStat((Stats)stat.StatId, stat.StatValue);
 
             StsInterface.BolsterLevel = newMaxLevel;
@@ -5566,9 +5575,9 @@ namespace WorldServer.World.Objects
         public void SetPVPFlag(bool state)
         {
             if (state == false)
-                Faction = (byte)(Realm == Realms.REALMS_REALM_DESTRUCTION ? 8 : 6);
+                Faction = (byte)(Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 8 : 6);
             else
-                Faction = (byte)(Realm == Realms.REALMS_REALM_DESTRUCTION ? 72 : 68);
+                Faction = (byte)(Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 72 : 68);
 
             if (!_initialized)
                 return;
@@ -5723,10 +5732,10 @@ namespace WorldServer.World.Objects
             CharMgr.Database.SaveObject(_Value);
 
             if (Info.Influences != null)
-                foreach (Characters_influence obj in Info.Influences)
+                foreach (characters_influences obj in Info.Influences)
                     CharMgr.Database.SaveObject(obj);
             if (Info.Bag_Pools != null)
-                foreach (Characters_bag_pools obj in Info.Bag_Pools)
+                foreach (characters_bag_pools obj in Info.Bag_Pools)
                     CharMgr.Database.SaveObject(obj);
             base.Save();
         }
@@ -5738,10 +5747,10 @@ namespace WorldServer.World.Objects
             CharMgr.Database.SaveObject(_Value);
 
             if (Info.Influences != null)
-                foreach (Characters_influence Obj in Info.Influences)
+                foreach (characters_influences Obj in Info.Influences)
                     CharMgr.Database.SaveObject(Obj);
             if (Info.Bag_Pools != null)
-                foreach (Characters_bag_pools Obj in Info.Bag_Pools)
+                foreach (characters_bag_pools Obj in Info.Bag_Pools)
                     CharMgr.Database.SaveObject(Obj);
             base.Save();
 
@@ -5880,7 +5889,7 @@ namespace WorldServer.World.Objects
             uint destOffX = worldX >> 12;
             uint destOffY = worldY >> 12;
 
-            Zone_Info newZone = Region.GetZone((ushort)destOffX, (ushort)destOffY);
+            zone_infos newZone = Region.GetZone((ushort)destOffX, (ushort)destOffY);
 
             if (newZone == null)
                 return;
@@ -5914,7 +5923,7 @@ namespace WorldServer.World.Objects
                 return;
             }
 
-            Zone_Info destination = ZoneService.GetZone_Info(zoneID);
+            zone_infos destination = ZoneService.GetZone_Info(zoneID);
             if (destination == null)
                 return;
 
@@ -5930,7 +5939,7 @@ namespace WorldServer.World.Objects
             {
                 if (destination.Type == 4)
                 {
-                    Zone_jump jump = new Zone_jump();
+                    zone_jumps jump = new zone_jumps();
                     jump.ZoneID = destination.ZoneId;
                     jump.WorldX = worldX;
                     jump.WorldY = worldY;
@@ -6162,14 +6171,14 @@ namespace WorldServer.World.Objects
 
                 Out.WriteByte((byte)("falling".Length + 1));
                 Out.WriteHexStringBytes("6504");
-                Out.WriteByte(Info.Realm == (byte)Realms.REALMS_REALM_ORDER ? (byte)2 : (byte)1); // faction
+                Out.WriteByte(Info.Realm == (byte)SetRealms.REALMS_REALM_ORDER ? (byte)2 : (byte)1); // faction
                 Out.WriteByte(0);
                 Out.WriteStringBytes("falling");
                 Out.WriteByte(0);
 
                 Out.WriteByte((byte)(Name.Length + 1)); // len for weapon name
                 Out.WriteHexStringBytes("4207");
-                Out.WriteByte(Info.Realm == (byte)Realms.REALMS_REALM_ORDER ? (byte)2 : (byte)1); // faction
+                Out.WriteByte(Info.Realm == (byte)SetRealms.REALMS_REALM_ORDER ? (byte)2 : (byte)1); // faction
                 Out.WriteByte(1);
                 Out.WriteStringBytes(Info.Name);
                 Out.WriteByte(0);
@@ -6221,7 +6230,7 @@ namespace WorldServer.World.Objects
 
         #region Area Detection
 
-        public Zone_Area CurrentArea;
+        public zone_areas CurrentArea;
         public byte CurrentPQArea;
         private long _nextAreaCheckTime;
 
@@ -6283,7 +6292,7 @@ namespace WorldServer.World.Objects
                 CurrentPQArea = pqarea;
             }
 
-            Zone_Area newArea = Zone.ClientInfo.GetZoneAreaFor((ushort)X, (ushort)Y, Zone.ZoneId, (ushort)Z);
+            zone_areas newArea = Zone.ClientInfo.GetZoneAreaFor((ushort)X, (ushort)Y, Zone.ZoneId, (ushort)Z);
             //if ((newArea == null && CurrentArea == null) || newArea != CurrentArea)
             if (newArea != CurrentArea)
             {
@@ -6386,7 +6395,7 @@ namespace WorldServer.World.Objects
 
         public void Rescue()
         {
-            RallyPoint rallyPoint = RallyPointService.GetRallyPoint(Info.Value.RallyPoint);
+            rally_points rallyPoint = RallyPointService.GetRallyPoint(Info.Value.RallyPoint);
 
             if (rallyPoint != null)
             {
@@ -6656,6 +6665,7 @@ namespace WorldServer.World.Objects
 
             Info += "Name=" + Name + ",Ip=" + (Client != null ? Client.GetIp() + " ClientId " + Client.Id : "Disconnected") + base.ToString();
             Info += $"CurrentArea={CurrentArea?.AreaName}/{CurrentArea?.IsRvR}/{CurrentArea?.DestroInfluenceId}/{CurrentArea?.OrderInfluenceId}";
+            Info += $"Zone = {ZoneId}";
             return Info;
         }
 

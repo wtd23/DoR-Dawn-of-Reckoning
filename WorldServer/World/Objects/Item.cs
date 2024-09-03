@@ -57,10 +57,10 @@ namespace WorldServer.World.Objects
         private bool _isCreature = false;
 
         // Player Uniquement
-        public Item_Info Info;
+        public item_infos Info;
 
-        public CharacterItem CharSaveInfo;
-        public Creature_item CreatureItem { get; protected set; }
+        public characters_items CharSaveInfo;
+        public creature_items CreatureItem { get; protected set; }
 
         public enum ItemType
         {
@@ -75,7 +75,7 @@ namespace WorldServer.World.Objects
             this.Owner = Owner;
         }
 
-        public Item(Creature_item CItem)
+        public Item(creature_items CItem)
         {
             _SlotId = CItem.SlotId;
             _ModelId = CItem.ModelId;
@@ -87,7 +87,7 @@ namespace WorldServer.World.Objects
             CreatureItem = CItem;
         }
 
-        public bool Load(CharacterItem itemSaveInfo)
+        public bool Load(characters_items itemSaveInfo)
         {
             Info = ItemService.GetItem_Info(itemSaveInfo.Entry);
 
@@ -101,7 +101,7 @@ namespace WorldServer.World.Objects
             return true;
         }
 
-        public bool Load(Item_Info info, ushort slotId, ushort count)
+        public bool Load(item_infos info, ushort slotId, ushort count)
         {
             Info = info;
 
@@ -162,9 +162,9 @@ namespace WorldServer.World.Objects
                 CharMgr.DeleteItem(CharSaveInfo);
         }
 
-        public CharacterItem CreateCharSaveInfo(uint characterId)
+        public characters_items CreateCharSaveInfo(uint characterId)
         {
-            CharSaveInfo = new CharacterItem
+            CharSaveInfo = new characters_items
             {
                 CharacterId = characterId,
                 Counts = _Count,
@@ -180,7 +180,7 @@ namespace WorldServer.World.Objects
             return CharSaveInfo;
         }
 
-        public CharacterItem Save(uint characterId)
+        public characters_items Save(uint characterId)
         {
             if (CharSaveInfo != null)
             {
@@ -215,7 +215,7 @@ namespace WorldServer.World.Objects
             if (CharSaveInfo == null)
                 return false;
 
-            Item_Info info = ItemService.GetItem_Info(entry);
+            item_infos info = ItemService.GetItem_Info(entry);
 
             if (info.Type != 23)
                 return false;
@@ -324,7 +324,7 @@ namespace WorldServer.World.Objects
         }
 
         // Writes approximately: (100 + info._Stats.Count * 8 + info.EffectsList.Count * 6 + info.SpellId > 0 ? 8 : 1 + info.Type == 23 ? info.Crafts.Count * 3 : 1 + info.Description.Length + info.TalismanSlots * 47)
-        public static void BuildItem(ref PacketOut Out, Item itm, Item_Info info, MailItem mail, ushort SlotId, ushort Count, Player Plr = null, bool frombuildrepairitem = false)
+        public static void BuildItem(ref PacketOut Out, Item itm, item_infos info, mail_item mail, ushort SlotId, ushort Count, Player Plr = null, bool frombuildrepairitem = false)
         {
             SlotId = SlotId == 0 ? (itm?.SlotId ?? SlotId) : SlotId;
             Count = Count == 0 ? (itm?.Count ?? Count) : Count;
@@ -362,7 +362,7 @@ namespace WorldServer.World.Objects
             //Appearance
             if (itm != null && itm.AltAppearanceEntry > 0 && itm.Info.Type != 24)
             {
-                Item_Info tmp = ItemService.GetItem_Info(itm.AltAppearanceEntry);
+                item_infos tmp = ItemService.GetItem_Info(itm.AltAppearanceEntry);
 
                 if (tmp == null)
                 {
@@ -511,7 +511,7 @@ namespace WorldServer.World.Objects
                         Out.WriteUInt32(0); // entry;
                     else
                     {
-                        Item_Info talismanInfo = ItemService.GetItem_Info(talis.Entry);
+                        item_infos talismanInfo = ItemService.GetItem_Info(talis.Entry);
 
                         // Out.Fill(0, 2);
 
@@ -677,20 +677,20 @@ namespace WorldServer.World.Objects
             Out.Fill(0, 11);*/
         }
 
-        public static void BuildRepairableItem(ref PacketOut Out, Item itm, Item_Info info, MailItem mail, ushort SlotId, ushort Count, Player Plr = null)
+        public static void BuildRepairableItem(ref PacketOut Out, Item itm, item_infos info, mail_item mail, ushort SlotId, ushort Count, Player Plr = null)
         {
             Out.WriteByte(1);    // repairable item
             Out.WritePascalString(info.Name);
 
             string[] items = info.Craftresult.Split(';');
-            Item_Info RepItemInfo = null;
+            item_infos RepItemInfo = null;
 
             uint itemlvl = 0;
             byte rarety = 0;
 
             foreach (string ritem in items)
             {
-                Item_Info RitemInfo = ItemService.GetItem_Info(uint.Parse(ritem));
+                item_infos RitemInfo = ItemService.GetItem_Info(uint.Parse(ritem));
                 rarety = RitemInfo.Rarity;
                 itemlvl = RitemInfo.MinRank;
 

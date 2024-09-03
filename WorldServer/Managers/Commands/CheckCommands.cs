@@ -145,11 +145,11 @@ namespace WorldServer.Managers.Commands
 
             return true;
         }
-
+/*
         public static bool GetPlayerContribution(Player plr, ref List<string> values)
         {
-            var activeBattleFrontId = WorldMgr.UpperTierCampaignManager.ActiveBattleFront.BattleFrontId;
-            var activeBattleFrontStatus = WorldMgr.UpperTierCampaignManager.GetBattleFrontStatus(activeBattleFrontId);
+            var activeBattleFrontId = WorldMgr.ScalingCampaignManager.ActiveBattleFront.BattleFrontId;
+            var activeBattleFrontStatus = WorldMgr.ScalingCampaignManager.GetBattleFrontStatus(activeBattleFrontId);
 
             var target = (Player)plr.CbtInterface.GetCurrentTarget();
             if (target != null)
@@ -181,13 +181,13 @@ namespace WorldServer.Managers.Commands
             }
             return true;
         }
-
+*/
         public static bool GetBagBonus(Player plr, ref List<string> values)
         {
             var target = (Player)plr.CbtInterface.GetCurrentTarget();
             if (target != null)
             {
-                var bagBonus = CharMgr.Database.SelectObject<RVRPlayerBagBonus>("CharacterId = " + target.CharacterId);
+                var bagBonus = CharMgr.Database.SelectObject<characters_bag_bonus>("CharacterId = " + target.CharacterId);
 
                 if (bagBonus == null)
                 {
@@ -205,11 +205,11 @@ namespace WorldServer.Managers.Commands
             }
             return true;
         }
-
+        /*
         public static bool GetBattleFrontContribution(Player plr, ref List<string> values)
         {
-            var activeBattleFrontId = WorldMgr.UpperTierCampaignManager.ActiveBattleFront.BattleFrontId;
-            var activeBattleFrontStatus = WorldMgr.UpperTierCampaignManager.GetBattleFrontStatus(activeBattleFrontId);
+            var activeBattleFrontId = WorldMgr.ScalingCampaignManager.ActiveBattleFront.BattleFrontId;
+            var activeBattleFrontStatus = WorldMgr.ScalingCampaignManager.GetBattleFrontStatus(activeBattleFrontId);
 
             var eligiblePlayers = activeBattleFrontStatus.ContributionManagerInstance.GetEligiblePlayers(0);
 
@@ -226,11 +226,11 @@ namespace WorldServer.Managers.Commands
             }
             return true;
         }
-
-        public static bool GetPlayerBounty(Player plr, ref List<string> values)
+        */
+       /* public static bool GetPlayerBounty(Player plr, ref List<string> values)
         {
-            var activeBattleFrontId = WorldMgr.UpperTierCampaignManager.ActiveBattleFront.BattleFrontId;
-            var activeBattleFrontStatus = WorldMgr.UpperTierCampaignManager.GetBattleFrontStatus(activeBattleFrontId);
+            var activeBattleFrontId = WorldMgr.ScalingCampaignManager.ActiveBattleFront.BattleFrontId;
+            var activeBattleFrontStatus = WorldMgr.ScalingCampaignManager.GetBattleFrontStatus(activeBattleFrontId);
 
             var target = (Player)plr.CbtInterface.GetCurrentTarget();
             if (target != null)
@@ -240,12 +240,12 @@ namespace WorldServer.Managers.Commands
             }
 
             return true;
-        }
-
+        }*/
+        /*
         public static bool GetPlayerImpactMatrix(Player plr, ref List<string> values)
         {
-            var activeBattleFrontId = WorldMgr.UpperTierCampaignManager.ActiveBattleFront.BattleFrontId;
-            var activeBattleFrontStatus = WorldMgr.UpperTierCampaignManager.GetBattleFrontStatus(activeBattleFrontId);
+            var activeBattleFrontId = WorldMgr.ScalingCampaignManager.ActiveBattleFront.BattleFrontId;
+            var activeBattleFrontStatus = WorldMgr.ScalingCampaignManager.GetBattleFrontStatus(activeBattleFrontId);
 
             var target = (Player)plr.CbtInterface.GetCurrentTarget();
             if (target != null)
@@ -265,15 +265,15 @@ namespace WorldServer.Managers.Commands
             }
             return true;
         }
-
+        */
         public static bool GetServerPopulation(Player plr, ref List<string> values)
         {
             lock (Player._Players)
             {
                 plr.SendClientMessage($"Server Population ");
                 plr.SendClientMessage($"Online players : {Player._Players.Count} ");
-                plr.SendClientMessage($"Order : {Player._Players.Count(x => x.Realm == Realms.REALMS_REALM_ORDER && !x.IsDisposed && x.IsInWorld() && x != null)} ");
-                plr.SendClientMessage($"Destro : {Player._Players.Count(x => x.Realm == Realms.REALMS_REALM_DESTRUCTION && !x.IsDisposed && x.IsInWorld() && x != null)}");
+                plr.SendClientMessage($"Order : {Player._Players.Count(x => x.Realm == SetRealms.REALMS_REALM_ORDER && !x.IsDisposed && x.IsInWorld() && x != null)} ");
+                plr.SendClientMessage($"Destro : {Player._Players.Count(x => x.Realm == SetRealms.REALMS_REALM_DESTRUCTION && !x.IsDisposed && x.IsInWorld() && x != null)}");
 
                 plr.SendClientMessage("------------------------------------");
                 var message = String.Empty;
@@ -284,19 +284,19 @@ namespace WorldServer.Managers.Commands
                     {
                         message += $"Region {regionMgr.RegionId} : " +
                                    $"Total : {Player._Players.Count(x => !x.IsDisposed && x.IsInWorld() && x != null && x.Region.RegionId == regionMgr.RegionId)} " +
-                                   $"Order : {Player._Players.Count(x => x.Realm == Realms.REALMS_REALM_ORDER && !x.IsDisposed && x.IsInWorld() && x != null && x.Region.RegionId == regionMgr.RegionId)} " +
-                                   $"Dest : {Player._Players.Count(x => x.Realm == Realms.REALMS_REALM_DESTRUCTION && !x.IsDisposed && x.IsInWorld() && x != null && x.Region.RegionId == regionMgr.RegionId)} ";
+                                   $"Order : {Player._Players.Count(x => x.Realm == SetRealms.REALMS_REALM_ORDER && !x.IsDisposed && x.IsInWorld() && x != null && x.Region.RegionId == regionMgr.RegionId)} " +
+                                   $"Dest : {Player._Players.Count(x => x.Realm == SetRealms.REALMS_REALM_DESTRUCTION && !x.IsDisposed && x.IsInWorld() && x != null && x.Region.RegionId == regionMgr.RegionId)} ";
                     }
                 }
                 plr.SendClientMessage(message);
             }
             return true;
         }
-
+/*
         public static bool GetRewardEligibility(Player plr, ref List<string> values)
         {
-            var activeBattleFrontId = WorldMgr.UpperTierCampaignManager.ActiveBattleFront.BattleFrontId;
-            var activeBattleFrontStatus = WorldMgr.UpperTierCampaignManager.GetBattleFrontStatus(activeBattleFrontId);
+            var activeBattleFrontId = WorldMgr.ScalingCampaignManager.ActiveBattleFront.BattleFrontId;
+            var activeBattleFrontStatus = WorldMgr.ScalingCampaignManager.GetBattleFrontStatus(activeBattleFrontId);
 
             var players = activeBattleFrontStatus.ContributionManagerInstance.GetEligiblePlayers(0);
 
@@ -306,7 +306,7 @@ namespace WorldServer.Managers.Commands
             {
                 var playerObject = Player.GetPlayer(player.Key);
 
-                if (playerObject.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                if (playerObject.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                     plr.SendClientMessage($"{playerObject.Name} (D) Contrib:{player.Value}");
                 else
                 {
@@ -316,7 +316,7 @@ namespace WorldServer.Managers.Commands
 
             return true;
         }
-
+*/
         /// <summary>
         /// Finds all players currently in range.
         /// </summary>

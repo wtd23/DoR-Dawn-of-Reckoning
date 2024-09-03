@@ -48,9 +48,9 @@ namespace WorldServer.World.Map
         public string RegionName;
         public RewardManager RewardManager;
         public Scenario Scenario;
-        public List<Zone_Info> ZonesInfo;
+        public List<zone_infos> ZonesInfo;
 
-        public RegionMgr(ushort regionId, List<Zone_Info> zones, string name, IApocCommunications apocCommunications)
+        public RegionMgr(ushort regionId, List<zone_infos> zones, string name, IApocCommunications apocCommunications)
         {
             ApocCommunications = apocCommunications;
             RegionId = regionId;
@@ -113,7 +113,7 @@ namespace WorldServer.World.Map
         /// </summary>
         /// <param name="zoneId">Identifier of the searched zone</param>
         /// <returns>Zone or null if does not exists</returns>
-        public Zone_Info GetZone_Info(ushort zoneId)
+        public zone_infos GetZone_Info(ushort zoneId)
         {
             foreach (var zone in ZonesInfo)
                 if (zone != null && zone.ZoneId == zoneId)
@@ -121,7 +121,7 @@ namespace WorldServer.World.Map
             return null;
         }
 
-        public Zone_Info GetZone(ushort offX, ushort offY)
+        public zone_infos GetZone(ushort offX, ushort offY)
         {
             return ZonesInfo.Find(zone =>
                 zone != null && zone.OffX <= offX && zone.OffX + MaxCells > offX && zone.OffY <= offY &&
@@ -261,8 +261,8 @@ namespace WorldServer.World.Map
                                 if (!Players.Contains(plr))
                                 {
                                     Players.Add(plr);
-                                    if (plr.Realm == Realms.REALMS_REALM_ORDER) OrderPlayers++;
-                                    if (plr.Realm == Realms.REALMS_REALM_DESTRUCTION) DestPlayers++;
+                                    if (plr.Realm == SetRealms.REALMS_REALM_ORDER) OrderPlayers++;
+                                    if (plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION) DestPlayers++;
                                 }
                             }
                         }
@@ -773,22 +773,22 @@ namespace WorldServer.World.Map
 
         #region Spawns
 
-        private CellSpawns[,] _cellSpawns;
+        private cell_spawns[,] _cellSpawns;
 
         public void LoadSpawns()
         {
             _cellSpawns = CellSpawnService.GetCells(RegionId);
         }
 
-        public CellSpawns GetCellSpawn(ushort x, ushort y)
+        public cell_spawns GetCellSpawn(ushort x, ushort y)
         {
             x = (ushort)Math.Min(MaxCellID - 1, x);
             y = (ushort)Math.Min(MaxCellID - 1, y);
 
-            return _cellSpawns[x, y] ?? (_cellSpawns[x, y] = new CellSpawns(RegionId, x, y));
+            return _cellSpawns[x, y] ?? (_cellSpawns[x, y] = new cell_spawns(RegionId, x, y));
         }
 
-        public Creature CreateCreature(Creature_spawn spawn)
+        public Creature CreateCreature(creature_spawns spawn)
         {
 #if NO_CREATURE
             return null;
@@ -801,7 +801,7 @@ namespace WorldServer.World.Map
             return crea;
         }
 
-        public Boss CreateBoss(Creature_spawn spawn, uint bossId)
+        public Boss CreateBoss(creature_spawns spawn, uint bossId)
         {
             if (spawn?.Proto == null)
                 return null;
@@ -811,7 +811,7 @@ namespace WorldServer.World.Map
             return boss;
         }
 
-        public AdvancedCreature CreateAdvancedCreature(Creature_spawn spawn)
+        public AdvancedCreature CreateAdvancedCreature(creature_spawns spawn)
         {
 #if NO_CREATURE
             return null;
@@ -824,7 +824,7 @@ namespace WorldServer.World.Map
             return crea;
         }
 
-        public GameObject CreateGameObject(GameObject_spawn spawn)
+        public GameObject CreateGameObject(gameobject_spawns spawn)
         {
             if (spawn == null || spawn.Proto == null)
                 return null;
@@ -834,7 +834,7 @@ namespace WorldServer.World.Map
             return obj;
         }
 
-        public LootChest CreateLootChest(GameObject_spawn spawn)
+        public LootChest CreateLootChest(gameobject_spawns spawn)
         {
             if (spawn == null || spawn.Proto == null)
                 return null;
@@ -844,14 +844,14 @@ namespace WorldServer.World.Map
             return obj;
         }
 
-        public ChapterObject CreateChapter(Chapter_Info chapter)
+        public ChapterObject CreateChapter(chapter_infos chapter)
         {
             var obj = new ChapterObject(chapter);
             AddObject(obj, chapter.ZoneId);
             return obj;
         }
 
-        public PublicQuest CreatePQuest(PQuest_Info quest)
+        public PublicQuest CreatePQuest(pquest_info quest)
         {
             if (PublicQuests.ContainsKey(quest.Entry))
                 Log.Error("CreatePQuest",

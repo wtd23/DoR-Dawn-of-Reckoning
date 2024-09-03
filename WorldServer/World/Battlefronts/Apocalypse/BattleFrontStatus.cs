@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.Database.World.Battlefront;
 using GameData;
 using NLog;
 using System.Collections.Generic;
@@ -13,7 +14,8 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         private static readonly Logger BattlefrontLogger = LogManager.GetLogger("BattlefrontLogger");
 
         public int BattleFrontId { get; set; }
-        public Realms LockingRealm { get; set; }
+        public int PairingId { get; set; }
+        public SetRealms LockingRealm { get; set; }
         public VictoryPointProgress FinalVictoryPoint { get; set; }
         public int OpenTimeStamp { get; set; }
         public int LockTimeStamp { get; set; }
@@ -22,15 +24,15 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         public string Description { get; set; }
         public ContributionManager ContributionManagerInstance { get; set; }
         public ImpactMatrixManager ImpactMatrixManagerInstance { get; set; }
-        public int ZoneId { get; set; }
-
         public RewardManager RewardManagerInstance { get; set; }
-
         public HashSet<uint> KillContributionSet { get; set; }
         public Player DestructionRealmCaptain { get; set; }
         public Player OrderRealmCaptain { get; set; }
-        public List<Keep_Info> KeepList { get; set; }
-        public List<BattleFront_Objective> BattlefieldObjectives { get; set; }
+        public List<keep_infos> KeepList { get; set; }
+        public List<battlefront_objectives> BattlefieldObjectives { get; set; }
+        public int DestroZoneId { get; internal set; }
+        public int OrderZoneId { get; internal set; }
+        public rvr_progression Progression { get; internal set; }
 
         public BattleFrontStatus(ImpactMatrixManager impactMatrixManager, int battleFrontId)
         {
@@ -41,8 +43,8 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
             RewardManagerInstance = new RewardManager(ContributionManagerInstance, new StaticWrapper(), RewardService._RewardPlayerKills, ImpactMatrixManagerInstance);
 
-            KeepList = new List<Keep_Info>();
-            BattlefieldObjectives = new List<BattleFront_Objective>();
+            KeepList = new List<keep_infos>();
+            BattlefieldObjectives = new List<battlefront_objectives>();
             if (battleFrontId != 0)
                 BattleFrontId = battleFrontId;
         }
@@ -66,9 +68,9 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             {
                 if (Locked)
                 {
-                    if (LockingRealm == Realms.REALMS_REALM_DESTRUCTION)
+                    if (LockingRealm == SetRealms.REALMS_REALM_DESTRUCTION)
                         return BattleFrontConstants.ZONE_STATUS_DESTRO_LOCKED;
-                    if (LockingRealm == Realms.REALMS_REALM_ORDER)
+                    if (LockingRealm == SetRealms.REALMS_REALM_ORDER)
                         return BattleFrontConstants.ZONE_STATUS_ORDER_LOCKED;
                 }
                 return BattleFrontConstants.ZONE_STATUS_CONTESTED;
@@ -85,9 +87,9 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             if (realmCaptain == null)
                 return;
             BattlefrontLogger.Info($"Removing player {realmCaptain.Name} as Captain");
-            if (realmCaptain.Realm == Realms.REALMS_REALM_DESTRUCTION)
+            if (realmCaptain.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                 DestructionRealmCaptain = null;
-            if (realmCaptain.Realm == Realms.REALMS_REALM_ORDER)
+            if (realmCaptain.Realm == SetRealms.REALMS_REALM_ORDER)
                 OrderRealmCaptain = null;
 
             //ScaleDownModel(realmCaptain);
@@ -99,9 +101,9 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                 return;
 
             BattlefrontLogger.Info($"Adding player {realmCaptain.Name} as Captain");
-            if (realmCaptain.Realm == Realms.REALMS_REALM_DESTRUCTION)
+            if (realmCaptain.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                 DestructionRealmCaptain = realmCaptain;
-            if (realmCaptain.Realm == Realms.REALMS_REALM_ORDER)
+            if (realmCaptain.Realm == SetRealms.REALMS_REALM_ORDER)
                 OrderRealmCaptain = realmCaptain;
         }
 

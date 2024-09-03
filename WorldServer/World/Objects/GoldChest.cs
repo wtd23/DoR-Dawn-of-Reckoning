@@ -76,9 +76,9 @@ namespace WorldServer.World.Objects
         //private List<Characters_bag_pools> _bagPools;
         private Dictionary<uint, GoldBag> _lootBags = new Dictionary<uint, GoldBag>();
 
-        private readonly PQuest_Info _publicQuestInfo;
+        private readonly pquest_info _publicQuestInfo;
 
-        public GoldChest(GameObject_spawn spawn, PQuest_Info info, ref Dictionary<uint, ContributionInfo> players, float bagCountMod, RegionMgr region)
+        public GoldChest(gameobject_spawns spawn, pquest_info info, ref Dictionary<uint, ContributionInfo> players, float bagCountMod, RegionMgr region)
         {
             Spawn = spawn;
             _publicQuestInfo = info;
@@ -257,9 +257,9 @@ namespace WorldServer.World.Objects
         //    ProximityBattleFront bf = null;
         //    int aaoMult = 0;
         //    bool isBonusAppliedAndConsumed = true;
-        //    Realms aaoRealm = Realms.REALMS_REALM_NEUTRAL;
+        //    SetRealms aaoRealm = SetRealms.REALMS_REALM_NEUTRAL;
         //    Player targPlayer = Player.GetPlayer(player.PlayerCharId);
-        //    Character targCharacter = CharMgr.GetCharacter(player.PlayerCharId, true);
+        //    characters targCharacter = CharMgr.GetCharacter(player.PlayerCharId, true);
         //    if (region != null && region.Bttlfront != null && region.Bttlfront is ProximityBattleFront)
         //    {
         //        bf = region.Bttlfront as ProximityBattleFront;
@@ -267,7 +267,7 @@ namespace WorldServer.World.Objects
         //        {
         //            aaoMult = Math.Abs(bf._againstAllOddsMult);
         //            if (aaoMult != 0)
-        //                aaoRealm = bf._againstAllOddsMult > 0 ? Realms.REALMS_REALM_DESTRUCTION : Realms.REALMS_REALM_ORDER;
+        //                aaoRealm = bf._againstAllOddsMult > 0 ? SetRealms.REALMS_REALM_DESTRUCTION : SetRealms.REALMS_REALM_ORDER;
         //        }
 
         //        if (targPlayer != null)
@@ -332,7 +332,7 @@ namespace WorldServer.World.Objects
         //        player.RandomBonus = (ushort)RandomMgr.Next(0, 1000);
 
         //        int temporaryBonus = (int)player.RandomBonus;
-        //        if (aaoRealm != Realms.REALMS_REALM_NEUTRAL && aaoMult != 0)
+        //        if (aaoRealm != SetRealms.REALMS_REALM_NEUTRAL && aaoMult != 0)
         //        {
         //            if (targPlayer != null)
         //            {
@@ -573,7 +573,7 @@ namespace WorldServer.World.Objects
             }
         }
 
-        public static void Create(RegionMgr region, PQuest_Info info, ref Dictionary<uint, ContributionInfo> players, float bagCountMod)
+        public static void Create(RegionMgr region, pquest_info info, ref Dictionary<uint, ContributionInfo> players, float bagCountMod)
         {
             if (region == null)
             {
@@ -592,7 +592,7 @@ namespace WorldServer.World.Objects
 
             GameObject_proto proto = GameObjectService.GetGameObjectProto(188);
 
-            GameObject_spawn spawn = new GameObject_spawn
+            gameobject_spawns spawn = new gameobject_spawns
             {
                 Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                 WorldO = 0,
@@ -618,21 +618,21 @@ namespace WorldServer.World.Objects
             {
                 foreach (KeyValuePair<uint, GoldBag> loot in _lootBags)
                 {
-                    Character_mail mail = new Character_mail
+                    characters_mails mail = new characters_mails
                     {
                         Guid = CharMgr.GenerateMailGuid(),
                         CharacterId = loot.Key,
-                        SenderName = "Public Quest",
+                        SenderName = "Public quests",
                         ReceiverName = loot.Value.plrName,
                         SendDate = (uint)TCPManager.GetTimeStamp(),
-                        Title = "Public Quest Loot",
-                        Content = "You won a Public Quest Loot Bag",
+                        Title = "Public quests Loot",
+                        Content = "You won a Public quests Loot Bag",
                         Money = 0,
                         Opened = false
                     };
 
                     //Mail.CharacterIdSender = plr.CharacterId;
-                    MailItem item = GenerateBag(loot.Key);
+                    mail_item item = GenerateBag(loot.Key);
                     if (item != null)
                     {
                         mail.Items.Add(item);
@@ -687,9 +687,9 @@ namespace WorldServer.World.Objects
 
         public void TakeLoot(Player plr)
         {
-            Character chara = CharMgr.GetCharacter(plr.CharacterId, false);
+            characters chara = CharMgr.GetCharacter(plr.CharacterId, false);
 
-            MailItem items = GenerateBag(chara.CharacterId);
+            mail_item items = GenerateBag(chara.CharacterId);
 
             ItemResult result = plr.ItmInterface.CreateItem(ItemService.GetItem_Info(items.id), 1, items.talisman, items.primary_dye, items.secondary_dye, false);
 
@@ -707,7 +707,7 @@ namespace WorldServer.World.Objects
                 TakeLoot(player);
         }
 
-        public MailItem GenerateBag(uint characterId)
+        public mail_item GenerateBag(uint characterId)
         {
             GoldBag bag;
             byte bagtype = 0;
@@ -741,7 +741,7 @@ namespace WorldServer.World.Objects
 
             uint itemid = 0;
 
-            PQuest_Loot loot = null;
+            pquest_loot loot = null;
 
             if (results.Count() > 0)
             {
@@ -776,7 +776,7 @@ namespace WorldServer.World.Objects
             }
 
             ushort money = (ushort)(100 * _publicQuestInfo.PQDifficult * _publicQuestInfo.Chapter * bagtype);
-            return new MailItem(bag.bagWon, items, _publicQuestInfo.PQCraftingBag, money, 1);
+            return new mail_item(bag.bagWon, items, _publicQuestInfo.PQCraftingBag, money, 1);
         }
 
         public byte GetWonBagType(bool optOutGold)
@@ -837,7 +837,7 @@ namespace WorldServer.World.Objects
             Out.WriteByte((byte)(Spawn.GetUnk(0) >> 8));
 
             // Get the database if the value hasnt been changed (currently only used for keep doors)
-            if (Realm == Realms.REALMS_REALM_NEUTRAL)
+            if (Realm == SetRealms.REALMS_REALM_NEUTRAL)
                 Out.WriteByte((byte)(Spawn.GetUnk(0) & 0xFF));
             else
                 Out.WriteByte((byte)Realm);
@@ -848,7 +848,7 @@ namespace WorldServer.World.Objects
 
             int flags = Spawn.GetUnk(3);
 
-            if (Realm != Realms.REALMS_REALM_NEUTRAL && !IsInvulnerable)
+            if (Realm != SetRealms.REALMS_REALM_NEUTRAL && !IsInvulnerable)
                 flags |= 8; // Attackable (stops invalid target errors)
 
             LootContainer loots = LootsMgr.GenerateLoot(this, plr, 1);

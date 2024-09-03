@@ -19,7 +19,7 @@ namespace WorldServer.Managers.Commands
         public static bool RespawnAdd(Player plr, ref List<string> values)
         {
             byte realm = (byte)GetInt(ref values);
-            Zone_Respawn respawn = new Zone_Respawn
+            zone_respawns respawn = new zone_respawns
             {
                 PinX = (ushort)plr.X,
                 PinY = (ushort)plr.Y,
@@ -33,7 +33,7 @@ namespace WorldServer.Managers.Commands
 
             GameObject_proto proto = GameObjectService.GetGameObjectProto(563);
 
-            GameObject_spawn spawn = new GameObject_spawn
+            gameobject_spawns spawn = new gameobject_spawns
             {
                 Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                 WorldX = plr.WorldPosition.X,
@@ -46,7 +46,7 @@ namespace WorldServer.Managers.Commands
             spawn.BuildFromProto(proto);
             plr.Region.CreateGameObject(spawn);
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -68,7 +68,7 @@ namespace WorldServer.Managers.Commands
         {
             int id = GetInt(ref values);
 
-            Zone_Respawn respawn = WorldMgr.Database.SelectObject<Zone_Respawn>("RespawnID=" + id);
+            zone_respawns respawn = WorldMgr.Database.SelectObject<zone_respawns>("RespawnID=" + id);
             if (respawn == null)
                 return false;
 
@@ -94,7 +94,7 @@ namespace WorldServer.Managers.Commands
         {
             int id = GetInt(ref values);
 
-            Zone_Respawn respawn = WorldMgr.Database.SelectObject<Zone_Respawn>("RespawnID=" + id);
+            zone_respawns respawn = WorldMgr.Database.SelectObject<zone_respawns>("RespawnID=" + id);
             if (respawn != null)
             {
                 WorldMgr.Database.DeleteObject(respawn);

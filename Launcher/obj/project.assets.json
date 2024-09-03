@@ -87,6 +87,49 @@
         }
       }
     },
+    ".NETFramework,Version=v4.8/win-arm64": {
+      "NLog/5.2.0": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System",
+          "System.Configuration",
+          "System.Core",
+          "System.IO.Compression",
+          "System.Xml"
+        ],
+        "compile": {
+          "lib/net46/NLog.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net46/NLog.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Common/1.0.0": {
+        "type": "project",
+        "dependencies": {
+          "FrameWork": "1.0.0"
+        },
+        "compile": {
+          "bin/placeholder/Common.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Common.dll": {}
+        }
+      },
+      "FrameWork/1.0.0": {
+        "type": "project",
+        "compile": {
+          "bin/placeholder/FrameWork.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/FrameWork.dll": {}
+        }
+      }
+    },
     ".NETFramework,Version=v4.8/win-x64": {
       "NLog/5.2.0": {
         "type": "package",
@@ -218,25 +261,20 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\wardwalf\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+    "C:\\Users\\DoR\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\wardwalf\\Desktop\\projectwar server\\ProjectWAR\\Launcher\\Launcher.csproj",
+      "projectUniqueName": "C:\\Users\\DoR\\Desktop\\for the lads\\Dor-Dawn of Reckoning\\Launcher\\Launcher.csproj",
       "projectName": "Launcher",
-      "projectPath": "C:\\Users\\wardwalf\\Desktop\\projectwar server\\ProjectWAR\\Launcher\\Launcher.csproj",
-      "packagesPath": "C:\\Users\\wardwalf\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\wardwalf\\Desktop\\projectwar server\\ProjectWAR\\Launcher\\obj\\",
+      "projectPath": "C:\\Users\\DoR\\Desktop\\for the lads\\Dor-Dawn of Reckoning\\Launcher\\Launcher.csproj",
+      "packagesPath": "C:\\Users\\DoR\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\DoR\\Desktop\\for the lads\\Dor-Dawn of Reckoning\\Launcher\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
-      "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-      ],
       "configFilePaths": [
-        "C:\\Users\\wardwalf\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Users\\DoR\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -249,14 +287,19 @@
       "frameworks": {
         "net48": {
           "projectReferences": {
-            "C:\\Users\\wardwalf\\Desktop\\projectwar server\\ProjectWAR\\Common\\Common.csproj": {
-              "projectPath": "C:\\Users\\wardwalf\\Desktop\\projectwar server\\ProjectWAR\\Common\\Common.csproj"
+            "C:\\Users\\DoR\\Desktop\\for the lads\\Dor-Dawn of Reckoning\\Common\\Common.csproj": {
+              "projectPath": "C:\\Users\\DoR\\Desktop\\for the lads\\Dor-Dawn of Reckoning\\Common\\Common.csproj"
             },
-            "C:\\Users\\wardwalf\\Desktop\\projectwar server\\ProjectWAR\\FrameWork\\FrameWork.csproj": {
-              "projectPath": "C:\\Users\\wardwalf\\Desktop\\projectwar server\\ProjectWAR\\FrameWork\\FrameWork.csproj"
+            "C:\\Users\\DoR\\Desktop\\for the lads\\Dor-Dawn of Reckoning\\FrameWork\\FrameWork.csproj": {
+              "projectPath": "C:\\Users\\DoR\\Desktop\\for the lads\\Dor-Dawn of Reckoning\\FrameWork\\FrameWork.csproj"
             }
           }
         }
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -271,6 +314,9 @@
     },
     "runtimes": {
       "win": {
+        "#import": []
+      },
+      "win-arm64": {
         "#import": []
       },
       "win-x64": {

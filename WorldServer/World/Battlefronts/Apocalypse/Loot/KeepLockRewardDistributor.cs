@@ -14,9 +14,9 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
     {
         private static readonly Logger RewardLogger = LogManager.GetLogger("RewardLogger");
         public IRandomGenerator RandomGenerator { get; }
-        public List<RVRKeepLockReward> KeepLockRewards { get; set; }
+        public List<rvr_keep_lock_reward> KeepLockRewards { get; set; }
 
-        public KeepLockRewardDistributor(IRandomGenerator randomGenerator, List<RVRKeepLockReward> keepLockRewards)
+        public KeepLockRewardDistributor(IRandomGenerator randomGenerator, List<rvr_keep_lock_reward> keepLockRewards)
         {
             RandomGenerator = randomGenerator;
             KeepLockRewards = keepLockRewards;
@@ -52,7 +52,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
             if (player.CurrentArea != null)
             {
                 ushort influenceId = 0;
-                if (player.Realm == Realms.REALMS_REALM_ORDER)
+                if (player.Realm == SetRealms.REALMS_REALM_ORDER)
                     influenceId = (ushort)player.CurrentArea.OrderInfluenceId;
                 else
                     influenceId = (ushort)player.CurrentArea.DestroInfluenceId;
@@ -75,7 +75,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
         /// <param name="player"></param>
         /// <param name="playerRenownBand"></param>
         /// <returns></returns>
-        public KeyValuePair<Item_Info, List<Talisman>> BuildChestLootBag(LootBagTypeDefinition lootBag, Player player)
+        public KeyValuePair<item_infos, List<Talisman>> BuildChestLootBag(LootBagTypeDefinition lootBag, Player player)
         {
             var lootRewardDescription = string.Empty;
             // Get the bag item id
@@ -89,14 +89,14 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
 
             // RewardLogger.Info($"Distributing reward of {lootBagItem.Name}, containing {lootBag.ItemId} ({lootBag.ItemCount}) to {player.Name}. Result = {result}");
 
-            return new KeyValuePair<Item_Info, List<Talisman>>(lootBagItem, lootBagContents);
+            return new KeyValuePair<item_infos, List<Talisman>>(lootBagItem, lootBagContents);
         }
 
         /// <summary>
         /// Builds the bag containing the players items.
         /// </summary>
         /// <returns></returns>
-        public KeyValuePair<Item_Info, List<Talisman>> BuildChestLootBag(LootBagRarity rarity, uint itemId, Player player)
+        public KeyValuePair<item_infos, List<Talisman>> BuildChestLootBag(LootBagRarity rarity, uint itemId, Player player)
         {
             var lootRewardDescription = string.Empty;
             // Get the bag item id
@@ -108,7 +108,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
                 new Talisman(itemId, (byte) 1, 0, 0)
             };
 
-            return new KeyValuePair<Item_Info, List<Talisman>>(lootBagItem, lootBagContents);
+            return new KeyValuePair<item_infos, List<Talisman>>(lootBagItem, lootBagContents);
         }
     }
 }

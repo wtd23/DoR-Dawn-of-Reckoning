@@ -21,8 +21,8 @@ namespace WorldServer.World.Interfaces
     public enum SiegeType
     {
         DIRECT = 1,
-        OIL = 3,
         SNIPER = 2,
+        OIL = 3,
         RAM = 4,
         GTAOE = 5
     }

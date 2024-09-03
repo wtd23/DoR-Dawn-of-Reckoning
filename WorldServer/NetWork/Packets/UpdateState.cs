@@ -8,18 +8,18 @@ using WorldServer.World.Objects;
 
 namespace WorldServer.NetWork
 {
-    ///TODO: check for 0x20, 0x40, 0x80 states
+    /// TODO: check for 0x20, 0x40, 0x80 states
     public enum QuestStateOpcode : byte
     {
         None = 0x00,
         QuestAvailable = 0x01,
-        QuestsTaken = 0x02,
+        QuestTaken = 0x02,
         QuestCompleted = 0x04,
         DailyAvailable = 0x08,
         DailyCompleted = 0x10,
     }
 
-    ///TODO : check for another states
+    /// TODO : check for another states
     public enum CreatureStateOpcode : byte
     {
         Interactable = 0x01,

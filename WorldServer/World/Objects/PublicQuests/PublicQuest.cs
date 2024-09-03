@@ -14,7 +14,7 @@ namespace WorldServer.World.Objects.PublicQuests
 {
     public class PublicQuest : Object
     {
-        public PQuest_Info Info;
+        public pquest_info Info;
         public PQuestStage Stage;
         public List<uint> ActivePlayers;
         public Dictionary<uint, ContributionInfo> Players;
@@ -36,7 +36,7 @@ namespace WorldServer.World.Objects.PublicQuests
         /// Initializes the public quest's objectives and stages.
         /// </summary>
         /// <param name="info"></param>
-        public PublicQuest(PQuest_Info info)
+        public PublicQuest(pquest_info info)
             : this()
         {
             Info = info;
@@ -45,7 +45,7 @@ namespace WorldServer.World.Objects.PublicQuests
             Players = new Dictionary<uint, ContributionInfo>();
             Stages = new List<PQuestStage>();
 
-            foreach (PQuest_Objective obj in info.Objectives)
+            foreach (pquest_objectives obj in info.Objectives)
             {
                 // Create a new public quest stage for this objective, if one did not previously exist.
                 bool exists = Stages.Any(x => x.StageName == obj.StageName);
@@ -94,7 +94,7 @@ namespace WorldServer.World.Objects.PublicQuests
                  SendReinitTime(plr, TIME_PQ_RESET);
 */
         // TODO
-        // Send Quest Info && Current Stage && Current Players
+        // Send quests Info && Current Stage && Current Players
         /*}*/
 
         public void SendReinitTime(Player player, ushort time)
@@ -130,7 +130,7 @@ namespace WorldServer.World.Objects.PublicQuests
 
             if (Stage == null)
             {
-                //Log.Error("Public Quest Object", "No Stage!");
+                //Log.Error("Public quests Object", "No Stage!");
                 return;
             }
             if (_ended)
@@ -358,7 +358,7 @@ namespace WorldServer.World.Objects.PublicQuests
             }
 
 #if DEBUG
-            Log.Success("PQuest", "Starting Quest " + Info.Name);
+            Log.Success("PQuest", "Starting quests " + Info.Name);
 #endif
 
             _started = true;
@@ -493,7 +493,7 @@ namespace WorldServer.World.Objects.PublicQuests
 
                         if (Info.Type == 0 && player.CurrentArea != null)
                         {
-                            if (player.Realm == GameData.Realms.REALMS_REALM_ORDER)
+                            if (player.Realm == GameData.SetRealms.REALMS_REALM_ORDER)
                                 influenceid = player.CurrentArea.OrderInfluenceId;
                             else
                                 influenceid = player.CurrentArea.DestroInfluenceId;
@@ -742,7 +742,7 @@ namespace WorldServer.World.Objects.PublicQuests
             {
                 GameObject_proto Proto = GameObjectService.GetGameObjectProto(2000489);
 
-                GameObject_spawn S = new GameObject_spawn();
+                gameobject_spawns S = new gameobject_spawns();
                 S.Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID();
                 S.BuildFromProto(Proto);
                 S.WorldX = Info.GoldChestWorldX;
@@ -867,7 +867,7 @@ namespace WorldServer.World.Objects.PublicQuests
         private Dictionary<ushort, Dictionary<uint, uint>> _playerHealing = new Dictionary<ushort, Dictionary<uint, uint>>();
 
         /// <summary>
-        /// When a player receives a hit from a Public Quest mob, tracks the damage dealt.
+        /// When a player receives a hit from a Public quests mob, tracks the damage dealt.
         /// </summary>
         public void AddTrackedDamage(Player target, PQuestCreature mob, uint damage)
         {

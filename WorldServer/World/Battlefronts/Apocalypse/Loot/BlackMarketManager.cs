@@ -28,7 +28,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
             {
                 if (blackMarketItem.ItemId == itemId)
                 {
-                    Character_mail mail = new Character_mail
+                    characters_mails mail = new characters_mails
                     {
                         Guid = CharMgr.GenerateMailGuid(),
                         CharacterId = Convert.ToUInt32(player.CharacterId), //CharacterId
@@ -42,7 +42,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
                         CharacterIdSender = 0  // system
                     };
 
-                    MailItem item = new MailItem(Convert.ToUInt32(1298378521), Convert.ToUInt16(1));
+                    mail_item item = new mail_item(Convert.ToUInt32(1298378521), Convert.ToUInt16(1));
                     if (item != null)
                     {
                         mail.Items.Add(item);

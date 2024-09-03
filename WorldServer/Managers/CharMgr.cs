@@ -23,7 +23,7 @@ namespace WorldServer.Managers
     public class AccountChars
     {
         public int AccountId;
-        public Realms Realm = Realms.REALMS_REALM_NEUTRAL;
+        public GameData.SetRealms Realm = GameData.SetRealms.REALMS_REALM_NEUTRAL;
 
         public bool Loaded { get; set; }
 
@@ -32,7 +32,7 @@ namespace WorldServer.Managers
             AccountId = accountId;
         }
 
-        public Character[] Chars = new Character[CharMgr.MaxSlot];
+        public characters[] Chars = new characters[CharMgr.MaxSlot];
 
         public byte GenerateFreeSlot()
         {
@@ -43,12 +43,12 @@ namespace WorldServer.Managers
             return CharMgr.MaxSlot;
         }
 
-        public bool AddChar(Character Char)
+        public bool AddChar(characters Char)
         {
             if (Char == null)
                 return false;
 
-            Realm = (Realms)Char.Realm;
+            Realm = (GameData.SetRealms)Char.Realm;
 
             Chars[Char.SlotId] = Char;
 
@@ -62,19 +62,19 @@ namespace WorldServer.Managers
                 characterId = Chars[slot].CharacterId;
 
             Chars[slot] = null;
-            Realm = Realms.REALMS_REALM_NEUTRAL;
+            Realm = GameData.SetRealms.REALMS_REALM_NEUTRAL;
 
-            foreach (Character Char in Chars)
+            foreach (characters Char in Chars)
                 if (Char != null)
                 {
-                    Realm = (Realms)Char.Realm;
+                    Realm = (GameData.SetRealms)Char.Realm;
                     break;
                 }
 
             return characterId;
         }
 
-        public Character GetCharacterBySlot(byte slot)
+        public characters GetCharacterBySlot(byte slot)
         {
             if (slot > Chars.Length)
                 return null;
@@ -95,23 +95,23 @@ namespace WorldServer.Managers
 
         #region CharacterInfo
 
-        public static Dictionary<byte, CharacterInfo> CharacterInfos = new Dictionary<byte, CharacterInfo>();
-        public static ConcurrentDictionary<byte, List<CharacterInfo_item>> CharacterStartingItems = new ConcurrentDictionary<byte, List<CharacterInfo_item>>();
-        public static Dictionary<byte, List<CharacterInfoRenown>> RenownAbilityInfo = new Dictionary<byte, List<CharacterInfoRenown>>();
-        public static Dictionary<byte, List<CharacterInfo_stats>> CharacterBaseStats = new Dictionary<byte, List<CharacterInfo_stats>>();
-        public static Dictionary<byte, List<PetStatOverride>> PetOverrideStats = new Dictionary<byte, List<PetStatOverride>>();
-        public static Dictionary<byte, List<PetMasteryModifiers>> PetMasteryMods = new Dictionary<byte, List<PetMasteryModifiers>>();
-        public static List<Random_name> RandomNameList = new List<Random_name>();
+        public static Dictionary<byte, character_info> CharacterInfos = new Dictionary<byte, character_info>();
+        public static ConcurrentDictionary<byte, List<character_info_items>> CharacterStartingItems = new ConcurrentDictionary<byte, List<character_info_items>>();
+        public static Dictionary<byte, List<character_info_renown>> RenownAbilityInfo = new Dictionary<byte, List<character_info_renown>>();
+        public static Dictionary<byte, List<character_info_stats>> CharacterBaseStats = new Dictionary<byte, List<character_info_stats>>();
+        public static Dictionary<byte, List<pet_stat_override>> PetOverrideStats = new Dictionary<byte, List<pet_stat_override>>();
+        public static Dictionary<byte, List<pet_mastery_modifiers>> PetMasteryMods = new Dictionary<byte, List<pet_mastery_modifiers>>();
+        public static List<random_names> RandomNameList = new List<random_names>();
 
         [LoadingFunction(true)]
         public static void LoadCharacterInfos()
         {
-            IList<CharacterInfo> chars = WorldMgr.Database.SelectAllObjects<CharacterInfo>();
-            foreach (CharacterInfo info in chars)
+            IList<character_info> chars = WorldMgr.Database.SelectAllObjects<character_info>();
+            foreach (character_info info in chars)
                 if (!CharacterInfos.ContainsKey(info.Career))
                     CharacterInfos.Add(info.Career, info);
 
-            RandomNameList = WorldMgr.Database.SelectAllObjects<Random_name>() as List<Random_name>;
+            RandomNameList = WorldMgr.Database.SelectAllObjects<random_names>() as List<random_names>;
 
             Log.Success("CharacterMgr", "Loaded " + chars.Count + " CharacterInfo");
         }
@@ -119,14 +119,14 @@ namespace WorldServer.Managers
         [LoadingFunction(true)]
         public static void LoadDefaultCharacterItems()
         {
-            IList<CharacterInfo_item> referenceListStartingItems = WorldMgr.Database.SelectAllObjects<CharacterInfo_item>();
+            IList<character_info_items> referenceListStartingItems = WorldMgr.Database.SelectAllObjects<character_info_items>();
 
             if (referenceListStartingItems != null)
             {
-                foreach (CharacterInfo_item item in referenceListStartingItems)
+                foreach (character_info_items item in referenceListStartingItems)
                 {
                     CharacterStartingItems.AddOrUpdate(
-                        item.CareerLine, new List<CharacterInfo_item> { item },
+                        item.CareerLine, new List<character_info_items> { item },
                         (k, v) =>
                         {
                             v.Add(item);
@@ -149,12 +149,12 @@ namespace WorldServer.Managers
         [LoadingFunction(true)]
         public static void LoadCharacterRenownInfo()
         {
-            IList<CharacterInfoRenown> characterRenownInfo = WorldMgr.Database.SelectAllObjects<CharacterInfoRenown>().OrderBy(x => x.ID).ToList();
+            IList<character_info_renown> characterRenownInfo = WorldMgr.Database.SelectAllObjects<character_info_renown>().OrderBy(x => x.ID).ToList();
 
-            foreach (CharacterInfoRenown renInfo in characterRenownInfo)
+            foreach (character_info_renown renInfo in characterRenownInfo)
                 if (!RenownAbilityInfo.ContainsKey(renInfo.Tree))
                 {
-                    List<CharacterInfoRenown> items = new List<CharacterInfoRenown>(1) { renInfo };
+                    List<character_info_renown> items = new List<character_info_renown>(1) { renInfo };
                     RenownAbilityInfo.Add(renInfo.Tree, items);
                 }
                 else RenownAbilityInfo[renInfo.Tree].Add(renInfo);
@@ -165,12 +165,12 @@ namespace WorldServer.Managers
         [LoadingFunction(true)]
         public static void LoadCharacterBaseStats()
         {
-            IList<CharacterInfo_stats> characterStatInfo = WorldMgr.Database.SelectAllObjects<CharacterInfo_stats>();
-            foreach (CharacterInfo_stats statInfo in characterStatInfo)
+            IList<character_info_stats> characterStatInfo = WorldMgr.Database.SelectAllObjects<character_info_stats>();
+            foreach (character_info_stats statInfo in characterStatInfo)
             {
                 if (!CharacterBaseStats.ContainsKey(statInfo.CareerLine))
                 {
-                    List<CharacterInfo_stats> stats = new List<CharacterInfo_stats>(1) { statInfo };
+                    List<character_info_stats> stats = new List<character_info_stats>(1) { statInfo };
                     CharacterBaseStats.Add(statInfo.CareerLine, stats);
                 }
                 else CharacterBaseStats[statInfo.CareerLine].Add(statInfo);
@@ -179,7 +179,7 @@ namespace WorldServer.Managers
             Log.Success("CharacterMgr", "Loaded " + characterStatInfo.Count + " CharacterInfo_Stats");
         }
 
-        public static CharacterInfo GetCharacterInfo(byte career)
+        public static character_info GetCharacterInfo(byte career)
         {
             lock (CharacterInfos)
                 if (CharacterInfos.ContainsKey(career))
@@ -188,19 +188,19 @@ namespace WorldServer.Managers
             return null;
         }
 
-        public static Dictionary<ushort, List<CharacterInfo_stats>> CareerLevelStats = new Dictionary<ushort, List<CharacterInfo_stats>>();
+        public static Dictionary<ushort, List<character_info_stats>> CareerLevelStats = new Dictionary<ushort, List<character_info_stats>>();
 
-        public static List<CharacterInfo_stats> GetCharacterInfoStats(byte careerLine, byte level)
+        public static List<character_info_stats> GetCharacterInfoStats(byte careerLine, byte level)
         {
-            List<CharacterInfo_stats> stats = new List<CharacterInfo_stats>();
+            List<character_info_stats> stats = new List<character_info_stats>();
             if (!CareerLevelStats.TryGetValue((ushort)((careerLine << 8) + level), out stats))
             {
-                stats = new List<CharacterInfo_stats>();
+                stats = new List<character_info_stats>();
 
-                List<CharacterInfo_stats> infoStats;
+                List<character_info_stats> infoStats;
                 if (CharacterBaseStats.TryGetValue(careerLine, out infoStats))
                 {
-                    foreach (CharacterInfo_stats stat in infoStats)
+                    foreach (character_info_stats stat in infoStats)
                         if (stat.CareerLine == careerLine && stat.Level == level)
                             stats.Add(stat);
 
@@ -226,12 +226,12 @@ namespace WorldServer.Managers
         [LoadingFunction(true)]
         public static void LoadPetStatOverrides()
         {
-            IList<PetStatOverride> overrides = WorldMgr.Database.SelectAllObjects<PetStatOverride>();
-            foreach (PetStatOverride ovrInfo in overrides)
+            IList<pet_stat_override> overrides = WorldMgr.Database.SelectAllObjects<pet_stat_override>();
+            foreach (pet_stat_override ovrInfo in overrides)
             {
                 if (!PetOverrideStats.ContainsKey(ovrInfo.CareerLine))
                 {
-                    List<PetStatOverride> ovr = new List<PetStatOverride>(1) { ovrInfo };
+                    List<pet_stat_override> ovr = new List<pet_stat_override>(1) { ovrInfo };
                     PetOverrideStats.Add(ovrInfo.CareerLine, ovr);
                 }
                 else PetOverrideStats[ovrInfo.CareerLine].Add(ovrInfo);
@@ -239,20 +239,20 @@ namespace WorldServer.Managers
             }
         }
 
-        public static Dictionary<ushort, List<PetStatOverride>> PetOverriddenStats = new Dictionary<ushort, List<PetStatOverride>>();
+        public static Dictionary<ushort, List<pet_stat_override>> PetOverriddenStats = new Dictionary<ushort, List<pet_stat_override>>();
 
-        public static List<PetStatOverride> GetPetStatOverride(byte careerLine)
+        public static List<pet_stat_override> GetPetStatOverride(byte careerLine)
         {
-            List<PetStatOverride> overrides = new List<PetStatOverride>();
+            List<pet_stat_override> overrides = new List<pet_stat_override>();
 
             // if (!PetOverriddenStats.TryGetValue((ushort)(careerLine << 8), out overrides))
             // {
-            overrides = new List<PetStatOverride>();
+            overrides = new List<pet_stat_override>();
 
-            List<PetStatOverride> infoOverrides;
+            List<pet_stat_override> infoOverrides;
             if (PetOverrideStats.TryGetValue(careerLine, out infoOverrides))
             {
-                foreach (PetStatOverride ovr in infoOverrides)
+                foreach (pet_stat_override ovr in infoOverrides)
                     if (ovr.CareerLine == careerLine && ovr.Active == true)
                         overrides.Add(ovr);
 
@@ -268,12 +268,12 @@ namespace WorldServer.Managers
         [LoadingFunction(true)]
         public static void LoadPetMasteryMods()
         {
-            IList<PetMasteryModifiers> modifiers = WorldMgr.Database.SelectAllObjects<PetMasteryModifiers>();
-            foreach (PetMasteryModifiers modInfo in modifiers)
+            IList<pet_mastery_modifiers> modifiers = WorldMgr.Database.SelectAllObjects<pet_mastery_modifiers>();
+            foreach (pet_mastery_modifiers modInfo in modifiers)
             {
                 if (!PetMasteryMods.ContainsKey(modInfo.CareerLine))
                 {
-                    List<PetMasteryModifiers> mod = new List<PetMasteryModifiers>(1) { modInfo };
+                    List<pet_mastery_modifiers> mod = new List<pet_mastery_modifiers>(1) { modInfo };
                     PetMasteryMods.Add(modInfo.CareerLine, mod);
                 }
                 else PetMasteryMods[modInfo.CareerLine].Add(modInfo);
@@ -281,18 +281,18 @@ namespace WorldServer.Managers
             Log.Success("CharacterMgr", "Loaded " + modifiers.Count + " PetMosteryModifiers");
         }
 
-        public static Dictionary<ushort, List<PetMasteryModifiers>> PetModifiedMastery = new Dictionary<ushort, List<PetMasteryModifiers>>();
+        public static Dictionary<ushort, List<pet_mastery_modifiers>> PetModifiedMastery = new Dictionary<ushort, List<pet_mastery_modifiers>>();
 
-        public static List<PetMasteryModifiers> GetPetMasteryModifiers(byte careerLine)
+        public static List<pet_mastery_modifiers> GetPetMasteryModifiers(byte careerLine)
         {
-            List<PetMasteryModifiers> modifiers = new List<PetMasteryModifiers>();
+            List<pet_mastery_modifiers> modifiers = new List<pet_mastery_modifiers>();
 
-            modifiers = new List<PetMasteryModifiers>();
+            modifiers = new List<pet_mastery_modifiers>();
 
-            List<PetMasteryModifiers> infoModifiers;
+            List<pet_mastery_modifiers> infoModifiers;
             if (PetMasteryMods.TryGetValue(careerLine, out infoModifiers))
             {
-                foreach (PetMasteryModifiers mod in infoModifiers)
+                foreach (pet_mastery_modifiers mod in infoModifiers)
                     if (mod.CareerLine == careerLine && mod.Active == true)
                         modifiers.Add(mod);
 
@@ -303,18 +303,18 @@ namespace WorldServer.Managers
             return modifiers;
         }
 
-        public static List<CharacterInfo_item> GetCharacterInfoItem(byte careerLine)
+        public static List<character_info_items> GetCharacterInfoItem(byte careerLine)
         {
-            List<CharacterInfo_item> items;
+            List<character_info_items> items;
             if (!CharacterStartingItems.TryGetValue(careerLine, out items))
             {
-                items = new List<CharacterInfo_item>();
+                items = new List<character_info_items>();
                 CharacterStartingItems.TryAdd(careerLine, items);
             }
             return items;
         }
 
-        public static List<Random_name> GetRandomNames()
+        public static List<random_names> GetRandomNames()
         {
             return RandomNameList;
         }
@@ -327,7 +327,7 @@ namespace WorldServer.Managers
         public static byte MaxSlot = 20;
 
         private static long _maxCharGuid = 1;
-        public static Dictionary<uint, Character> Chars = new Dictionary<uint, Character>();
+        public static Dictionary<uint, characters> Chars = new Dictionary<uint, characters>();
         public static Dictionary<string, uint> CharIdLookup = new Dictionary<string, uint>();
         public static Dictionary<int, AccountChars> AcctChars = new Dictionary<int, AccountChars>();
 
@@ -338,21 +338,21 @@ namespace WorldServer.Managers
         {
             if (Core.Config.PreloadAllCharacters)
             {
-                List<Character> chars = (List<Character>)Database.SelectAllObjects<Character>();
-                Dictionary<uint, Character_value> charValues = Database.SelectAllObjects<Character_value>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
-                Dictionary<uint, CharacterClientData> charClientData = Database.SelectAllObjects<CharacterClientData>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
-                Dictionary<uint, List<Character_social>> charSocials = Database.SelectAllObjects<Character_social>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-                Dictionary<uint, List<Character_tok>> charToks = Database.SelectAllObjects<Character_tok>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-                Dictionary<uint, List<Character_tok_kills>> charToksKills = Database.SelectAllObjects<Character_tok_kills>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-                Dictionary<uint, List<Character_quest>> charQuests = Database.SelectAllObjects<Character_quest>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-                Dictionary<uint, List<Characters_influence>> charInfluences = Database.SelectAllObjects<Characters_influence>().GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
-                Dictionary<uint, List<Characters_bag_pools>> charBagPools = Database.SelectAllObjects<Characters_bag_pools>().GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
-                Dictionary<uint, List<Character_mail>> charMail = Database.SelectAllObjects<Character_mail>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-                Dictionary<uint, List<CharacterSavedBuff>> charBuffs = Database.SelectAllObjects<CharacterSavedBuff>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-                Dictionary<uint, List<HonorRewardCooldown>> charHonorCooldowns = Database.SelectAllObjects<HonorRewardCooldown>().GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
+                List<characters> chars = (List<characters>)Database.SelectAllObjects<characters>();
+                Dictionary<uint, characters_value> charValues = Database.SelectAllObjects<characters_value>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
+                Dictionary<uint, characters_client_data> charClientData = Database.SelectAllObjects<characters_client_data>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
+                Dictionary<uint, List<characters_socials>> charSocials = Database.SelectAllObjects<characters_socials>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_toks>> charToks = Database.SelectAllObjects<characters_toks>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_toks_kills>> charToksKills = Database.SelectAllObjects<characters_toks_kills>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_quests>> charQuests = Database.SelectAllObjects<characters_quests>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_influences>> charInfluences = Database.SelectAllObjects<characters_influences>().GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_bag_pools>> charBagPools = Database.SelectAllObjects<characters_bag_pools>().GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_mails>> charMail = Database.SelectAllObjects<characters_mails>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_saved_buffs>> charBuffs = Database.SelectAllObjects<characters_saved_buffs>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_honor_reward_cooldown>> charHonorCooldowns = Database.SelectAllObjects<characters_honor_reward_cooldown>().GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
 
                 int count = 0;
-                foreach (Character Char in chars)
+                foreach (characters Char in chars)
                 {
                     if (charValues.ContainsKey(Char.CharacterId)) Char.Value = charValues[Char.CharacterId];
                     if (charClientData.ContainsKey(Char.CharacterId)) Char.ClientData = charClientData[Char.CharacterId];
@@ -368,9 +368,9 @@ namespace WorldServer.Managers
 
                     // Mail list must never be null
                     if (Char.Mails == null)
-                        Char.Mails = new List<Character_mail>();
+                        Char.Mails = new List<characters_mails>();
                     if (Char.HonorCooldowns == null)
-                        Char.HonorCooldowns = new List<HonorRewardCooldown>();
+                        Char.HonorCooldowns = new List<characters_honor_reward_cooldown>();
                     AddChar(Char);
                     ++count;
                 }
@@ -380,36 +380,36 @@ namespace WorldServer.Managers
             else
             {
                 string whereString = $"CharacterId IN (SELECT CharacterId FROM `{Database.GetSchemaName()}`.characters t1 WHERE t1.AccountId IN (SELECT AccountId FROM `{Core.AcctMgr.GetAccountSchemaName()}`.accounts t2 WHERE t2.LastLogged >= {RecentHistoryTime}))";
-                /*_maxCharGuid = Database.GetMaxColValue<Character>("CharacterId");
+                /*_maxCharGuid = Database.GetMaxColValue<characters>("CharacterId");
 
                 Log.Success("LoadCharacters", _maxCharGuid + " is the max char GUID.");
 
-                List<Character> auctionSellers = (List<Character>)Database.SelectObjects<Character>("CharacterId IN (SELECT SellerId FROM war_characters.auctions)");
+                List<characters> auctionSellers = (List<characters>)Database.SelectObjects<characters>("CharacterId IN (SELECT SellerId FROM war_characters.auctions)");
 
-                foreach (Character seller in auctionSellers)
+                foreach (characters seller in auctionSellers)
                 {
                     if (!Chars.ContainsKey(seller.CharacterId))
                         AddChar(seller);
                 }*/
 
                 // Full load
-                List<Character> chars = (List<Character>)Database.SelectAllObjects<Character>();
-                Dictionary<uint, List<Character_social>> charSocials = Database.SelectAllObjects<Character_social>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+                List<characters> chars = (List<characters>)Database.SelectAllObjects<characters>();
+                Dictionary<uint, List<characters_socials>> charSocials = Database.SelectAllObjects<characters_socials>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
 
                 // Partial load
-                Dictionary<uint, Character_value> charValues = Database.SelectObjects<Character_value>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
-                Dictionary<uint, CharacterClientData> charClientData = Database.SelectAllObjects<CharacterClientData>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
-                Dictionary<uint, List<Character_tok>> charToks = Database.SelectObjects<Character_tok>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-                Dictionary<uint, List<Character_tok_kills>> charToksKills = Database.SelectObjects<Character_tok_kills>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-                Dictionary<uint, List<Character_quest>> charQuests = Database.SelectObjects<Character_quest>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-                Dictionary<uint, List<Characters_influence>> charInfluences = Database.SelectObjects<Characters_influence>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
-                Dictionary<uint, List<Characters_bag_pools>> charBagPools = Database.SelectObjects<Characters_bag_pools>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
-                Dictionary<uint, List<Character_mail>> charMail = Database.SelectObjects<Character_mail>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-                Dictionary<uint, List<CharacterSavedBuff>> charBuffs = Database.SelectObjects<CharacterSavedBuff>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-                Dictionary<uint, List<HonorRewardCooldown>> charHonorCooldowns = Database.SelectAllObjects<HonorRewardCooldown>().GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
+                Dictionary<uint, characters_value> charValues = Database.SelectObjects<characters_value>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
+                Dictionary<uint, characters_client_data> charClientData = Database.SelectAllObjects<characters_client_data>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
+                Dictionary<uint, List<characters_toks>> charToks = Database.SelectObjects<characters_toks>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_toks_kills>> charToksKills = Database.SelectObjects<characters_toks_kills>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_quests>> charQuests = Database.SelectObjects<characters_quests>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_influences>> charInfluences = Database.SelectObjects<characters_influences>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_bag_pools>> charBagPools = Database.SelectObjects<characters_bag_pools>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_mails>> charMail = Database.SelectObjects<characters_mails>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_saved_buffs>> charBuffs = Database.SelectObjects<characters_saved_buffs>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+                Dictionary<uint, List<characters_honor_reward_cooldown>> charHonorCooldowns = Database.SelectAllObjects<characters_honor_reward_cooldown>().GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
 
                 int count = 0;
-                foreach (Character Char in chars)
+                foreach (characters Char in chars)
                 {
                     if (charValues.ContainsKey(Char.CharacterId)) Char.Value = charValues[Char.CharacterId];
                     if (charClientData.ContainsKey(Char.CharacterId)) Char.ClientData = charClientData[Char.CharacterId];
@@ -425,9 +425,9 @@ namespace WorldServer.Managers
 
                     // Mail list must never be null
                     if (Char.Mails == null)
-                        Char.Mails = new List<Character_mail>();
+                        Char.Mails = new List<characters_mails>();
                     if (Char.HonorCooldowns == null)
-                        Char.HonorCooldowns = new List<HonorRewardCooldown>();
+                        Char.HonorCooldowns = new List<characters_honor_reward_cooldown>();
 
                     AddChar(Char);
                     if (Char.Value != null)
@@ -443,15 +443,15 @@ namespace WorldServer.Managers
             LoadAlliances();
         }
 
-        public static Character LoadCharacterInfo(string name, bool fullLoad)
+        public static characters LoadCharacterInfo(string name, bool fullLoad)
         {
-            Character Char = Database.SelectObject<Character>("Name='" + Database.Escape(name) + "'");
+            characters Char = Database.SelectObject<characters>("Name='" + Database.Escape(name) + "'");
             if (Char != null)
             {
                 if (Char.Value == null)
-                    Char.Value = Database.SelectObject<Character_value>("CharacterId=" + Char.CharacterId);
+                    Char.Value = Database.SelectObject<characters_value>("CharacterId=" + Char.CharacterId);
                 if (Char.ClientData == null)
-                    Char.ClientData = Database.SelectObject<CharacterClientData>("CharacterId=" + Char.CharacterId);
+                    Char.ClientData = Database.SelectObject<characters_client_data>("CharacterId=" + Char.CharacterId);
                 if (fullLoad)
                     LoadAdditionalCharacterInfo(Char);
 
@@ -462,15 +462,15 @@ namespace WorldServer.Managers
             return Char;
         }
 
-        public static Character LoadCharacterInfo(uint id, bool fullLoad)
+        public static characters LoadCharacterInfo(uint id, bool fullLoad)
         {
-            Character Char = Database.SelectObject<Character>("CharacterId='" + id + "'");
+            characters Char = Database.SelectObject<characters>("CharacterId='" + id + "'");
             if (Char != null)
             {
                 if (Char.Value == null)
-                    Char.Value = Database.SelectObject<Character_value>("CharacterId=" + Char.CharacterId);
+                    Char.Value = Database.SelectObject<characters_value>("CharacterId=" + Char.CharacterId);
                 if (Char.ClientData == null)
-                    Char.ClientData = Database.SelectObject<CharacterClientData>("CharacterId=" + Char.CharacterId);
+                    Char.ClientData = Database.SelectObject<characters_client_data>("CharacterId=" + Char.CharacterId);
 
                 if (fullLoad)
                     LoadAdditionalCharacterInfo(Char);
@@ -482,19 +482,19 @@ namespace WorldServer.Managers
             return Char;
         }
 
-        private static void LoadAdditionalCharacterInfo(Character Char)
+        private static void LoadAdditionalCharacterInfo(characters Char)
         {
-            Char.Socials = (List<Character_social>)Database.SelectObjects<Character_social>("CharacterId=" + Char.CharacterId);
-            Char.Toks = (List<Character_tok>)Database.SelectObjects<Character_tok>("CharacterId=" + Char.CharacterId);
-            Char.TokKills = (List<Character_tok_kills>)Database.SelectObjects<Character_tok_kills>("CharacterId=" + Char.CharacterId);
-            Char.Quests = (List<Character_quest>)Database.SelectObjects<Character_quest>("CharacterId=" + Char.CharacterId);
-            Char.Influences = (List<Characters_influence>)Database.SelectObjects<Characters_influence>("CharacterId=" + Char.CharacterId);
-            Char.Bag_Pools = (List<Characters_bag_pools>)Database.SelectObjects<Characters_bag_pools>("CharacterId=" + Char.CharacterId);
-            Char.Buffs = (List<CharacterSavedBuff>)Database.SelectObjects<CharacterSavedBuff>("CharacterId=" + Char.CharacterId);
-            Char.HonorCooldowns = (List<HonorRewardCooldown>)Database.SelectObjects<HonorRewardCooldown>("CharacterId=" + Char.CharacterId);
+            Char.Socials = (List<characters_socials>)Database.SelectObjects<characters_socials>("CharacterId=" + Char.CharacterId);
+            Char.Toks = (List<characters_toks>)Database.SelectObjects<characters_toks>("CharacterId=" + Char.CharacterId);
+            Char.TokKills = (List<characters_toks_kills>)Database.SelectObjects<characters_toks_kills>("CharacterId=" + Char.CharacterId);
+            Char.Quests = (List<characters_quests>)Database.SelectObjects<characters_quests>("CharacterId=" + Char.CharacterId);
+            Char.Influences = (List<characters_influences>)Database.SelectObjects<characters_influences>("CharacterId=" + Char.CharacterId);
+            Char.Bag_Pools = (List<characters_bag_pools>)Database.SelectObjects<characters_bag_pools>("CharacterId=" + Char.CharacterId);
+            Char.Buffs = (List<characters_saved_buffs>)Database.SelectObjects<characters_saved_buffs>("CharacterId=" + Char.CharacterId);
+            Char.HonorCooldowns = (List<characters_honor_reward_cooldown>)Database.SelectObjects<characters_honor_reward_cooldown>("CharacterId=" + Char.CharacterId);
 
             if (Char.Mails == null)
-                Char.Mails = (List<Character_mail>)Database.SelectObjects<Character_mail>("CharacterId=" + Char.CharacterId);
+                Char.Mails = (List<characters_mails>)Database.SelectObjects<characters_mails>("CharacterId=" + Char.CharacterId);
         }
 
         public static uint GenerateMaxCharId()
@@ -502,7 +502,7 @@ namespace WorldServer.Managers
             return (uint)Interlocked.Increment(ref _maxCharGuid);
         }
 
-        public static bool CreateChar(Character Char)
+        public static bool CreateChar(characters Char)
         {
             AccountChars chars = GetAccountChar(Char.AccountId);
             Char.SlotId = chars.GenerateFreeSlot();
@@ -533,7 +533,7 @@ namespace WorldServer.Managers
             return true;
         }
 
-        public static void AddChar(Character Char)
+        public static void AddChar(characters Char)
         {
             lock (Chars)
             {
@@ -558,7 +558,7 @@ namespace WorldServer.Managers
                 return CharIdLookup.ContainsKey(name) ? CharIdLookup[name] : 0;
         }
 
-        public static void UpdateCharacterName(Character chara, string newName)
+        public static void UpdateCharacterName(characters chara, string newName)
         {
             lock (CharIdLookup)
             {
@@ -571,7 +571,7 @@ namespace WorldServer.Managers
             }
         }
 
-        public static Character GetCharacter(string name, bool fullLoad)
+        public static characters GetCharacter(string name, bool fullLoad)
         {
             uint characterId = GetCharacterId(name);
 
@@ -580,7 +580,7 @@ namespace WorldServer.Managers
                 if (characterId > 0)
                     return Chars[characterId];
 
-                foreach (Character chara in Chars.Values)
+                foreach (characters chara in Chars.Values)
                     if (chara != null && name.Equals(chara.Name, StringComparison.OrdinalIgnoreCase))
                         return chara;
             }
@@ -588,7 +588,7 @@ namespace WorldServer.Managers
             return LoadCharacterInfo(name, fullLoad);
         }
 
-        public static Character GetCharacter(uint id, bool fullLoad)
+        public static characters GetCharacter(uint id, bool fullLoad)
         {
             lock (Chars)
                 if (Chars.ContainsKey(id))
@@ -597,7 +597,7 @@ namespace WorldServer.Managers
             return LoadCharacterInfo(id, fullLoad);
         }
 
-        public static void GetCharactersWithName(string name, List<Character> inList)
+        public static void GetCharactersWithName(string name, List<characters> inList)
         {
             uint characterId = GetCharacterId(name);
 
@@ -606,7 +606,7 @@ namespace WorldServer.Managers
                 if (characterId > 0)
                     inList.Add(Chars[characterId]);
 
-                foreach (Character chara in Chars.Values)
+                foreach (characters chara in Chars.Values)
                     if (!string.IsNullOrEmpty(chara?.OldName) && name.Equals(chara.OldName, StringComparison.OrdinalIgnoreCase))
                         inList.Add(chara);
             }
@@ -621,7 +621,7 @@ namespace WorldServer.Managers
             lock (Chars)
                 if (characterId > 0 && Chars.ContainsKey(characterId))
                 {
-                    CharacterDeletionRecord record = new CharacterDeletionRecord
+                    characters_deletions record = new characters_deletions
                     {
                         DeletionIP = client.GetIp(),
                         AccountID = client._Account.AccountId,
@@ -633,12 +633,12 @@ namespace WorldServer.Managers
 
                     Database.AddObject(record);
 
-                    Character Char = Chars[characterId];
+                    characters Char = Chars[characterId];
                     Chars.Remove(characterId);
                     RemoveItemsFromCharacterId(characterId);
                     DeleteChar(Char);
 
-                    Core.AcctMgr.UpdateRealmCharacters(Core.Rm.RealmId, (uint)Database.GetObjectCount<Character>(" Realm=1"), (uint)Database.GetObjectCount<Character>(" Realm=2"));
+                    Core.AcctMgr.UpdateRealmCharacters(Core.Rm.RealmId, (uint)Database.GetObjectCount<characters>(" Realm=1"), (uint)Database.GetObjectCount<characters>(" Realm=2"));
                 }
         }
 
@@ -649,7 +649,7 @@ namespace WorldServer.Managers
             lock (Chars)
                 if (characterId > 0 && Chars.ContainsKey(characterId))
                 {
-                    CharacterDeletionRecord record = new CharacterDeletionRecord
+                    characters_deletions record = new characters_deletions
                     {
                         DeletionIP = deleter.Client.GetIp(),
                         AccountID = accountId,
@@ -661,16 +661,16 @@ namespace WorldServer.Managers
 
                     Database.AddObject(record);
 
-                    Character Char = Chars[characterId];
+                    characters Char = Chars[characterId];
                     Chars.Remove(characterId);
                     RemoveItemsFromCharacterId(characterId);
                     DeleteChar(Char);
 
-                    Core.AcctMgr.UpdateRealmCharacters(Core.Rm.RealmId, (uint)Database.GetObjectCount<Character>(" Realm=1"), (uint)Database.GetObjectCount<Character>(" Realm=2"));
+                    Core.AcctMgr.UpdateRealmCharacters(Core.Rm.RealmId, (uint)Database.GetObjectCount<characters>(" Realm=1"), (uint)Database.GetObjectCount<characters>(" Realm=2"));
                 }
         }
 
-        public static bool DeleteChar(Character Char)
+        public static bool DeleteChar(characters Char)
         {
             lock (CharIdLookup)
                 CharIdLookup.Remove(Char.Name);
@@ -680,32 +680,32 @@ namespace WorldServer.Managers
             Database.DeleteObject(Char.ClientData);
 
             if (Char.Socials != null)
-                foreach (Character_social obj in Char.Socials)
+                foreach (characters_socials obj in Char.Socials)
                     Database.DeleteObject(obj);
 
             if (Char.Toks != null)
-                foreach (Character_tok obj in Char.Toks)
+                foreach (characters_toks obj in Char.Toks)
                     Database.DeleteObject(obj);
 
             if (Char.Quests != null)
-                foreach (Character_quest obj in Char.Quests)
+                foreach (characters_quests obj in Char.Quests)
                     Database.DeleteObject(obj);
 
             if (Char.Influences != null)
-                foreach (Characters_influence obj in Char.Influences)
+                foreach (characters_influences obj in Char.Influences)
                     Database.DeleteObject(obj);
             if (Char.Bag_Pools != null)
-                foreach (Characters_bag_pools obj in Char.Bag_Pools)
+                foreach (characters_bag_pools obj in Char.Bag_Pools)
                     Database.DeleteObject(obj);
             foreach (Guild gld in Guild.Guilds)
             {
                 // Shouldnt be more than 1, but might as well check
-                List<Guild_member> toRemove = new List<Guild_member>();
-                foreach (Guild_member member in gld.Info.Members.Values)
+                List<guild_members> toRemove = new List<guild_members>();
+                foreach (guild_members member in gld.Info.Members.Values)
                     if (member.CharacterId == Char.CharacterId)
                         toRemove.Add(member);
 
-                foreach (Guild_member member in toRemove)
+                foreach (guild_members member in toRemove)
                     gld.LeaveGuild(member, false);
             }
 
@@ -725,7 +725,7 @@ namespace WorldServer.Managers
 
         public static bool NameIsUsed(string name)
         {
-            return Database.SelectObject<Character>("Name='" + Database.Escape(name) + "'") != null;
+            return Database.SelectObject<characters>("Name='" + Database.Escape(name) + "'") != null;
         }
 
         /// <summary>
@@ -733,8 +733,8 @@ namespace WorldServer.Managers
         /// </summary>
         public static bool NameIsDeleted(string name)
         {
-            Realm Rm = Core.Rm;
-            return Database.SelectObject<CharacterDeletionRecord>("CharacterName='" + Database.Escape(name) + "' AND DeletionTimeSeconds > " + Rm.BootTime) != null;
+            Common.realms Rm = Core.Rm;
+            return Database.SelectObject<characters_deletions>("CharacterName='" + Database.Escape(name) + "' AND DeletionTimeSeconds > " + Rm.BootTime) != null;
         }
 
         /// <summary>
@@ -780,24 +780,24 @@ namespace WorldServer.Managers
 
             string whereString = sb.ToString();
 
-            Dictionary<uint, Character_value> charValues = Database.SelectObjects<Character_value>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
-            Dictionary<uint, CharacterClientData> charClientData = Database.SelectObjects<CharacterClientData>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
-            Dictionary<uint, List<Character_social>> charSocials = Database.SelectAllObjects<Character_social>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-            Dictionary<uint, List<Character_tok>> charToks = Database.SelectObjects<Character_tok>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-            Dictionary<uint, List<Character_tok_kills>> charToksKills = Database.SelectObjects<Character_tok_kills>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-            Dictionary<uint, List<Character_quest>> charQuests = Database.SelectObjects<Character_quest>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-            Dictionary<uint, List<Characters_influence>> charInfluences = Database.SelectObjects<Characters_influence>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
-            Dictionary<uint, List<Characters_bag_pools>> charBagPools = Database.SelectObjects<Characters_bag_pools>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
-            Dictionary<uint, List<Character_mail>> charMail = Database.SelectObjects<Character_mail>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-            Dictionary<uint, List<CharacterSavedBuff>> charBuffs = Database.SelectObjects<CharacterSavedBuff>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
-            Dictionary<uint, List<HonorRewardCooldown>> charHonorCooldowns = Database.SelectAllObjects<HonorRewardCooldown>().GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
+            Dictionary<uint, characters_value> charValues = Database.SelectObjects<characters_value>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
+            Dictionary<uint, characters_client_data> charClientData = Database.SelectObjects<characters_client_data>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.FirstOrDefault());
+            Dictionary<uint, List<characters_socials>> charSocials = Database.SelectAllObjects<characters_socials>().GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+            Dictionary<uint, List<characters_toks>> charToks = Database.SelectObjects<characters_toks>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+            Dictionary<uint, List<characters_toks_kills>> charToksKills = Database.SelectObjects<characters_toks_kills>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+            Dictionary<uint, List<characters_quests>> charQuests = Database.SelectObjects<characters_quests>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+            Dictionary<uint, List<characters_influences>> charInfluences = Database.SelectObjects<characters_influences>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
+            Dictionary<uint, List<characters_bag_pools>> charBagPools = Database.SelectObjects<characters_bag_pools>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
+            Dictionary<uint, List<characters_mails>> charMail = Database.SelectObjects<characters_mails>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+            Dictionary<uint, List<characters_saved_buffs>> charBuffs = Database.SelectObjects<characters_saved_buffs>(whereString).GroupBy(v => v.CharacterId).ToDictionary(g => g.Key, g => g.ToList());
+            Dictionary<uint, List<characters_honor_reward_cooldown>> charHonorCooldowns = Database.SelectAllObjects<characters_honor_reward_cooldown>().GroupBy(v => v.CharacterId).ToDictionary(g => (uint)g.Key, g => g.ToList());
 
-            List<CharacterItem> charItems = (List<CharacterItem>)Database.SelectObjects<CharacterItem>(whereString);
+            List<characters_items> charItems = (List<characters_items>)Database.SelectObjects<characters_items>(whereString);
 
             int count = 0;
             foreach (uint characterId in charValues.Keys)
             {
-                Character chara = GetCharacter(characterId, false);
+                characters chara = GetCharacter(characterId, false);
 
                 if (charValues.ContainsKey(characterId)) chara.Value = charValues[characterId];
                 if (charClientData.ContainsKey(characterId)) chara.ClientData = charClientData[characterId];
@@ -812,13 +812,13 @@ namespace WorldServer.Managers
                 if (charHonorCooldowns.ContainsKey(characterId)) chara.HonorCooldowns = charHonorCooldowns[characterId];
                 // Mail list must never be null
                 if (chara.Mails == null)
-                    chara.Mails = new List<Character_mail>();
+                    chara.Mails = new List<characters_mails>();
                 if (chara.HonorCooldowns == null)
-                    chara.HonorCooldowns = new List<HonorRewardCooldown>();
+                    chara.HonorCooldowns = new List<characters_honor_reward_cooldown>();
                 ++count;
             }
 
-            foreach (CharacterItem item in charItems)
+            foreach (characters_items item in charItems)
                 LoadItem(item);
 
             foreach (int accountid in accountIds)
@@ -833,7 +833,7 @@ namespace WorldServer.Managers
         /// <summary>
         /// Returns the characters associated with the given account ID, loading them if they are not yet cached.
         /// </summary>
-        public static Character[] LoadCharacters(int accountId)
+        public static characters[] LoadCharacters(int accountId)
         {
             AccountChars accountChars = GetAccountChar(accountId);
 
@@ -845,27 +845,27 @@ namespace WorldServer.Managers
 
             Log.Info("LoadCharacters", "Forced to load from connection thread for account ID " + accountId);
 
-            List<Character_tok> charactersTok = (List<Character_tok>)Database.SelectObjects<Character_tok>(whereString);
-            List<Character_quest> charactersQuest = (List<Character_quest>)Database.SelectObjects<Character_quest>(whereString);
-            List<Characters_influence> charactersInf = (List<Characters_influence>)Database.SelectObjects<Characters_influence>(whereString);
-            List<Characters_bag_pools> charactersBgPls = (List<Characters_bag_pools>)Database.SelectObjects<Characters_bag_pools>(whereString);
-            List<CharacterItem> charactersItems = (List<CharacterItem>)Database.SelectObjects<CharacterItem>(whereString);
-            List<Character_tok_kills> charToksKills = (List<Character_tok_kills>)Database.SelectObjects<Character_tok_kills>(whereString);
-            List<Character_mail> charMail = (List<Character_mail>)Database.SelectObjects<Character_mail>(whereString);
-            List<CharacterSavedBuff> charBuffs = (List<CharacterSavedBuff>)Database.SelectObjects<CharacterSavedBuff>(whereString);
+            List<characters_toks> charactersTok = (List<characters_toks>)Database.SelectObjects<characters_toks>(whereString);
+            List<characters_quests> charactersQuest = (List<characters_quests>)Database.SelectObjects<characters_quests>(whereString);
+            List<characters_influences> charactersInf = (List<characters_influences>)Database.SelectObjects<characters_influences>(whereString);
+            List<characters_bag_pools> charactersBgPls = (List<characters_bag_pools>)Database.SelectObjects<characters_bag_pools>(whereString);
+            List<characters_items> charactersItems = (List<characters_items>)Database.SelectObjects<characters_items>(whereString);
+            List<characters_toks_kills> charToksKills = (List<characters_toks_kills>)Database.SelectObjects<characters_toks_kills>(whereString);
+            List<characters_mails> charMail = (List<characters_mails>)Database.SelectObjects<characters_mails>(whereString);
+            List<characters_saved_buffs> charBuffs = (List<characters_saved_buffs>)Database.SelectObjects<characters_saved_buffs>(whereString);
 
             CharLoadSemaphore.Release();
 
             for (int i = 0; i < accountChars.Chars.Length; ++i)
             {
-                Character character = accountChars.Chars[i];
+                characters character = accountChars.Chars[i];
                 if (character == null)
                     continue;
 
                 if (character.Value == null)
-                    character.Value = Database.SelectObject<Character_value>("CharacterId=" + character.CharacterId);
+                    character.Value = Database.SelectObject<characters_value>("CharacterId=" + character.CharacterId);
                 if (character.ClientData == null)
-                    character.ClientData = Database.SelectObject<CharacterClientData>("CharacterId=" + character.CharacterId);
+                    character.ClientData = Database.SelectObject<characters_client_data>("CharacterId=" + character.CharacterId);
                 character.Toks = charactersTok.FindAll(tok => tok.CharacterId == character.CharacterId);
                 character.TokKills = charToksKills.FindAll(tok => tok.CharacterId == character.CharacterId);
                 character.Quests = charactersQuest.FindAll(quest => quest.CharacterId == character.CharacterId);
@@ -874,7 +874,7 @@ namespace WorldServer.Managers
                 character.Mails = charMail.FindAll(mail => mail.CharacterId == character.CharacterId);
                 character.Buffs = charBuffs.FindAll(buff => buff.CharacterId == character.CharacterId);
 
-                List<CharacterItem> charItm = charactersItems.FindAll(item => item.CharacterId == character.CharacterId);
+                List<characters_items> charItm = charactersItems.FindAll(item => item.CharacterId == character.CharacterId);
 
                 lock (CharItems)
                 {
@@ -883,7 +883,7 @@ namespace WorldServer.Managers
                 }
             }
 
-            Log.Info("LoadCharacters", "Character loading for account ID " + accountId + " completed.");
+            Log.Info("LoadCharacters", "characters loading for account ID " + accountId + " completed.");
 
             accountChars.Loaded = true;
 
@@ -899,7 +899,7 @@ namespace WorldServer.Managers
         {
             Log.Debug("BuildCharacters", "AccountId = " + accountId);
 
-            Character[] chars = GetAccountChar(accountId).Chars;
+            characters[] chars = GetAccountChar(accountId).Chars;
 
             PacketOut Out = new PacketOut(0) { Position = 0 };
 
@@ -907,21 +907,21 @@ namespace WorldServer.Managers
 
             for (int i = 0; i < MaxSlot; ++i)
             {
-                Character Char = chars[i];
+                characters Char = chars[i];
 
                 if (Char == null)
                     Out.Fill(0, 284); // 284
                 else
                 {
                     if (Char.Value == null)
-                        throw new NullReferenceException("Character " + Char.Name + " with ID " + Char.CharacterId + " is missing its character values!");
+                        throw new NullReferenceException("characters " + Char.Name + " with ID " + Char.CharacterId + " is missing its character values!");
 
-                    List<CharacterItem> items;
+                    List<characters_items> items;
 
                     CharItems.TryGetValue(Char.CharacterId, out items);
 
                     if (items == null)
-                        items = new List<CharacterItem>();
+                        items = new List<characters_items>();
 
                     // The first and last name strings are each up to 24 bytes in length,
                     // and need to be null-terminated in the packet, allowing for 23 characters total.
@@ -938,7 +938,7 @@ namespace WorldServer.Managers
                     Out.WriteUInt16R(Char.Value.ZoneId);
                     Out.Fill(0, 4);
 
-                    CharacterItem Item;
+                    characters_items Item;
                     for (ushort slotId = 19; slotId < 37; ++slotId)
                     {
                         Item = items.Find(item => item != null && item.SlotId == slotId);
@@ -993,18 +993,18 @@ namespace WorldServer.Managers
             return Out.ToArray();
         }
 
-        public static Realms GetAccountRealm(int accountId) => GetAccountChar(accountId).Realm;
+        public static GameData.SetRealms GetAccountRealm(int accountId) => GetAccountChar(accountId).Realm;
 
         #endregion Characters
 
         #region Name filtering
 
-        private static List<BannedNameRecord> BannedNameRecords;
+        private static List<banned_names> BannedNameRecords;
 
         [LoadingFunction(false)]
         public static void LoadBannedNames()
         {
-            BannedNameRecords = (List<BannedNameRecord>)Database.SelectAllObjects<BannedNameRecord>();
+            BannedNameRecords = (List<banned_names>)Database.SelectAllObjects<banned_names>();
         }
 
         public static bool AddBannedName(string name, NameFilterType filtertype)
@@ -1020,7 +1020,7 @@ namespace WorldServer.Managers
                         return false;
                 }
 
-                BannedNameRecord newRecord = new BannedNameRecord { NameString = name, FilterType = filtertype };
+                banned_names newRecord = new banned_names { NameString = name, FilterType = filtertype };
                 Database.AddObject(newRecord);
                 BannedNameRecords.Add(newRecord);
             }
@@ -1032,7 +1032,7 @@ namespace WorldServer.Managers
         {
             lock (BannedNameRecords)
             {
-                BannedNameRecord record = BannedNameRecords.Find(rec => rec.NameString == name);
+                banned_names record = BannedNameRecords.Find(rec => rec.NameString == name);
 
                 if (record == null)
                     return false;
@@ -1090,7 +1090,7 @@ namespace WorldServer.Managers
         {
             lock (BannedNameRecords)
             {
-                foreach (BannedNameRecord rec in BannedNameRecords)
+                foreach (banned_names rec in BannedNameRecords)
                 {
                     switch (rec.FilterType)
                     {
@@ -1125,8 +1125,8 @@ namespace WorldServer.Managers
 
             if (Core.Config.PreloadAllCharacters)
             {
-                List<Guild_Alliance_info> Alliances = (List<Guild_Alliance_info>)Database.SelectAllObjects<Guild_Alliance_info>();
-                foreach (Guild_Alliance_info ali in Alliances)
+                List<guild_alliance_info> Alliances = (List<guild_alliance_info>)Database.SelectAllObjects<guild_alliance_info>();
+                foreach (guild_alliance_info ali in Alliances)
                 {
                     Alliance.Alliances.Add(ali.AllianceId, ali);
                 }
@@ -1138,18 +1138,18 @@ namespace WorldServer.Managers
         public static void LoadGuilds()
         {
             Log.Info("LoadGuilds", "Loading guilds...");
-            List<Guild_info> guilds = (List<Guild_info>)Database.SelectAllObjects<Guild_info>();
-            List<Guild_member> guildMembers = (List<Guild_member>)Database.SelectAllObjects<Guild_member>();
-            List<Guild_rank> guildRanks = (List<Guild_rank>)Database.SelectAllObjects<Guild_rank>();
-            List<Guild_log> guildLogs = (List<Guild_log>)Database.SelectAllObjects<Guild_log>();
-            List<Guild_event> guildEvents = (List<Guild_event>)Database.SelectAllObjects<Guild_event>();
-            List<GuildVaultItem> guildVault = (List<GuildVaultItem>)Database.SelectAllObjects<GuildVaultItem>();
+            List<guild_info> guilds = (List<guild_info>)Database.SelectAllObjects<guild_info>();
+            List<guild_members> guildMembers = (List<guild_members>)Database.SelectAllObjects<guild_members>();
+            List<guild_ranks> guildRanks = (List<guild_ranks>)Database.SelectAllObjects<guild_ranks>();
+            List<guild_logs> guildLogs = (List<guild_logs>)Database.SelectAllObjects<guild_logs>();
+            List<guild_event> guildEvents = (List<guild_event>)Database.SelectAllObjects<guild_event>();
+            List<guild_vault_item> guildVault = (List<guild_vault_item>)Database.SelectAllObjects<guild_vault_item>();
 
             if (Core.Config.PreloadAllCharacters)
             {
-                List<Guild_member> toRemove = new List<Guild_member>();
+                List<guild_members> toRemove = new List<guild_members>();
 
-                foreach (Guild_member gldMem in guildMembers)
+                foreach (guild_members gldMem in guildMembers)
                 {
                     if (Chars.ContainsKey(gldMem.CharacterId))
                         gldMem.Member = Chars[gldMem.CharacterId];
@@ -1158,13 +1158,13 @@ namespace WorldServer.Managers
                 }
 
                 if (toRemove.Count > 0)
-                    foreach (Guild_member mem in toRemove)
+                    foreach (guild_members mem in toRemove)
                     {
                         Database.DeleteObject(mem);
                         guildMembers.Remove(mem);
                     }
 
-                foreach (Guild_info guild in guilds)
+                foreach (guild_info guild in guilds)
                 {
                     if (guild.AllianceId > 0)
                     {
@@ -1198,7 +1198,7 @@ namespace WorldServer.Managers
 
                     Guild.Guilds.Add(new Guild(guild));
 
-                    List<Guild_member> members = guild.Members.Values.OrderByDescending(x => x.RankId).ToList();
+                    List<guild_members> members = guild.Members.Values.OrderByDescending(x => x.RankId).ToList();
 
                     //checks if theres more then 1 guildmember with guild rank of 9 (leader)
 
@@ -1228,7 +1228,7 @@ namespace WorldServer.Managers
 
                         if (guild.Members.ContainsKey(guild.LeaderId))
                         {
-                            Guild_member mem;
+                            guild_members mem;
                             guild.Members.TryGetValue(guild.LeaderId, out mem);
                             mem.RankId = 9;
                             Database.SaveObject(mem);
@@ -1236,7 +1236,7 @@ namespace WorldServer.Managers
                     }
 
                     //checks for guild leader id player not found guildleader banned or guild leader inactive is so tryes to set a new guild leader if no guildleader can be found guild is set to inactive
-                    Account accountEntity = null;
+                    accounts accountEntity = null;
                     var characterEntity = CharMgr.GetCharacter(guild.LeaderId, true);
                     if (characterEntity != null)
                         accountEntity = Core.AcctMgr.GetAccountById(characterEntity.AccountId);
@@ -1285,24 +1285,24 @@ namespace WorldServer.Managers
             }
             else
             {
-                foreach (Guild_info gld in guilds)
+                foreach (guild_info gld in guilds)
                 {
                     //Log.Success("LoadGuilds", "Loading guild " + gld.Name);
 
-                    List<Character> guildCharacters = (List<Character>)Database.SelectObjects<Character>($"CharacterId IN (SELECT CharacterId FROM `{Database.GetSchemaName()}`.guild_members WHERE GuildId = {gld.GuildId})");
+                    List<characters> guildCharacters = (List<characters>)Database.SelectObjects<characters>($"CharacterId IN (SELECT CharacterId FROM `{Database.GetSchemaName()}`.guild_members WHERE GuildId = {gld.GuildId})");
 
-                    foreach (Character gChar in guildCharacters)
+                    foreach (characters gChar in guildCharacters)
                     {
                         if (!Chars.ContainsKey(gChar.CharacterId))
                         {
                             AddChar(gChar);
-                            gChar.Value = Database.SelectObject<Character_value>("CharacterId=" + gChar.CharacterId);
+                            gChar.Value = Database.SelectObject<characters_value>("CharacterId=" + gChar.CharacterId);
                         }
                     }
 
                     gld.Members = guildMembers.FindAll(info => info.GuildId == gld.GuildId).ToDictionary(x => x.CharacterId, x => x);
 
-                    foreach (Guild_member m in gld.Members.Values)
+                    foreach (guild_members m in gld.Members.Values)
                         m.Member = GetCharacter(m.CharacterId, false);
 
                     gld.Ranks = guildRanks.FindAll(info => info.GuildId == gld.GuildId).OrderBy(info => info.RankId).ToDictionary(x => x.RankId, x => x);
@@ -1315,7 +1315,7 @@ namespace WorldServer.Managers
             }
         }
 
-        public static bool ChangeGuildName(Guild_info guild, string newName)
+        public static bool ChangeGuildName(guild_info guild, string newName)
         {
             guild.Name = newName;
             Database.SaveObject(guild);
@@ -1323,20 +1323,20 @@ namespace WorldServer.Managers
             return true;
         }
 
-        public static bool DeleteGuild(Guild_info guild)
+        public static bool DeleteGuild(guild_info guild)
         {
             Database.DeleteObject(guild);
 
             if (guild.Members != null)
-                foreach (Guild_member obj in guild.Members.Values)
+                foreach (guild_members obj in guild.Members.Values)
                     Database.DeleteObject(obj);
 
             if (guild.Ranks != null)
-                foreach (Guild_rank obj in guild.Ranks.Values)
+                foreach (guild_ranks obj in guild.Ranks.Values)
                     Database.DeleteObject(obj);
 
             if (guild.Logs != null)
-                foreach (Guild_log obj in guild.Logs)
+                foreach (guild_logs obj in guild.Logs)
                     Database.DeleteObject(obj);
 
             return true;
@@ -1346,7 +1346,7 @@ namespace WorldServer.Managers
 
         #region CharacterItems
 
-        public static Dictionary<uint, List<CharacterItem>> CharItems = new Dictionary<uint, List<CharacterItem>>();
+        public static Dictionary<uint, List<characters_items>> CharItems = new Dictionary<uint, List<characters_items>>();
 
         [LoadingFunction(true)]
         public static void LoadItems()
@@ -1359,44 +1359,44 @@ namespace WorldServer.Managers
                 CharItems.Clear();
             }
 
-            IList<CharacterItem> charItems;
+            IList<characters_items> charItems;
 
             if (Core.Config.PreloadAllCharacters)
-                charItems = Database.SelectAllObjects<CharacterItem>();
+                charItems = Database.SelectAllObjects<characters_items>();
             else
             {
                 string whereString = $"CharacterId IN (SELECT CharacterId FROM `{Database.GetSchemaName()}`.characters t1 WHERE t1.AccountId IN (SELECT AccountId FROM `{Core.AcctMgr.GetAccountSchemaName()}`.accounts t2 WHERE t2.LastLogged >= {RecentHistoryTime}))";
-                charItems = Database.SelectObjects<CharacterItem>(whereString);
+                charItems = Database.SelectObjects<characters_items>(whereString);
             }
 
             myCount = charItems.Count;
 
             lock (CharItems)
-                foreach (CharacterItem itm in charItems)
+                foreach (characters_items itm in charItems)
                     LoadItem(itm);
 
             Log.Success("LoadItems", $"{myCount} inventory items {(Core.Config.PreloadAllCharacters ? "loaded" : "precached")}.");
         }
 
-        public static void CreateItem(CharacterItem item)
+        public static void CreateItem(characters_items item)
         {
             LoadItem(item);
             Database.AddObject(item);
             Database.ForceSave();
         }
 
-        public static void LoadItem(CharacterItem charItem)
+        public static void LoadItem(characters_items charItem)
         {
             lock (CharItems)
             {
                 if (!CharItems.ContainsKey(charItem.CharacterId))
-                    CharItems.Add(charItem.CharacterId, new List<CharacterItem> { charItem });
+                    CharItems.Add(charItem.CharacterId, new List<characters_items> { charItem });
                 else
                     CharItems[charItem.CharacterId].Add(charItem);
             }
         }
 
-        public static List<CharacterItem> GetItemsForCharacter(Character chara)
+        public static List<characters_items> GetItemsForCharacter(characters chara)
         {
             try
             {
@@ -1410,7 +1410,7 @@ namespace WorldServer.Managers
                 Log.Info("GetItemsForChar", "Loading items for CharacterId: " + chara.CharacterId);
                 _logger.Debug($"Loading items for CharacterId ==> {chara.Name}");
 
-                List<CharacterItem> myItems = (List<CharacterItem>)Database.SelectObjects<CharacterItem>("CharacterId='" + chara.CharacterId + "'");
+                List<characters_items> myItems = (List<characters_items>)Database.SelectObjects<characters_items>("CharacterId='" + chara.CharacterId + "'");
 
                 if (myItems != null && myItems.Count > 0)
                 {
@@ -1426,16 +1426,16 @@ namespace WorldServer.Managers
                     }
                 }
                 _logger.Debug($"Getting CharacterInfoItem for {chara.Name} career {chara.CareerLine}");
-                List<CharacterInfo_item> Items = GetCharacterInfoItem(chara.CareerLine);
+                List<character_info_items> Items = GetCharacterInfoItem(chara.CareerLine);
                 _logger.Debug($"Found CharacterInfoItem Count={Items.Count} for {chara.Name}");
-                foreach (CharacterInfo_item Itm in Items)
+                foreach (character_info_items Itm in Items)
                 {
                     if (Itm == null)
                         continue;
 
                     _logger.Debug($"Adding item {Itm.Entry} to character {chara.Name}");
 
-                    CharacterItem Citm = new CharacterItem
+                    characters_items Citm = new characters_items
                     {
                         Counts = Itm.Count,
                         CharacterId = chara.CharacterId,
@@ -1455,7 +1455,7 @@ namespace WorldServer.Managers
                     else
                     {
                         _logger.Warn($"Returning empty char item list for character {chara.Name}");
-                        return new List<CharacterItem>();
+                        return new List<characters_items>();
                     }
                 }
             }
@@ -1468,7 +1468,7 @@ namespace WorldServer.Managers
 
         public static void SaveItems(uint characterId, List<Item> oldItems)
         {
-            List<CharacterItem> newItems = new List<CharacterItem>();
+            List<characters_items> newItems = new List<characters_items>();
             for (int i = 0; i < oldItems.Count; ++i)
                 if (oldItems[i] != null)
                     newItems.Add(oldItems[i].Save(characterId));
@@ -1480,7 +1480,7 @@ namespace WorldServer.Managers
             }
         }
 
-        public static void DeleteItem(CharacterItem itm)
+        public static void DeleteItem(characters_items itm)
         {
             lock (CharItems)
             {
@@ -1495,12 +1495,12 @@ namespace WorldServer.Managers
         {
             lock (CharItems)
             {
-                CharacterItem book = null;
+                characters_items book = null;
 
                 if (!CharItems.ContainsKey(characterId))
                     return;
 
-                foreach (CharacterItem item in CharItems[characterId])
+                foreach (characters_items item in CharItems[characterId])
                 {
                     if (item.Entry == 11919 && excludeBook)
                     {
@@ -1538,11 +1538,11 @@ namespace WorldServer.Managers
             {
                 Log.Debug("WorldMgr", "Loading Character_mails...");
 
-                List<Character_mail> mails = (List<Character_mail>)Database.SelectAllObjects<Character_mail>();
+                List<characters_mails> mails = (List<characters_mails>)Database.SelectAllObjects<characters_mails>();
                 int count = 0;
                 if (mails != null)
                 {
-                    List<Character_mail> expired = mails.FindAll(mail => MailInterface.TimeToExpire(mail) <= 0);
+                    List<characters_mails> expired = mails.FindAll(mail => MailInterface.TimeToExpire(mail) <= 0);
 
                     if (expired.Count > 0)
                     {
@@ -1555,7 +1555,7 @@ namespace WorldServer.Managers
                         Log.Success("LoadMails", "Removed " + expired.Count + " expired mails.");
                     }
 
-                    foreach (Character_mail mail in mails)
+                    foreach (characters_mails mail in mails)
                     {
                         if (mail.Guid > _maxMailGuid)
                             _maxMailGuid = mail.Guid;
@@ -1566,14 +1566,14 @@ namespace WorldServer.Managers
             }
             else
             {
-                _maxMailGuid = Database.GetObjectCount<Character_mail>();
+                _maxMailGuid = Database.GetObjectCount<characters_mails>();
                 Log.Success("LoadMails", _maxMailGuid + " existing mails.");
             }
         }
 
-        public static void AddMail(Character_mail mail)
+        public static void AddMail(characters_mails mail)
         {
-            Character character = GetCharacter(mail.CharacterId, false);
+            characters character = GetCharacter(mail.CharacterId, false);
 
             if (character == null)
                 return;
@@ -1581,7 +1581,7 @@ namespace WorldServer.Managers
             if (character.Mails == null)
             {
                 _logger.Info("Mail System loading mail for " + character.Name);
-                character.Mails = (List<Character_mail>)Database.SelectObjects<Character_mail>("CharacterId='" + mail.CharacterId + "'");
+                character.Mails = (List<characters_mails>)Database.SelectObjects<characters_mails>("CharacterId='" + mail.CharacterId + "'");
             }
 
             character.Mails.Add(mail);
@@ -1594,7 +1594,7 @@ namespace WorldServer.Managers
             receiver?.MlInterface?.AddMail(mail);
         }
 
-        public static void DeleteMail(Character_mail mail)
+        public static void DeleteMail(characters_mails mail)
         {
             Chars[mail.CharacterId].Mails.Remove(mail);
             Database.DeleteObject(mail);
@@ -1603,12 +1603,12 @@ namespace WorldServer.Managers
             receiver?.MlInterface?.RemoveMail(mail);
         }
 
-        public static void RemoveMailFromCharacter(Character chara)
+        public static void RemoveMailFromCharacter(characters chara)
         {
             if (chara.Mails == null)
                 return;
 
-            foreach (Character_mail mail in chara.Mails)
+            foreach (characters_mails mail in chara.Mails)
                 Database.DeleteObject(mail);
 
             chara.Mails.Clear();
@@ -1618,20 +1618,20 @@ namespace WorldServer.Managers
 
         #region Support Tickets
 
-        public static List<Bug_report> _report = new List<Bug_report>();
+        public static List<bugs_reports> _report = new List<bugs_reports>();
 
         [LoadingFunction(true)]
         public static void LoadTickets()
         {
-            List<Bug_report> reports = (List<Bug_report>)Database.SelectAllObjects<Bug_report>();
+            List<bugs_reports> reports = (List<bugs_reports>)Database.SelectAllObjects<bugs_reports>();
 
-            foreach (Bug_report report in reports)
+            foreach (bugs_reports report in reports)
                 _report.Add(report);
 
             Log.Success("CharacterMgr", "Loaded " + _report.Count + " Support Tickets");
         }
 
-        public static Bug_report GetReport(string reportID)
+        public static bugs_reports GetReport(string reportID)
         {
             var ticket = _report.Find(x => x.ObjectId == reportID);
 
@@ -1643,32 +1643,32 @@ namespace WorldServer.Managers
 
         #endregion Support Tickets
 
-        public static void RemoveQuestsFromCharacter(Character chara)
+        public static void RemoveQuestsFromCharacter(characters chara)
         {
             if (chara.Quests == null)
                 return;
-            foreach (Character_quest quest in chara.Quests)
+            foreach (characters_quests quest in chara.Quests)
                 Database.DeleteObject(quest);
 
             chara.Quests.Clear();
         }
 
-        public static void RemoveToKsFromCharacter(Character chara)
+        public static void RemoveToKsFromCharacter(characters chara)
         {
             if (chara.Toks == null)
                 return;
-            foreach (Character_tok tok in chara.Toks)
+            foreach (characters_toks tok in chara.Toks)
                 Database.DeleteObject(tok);
 
             chara.Toks.Clear();
         }
 
-        public static void RemoveToKKillsFromCharacter(Character chara)
+        public static void RemoveToKKillsFromCharacter(characters chara)
         {
             if (chara.TokKills == null)
                 return;
 
-            foreach (Character_tok_kills tokKill in chara.TokKills)
+            foreach (characters_toks_kills tokKill in chara.TokKills)
                 Database.DeleteObject(tokKill);
 
             chara.TokKills.Clear();

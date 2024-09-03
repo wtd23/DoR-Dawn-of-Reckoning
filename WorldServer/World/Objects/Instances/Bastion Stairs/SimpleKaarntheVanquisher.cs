@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.Bastion_Stairs
     {
         #region Constructors
 
-        public SimpleKaarntheVanquisher(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleKaarntheVanquisher(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

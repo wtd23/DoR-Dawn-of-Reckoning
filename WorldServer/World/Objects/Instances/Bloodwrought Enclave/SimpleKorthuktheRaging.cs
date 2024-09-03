@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.Bloodwrought_Enclave
     {
         #region Constructors
 
-        public SimpleKorthuktheRaging(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleKorthuktheRaging(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

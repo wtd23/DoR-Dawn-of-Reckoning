@@ -111,7 +111,7 @@ namespace WorldServer.World.Abilities.Components
         {
         }
 
-        public AbilityDamageInfo(DBAbilityDamageInfo dbObj)
+        public AbilityDamageInfo(ability_damage_heals dbObj)
         {
             Entry = dbObj.Entry;
             DisplayEntry = dbObj.DisplayEntry;
@@ -140,11 +140,11 @@ namespace WorldServer.World.Abilities.Components
             PriStatMultiplier = dbObj.PriStatMultiplier;
         }
 
-        public static List<AbilityDamageInfo> Convert(List<DBAbilityDamageInfo> dbObjs)
+        public static List<AbilityDamageInfo> Convert(List<ability_damage_heals> dbObjs)
         {
             List<AbilityDamageInfo> dmgInfo = new List<AbilityDamageInfo>();
 
-            foreach (DBAbilityDamageInfo dbObj in dbObjs)
+            foreach (ability_damage_heals dbObj in dbObjs)
                 dmgInfo.Add(new AbilityDamageInfo(dbObj));
 
             return dmgInfo;

@@ -19,7 +19,7 @@ namespace WorldServer.World.Objects.Instances
 
         private byte _maxplayers = 6;
 
-        public bool ZoneIn(Player player, byte instancetyp, Zone_jump Jump = null)
+        public bool ZoneIn(Player player, byte instancetyp, zone_jumps Jump = null)
         {
             // jump type 4 = realm 5 = raid 6 = group instances
             ushort zoneID;
@@ -31,7 +31,7 @@ namespace WorldServer.World.Objects.Instances
             else
                 zoneID = Jump.ZoneID;
 
-            Instance_Info II;
+            instance_infos II;
             InstanceService._InstanceInfo.TryGetValue(zoneID, out II);
             ushort InstanceMainID = II.Entry;
 
@@ -136,7 +136,7 @@ namespace WorldServer.World.Objects.Instances
             }
         }
 
-        private ushort Create_new_instance(Player player, Zone_jump Jump)
+        private ushort Create_new_instance(Player player, zone_jumps Jump)
         {
             lock (_instances)
             {
@@ -147,7 +147,7 @@ namespace WorldServer.World.Objects.Instances
                         if (Jump.ZoneID == 179)
                         {
                             TOTVL ints = null;
-                            Instance_Lockouts deadbosses = null;
+                            instance_lockouts deadbosses = null;
                             if (player._Value.GetLockout(Jump.InstanceID) != null)
                             {
                                 if (player.PriorityGroup == null) // solo player gets his own lockouts
@@ -162,7 +162,7 @@ namespace WorldServer.World.Objects.Instances
                         else
                         {
                             Instance ints = null;
-                            Instance_Lockouts deadbosses = null;
+                            instance_lockouts deadbosses = null;
                             if (player._Value.GetLockout(Jump.InstanceID) != null)
                             {
                                 if (player.PriorityGroup == null) // solo player gets his own lockouts
@@ -181,7 +181,7 @@ namespace WorldServer.World.Objects.Instances
             return 0;
         }
 
-        private bool Join_Instance(Player player, ushort Instanceid, Zone_jump Jump, ushort InstancemainID)
+        private bool Join_Instance(Player player, ushort Instanceid, zone_jumps Jump, ushort InstancemainID)
         {
             lock (_instances)
             {

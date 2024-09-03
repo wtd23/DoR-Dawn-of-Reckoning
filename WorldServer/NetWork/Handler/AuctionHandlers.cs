@@ -80,7 +80,7 @@ namespace WorldServer.NetWork.Handler
                 return;
             }
 
-            Auction auction = new Auction
+            auctions auction = new auctions
             {
                 Item = plr.ItmInterface.GetItemInSlot(slot).Info,
                 ItemId = plr.ItmInterface.GetItemInSlot(slot).Info.Entry,

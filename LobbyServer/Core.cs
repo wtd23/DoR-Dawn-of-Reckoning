@@ -7,7 +7,7 @@ namespace LobbyServer
 {
     internal class Core
     {
-        public static LobbyConfigs Config;
+        public static LobbyConfig Config;
 
         public static RpcClient Client;
         public static TCPServer Server;
@@ -22,7 +22,7 @@ namespace LobbyServer
 
             // Loading all configs files
             ConfigMgr.LoadConfigs();
-            Config = ConfigMgr.GetConfig<LobbyConfigs>();
+            Config = ConfigMgr.GetConfig<LobbyConfig>();
 
             // Loading log level from file
             if (!Log.InitLog(Config.LogLevel, "LobbyServer"))

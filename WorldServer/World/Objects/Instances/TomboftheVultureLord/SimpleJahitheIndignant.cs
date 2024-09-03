@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.TomboftheVultureLord
     {
         #region Constructors
 
-        public SimpleJahitheIndignant(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleJahitheIndignant(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

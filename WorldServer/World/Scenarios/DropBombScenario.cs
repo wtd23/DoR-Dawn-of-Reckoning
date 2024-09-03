@@ -41,10 +41,10 @@ namespace WorldServer.World.Scenarios
 
         private Point3D _bombSpawn = new Point3D();
 
-        public DropBombScenario(Scenario_Info info, int tier)
+        public DropBombScenario(scenario_infos info, int tier)
             : base(info, tier)
         {
-            foreach (Scenario_Object scenarioObject in info.ScenObjects)
+            foreach (scenario_objects scenarioObject in info.ScenObjects)
             {
                 if (scenarioObject.ObjectiveName == "Powder Keg")
                 {
@@ -80,7 +80,7 @@ namespace WorldServer.World.Scenarios
 
             GameObject_proto glowProto = GameObjectService.GetGameObjectProto(100112);
 
-            GameObject_spawn spawn = new GameObject_spawn
+            gameobject_spawns spawn = new gameobject_spawns
             {
                 Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                 WorldO = 0,
@@ -133,14 +133,14 @@ namespace WorldServer.World.Scenarios
             EvtInterface.RemoveEvent(CarrierBombTimer);
             EvtInterface.AddEvent(CarrierBombTimer, RandomMgr.Next(50000, 80000), 1);
 
-            if (_carrier.Realm == Realms.REALMS_REALM_DESTRUCTION)
+            if (_carrier.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
             {
                 _centerGlow.VfxState = 2;
             }
             else
                 _centerGlow.VfxState = 1;
 
-            Broadcast(new[] { plr.GenderedName, (plr.Realm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction"), _bomb.Name }, ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.TEXT_FLAG_CAPTURE);
+            Broadcast(new[] { plr.GenderedName, (plr.Realm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction"), _bomb.Name }, ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.TEXT_FLAG_CAPTURE);
         }
 
         private void BombDroppedOff(Player plr, Part part)
@@ -155,11 +155,11 @@ namespace WorldServer.World.Scenarios
                 Log.Error("BombDroppedOff", "NULL bomb");
                 return;
             }
-            GivePoints((_carrier.Realm == Realms.REALMS_REALM_ORDER ? 1 : 2), 75);
+            GivePoints((_carrier.Realm == SetRealms.REALMS_REALM_ORDER ? 1 : 2), 75);
             _carrier.CanMount = true;
             RemoveBombBuff(_carrier);
             EvtInterface.AddEvent(DetonateStockpile, RandomMgr.Next(3000, 5000), 1);
-            Broadcast(new[] { plr.GenderedName, (plr.Realm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction"), _bomb.Name }, ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.TEXT_BOMB_CAPTURE);
+            Broadcast(new[] { plr.GenderedName, (plr.Realm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction"), _bomb.Name }, ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.TEXT_BOMB_CAPTURE);
         }
 
         private void BombLost(Player plr, Part part)
@@ -171,7 +171,7 @@ namespace WorldServer.World.Scenarios
         {
             GameObject_proto glowProto = GameObjectService.GetGameObjectProto(entry);
 
-            GameObject_spawn spawn = new GameObject_spawn
+            gameobject_spawns spawn = new gameobject_spawns
             {
                 Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                 WorldO = o,
@@ -192,8 +192,8 @@ namespace WorldServer.World.Scenarios
         {
             base.Interact(obj, plr, menu);
 
-            if ((obj == _destroGunPowder && plr.Realm == Realms.REALMS_REALM_ORDER && plr == _carrier) ||
-                (obj == _orderGunPowder && plr.Realm == Realms.REALMS_REALM_DESTRUCTION && plr == _carrier))
+            if ((obj == _destroGunPowder && plr.Realm == SetRealms.REALMS_REALM_ORDER && plr == _carrier) ||
+                (obj == _orderGunPowder && plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION && plr == _carrier))
             {
                 //drop part
                 PutPartInCart(plr, obj);
@@ -249,8 +249,8 @@ namespace WorldServer.World.Scenarios
         {
             if (_carrier == plr)
             {
-                if ((powder == _destroGunPowder && plr.Realm == Realms.REALMS_REALM_ORDER)
-                    || (powder == _orderGunPowder && plr.Realm == Realms.REALMS_REALM_DESTRUCTION))
+                if ((powder == _destroGunPowder && plr.Realm == SetRealms.REALMS_REALM_ORDER)
+                    || (powder == _orderGunPowder && plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION))
                 {
                     _bomb.BeginDropOff(plr, powder);
                     _plantedBomb = powder;

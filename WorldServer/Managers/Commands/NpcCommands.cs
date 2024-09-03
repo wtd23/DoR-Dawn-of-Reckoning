@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using WorldServer.Services.World;
 using WorldServer.World.AI;
+using WorldServer.World.Battlefronts.Events;
 using WorldServer.World.Battlefronts.Keeps;
 using WorldServer.World.Objects;
 using WorldServer.World.Objects.PublicQuests;
@@ -44,7 +45,7 @@ namespace WorldServer.Managers.Commands
 
             plr.UpdateWorldPosition();
 
-            Creature_spawn spawn = new Creature_spawn();
+            creature_spawns spawn = new creature_spawns();
             spawn.Guid = (uint)CreatureService.GenerateCreatureSpawnGUID();
             spawn.BuildFromProto(proto);
             spawn.WorldO = plr._Value.WorldO;
@@ -59,7 +60,7 @@ namespace WorldServer.Managers.Commands
             var c = plr.Region.CreateCreature(spawn);
             c.AiInterface.SetBrain(new PassiveBrain(c));
 
-            GMCommandLog log = new GMCommandLog();
+            gm_commands_logs log = new gm_commands_logs();
             log.PlayerName = plr.Name;
             log.AccountId = (uint)plr.Client._Account.AccountId;
             log.Command = "SPAWN CREATURE " + spawn.Entry + " " + spawn.Guid + " AT " + spawn.ZoneId + " " + plr._Value.WorldX + " " + plr._Value.WorldY;
@@ -96,11 +97,11 @@ namespace WorldServer.Managers.Commands
 
             KeepNpcCreature keepNpcCreature = null;
 
-            if (keep.Realm == Realms.REALMS_REALM_DESTRUCTION)
+            if (keep.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
             {
                 keepNpcCreature = keep.Creatures.SingleOrDefault(x => x.Info.DestroId == selectedEntry && x.Info.X == oldX);
             }
-            if (keep.Realm == Realms.REALMS_REALM_ORDER)
+            if (keep.Realm == SetRealms.REALMS_REALM_ORDER)
             {
                 keepNpcCreature = keep.Creatures.SingleOrDefault(x => x.Info.OrderId == selectedEntry && x.Info.X == oldX);
             }
@@ -127,7 +128,7 @@ namespace WorldServer.Managers.Commands
 
             plr.SendClientMessage($"Moved keep creature to new position");
 
-            GMCommandLog log = new GMCommandLog();
+            gm_commands_logs log = new gm_commands_logs();
             log.PlayerName = plr.Name;
             log.AccountId = (uint)plr.Client._Account.AccountId;
             log.Command = "MOVE KEEP CREATURE " + selectedEntry + " " + " AT " + keepNpcCreature.Info.ZoneId + " " + plr._Value.WorldX + " " + plr._Value.WorldY;
@@ -198,7 +199,7 @@ namespace WorldServer.Managers.Commands
 
             //WorldMgr.Database.AddObject(spawn);
 
-            var kc = new Keep_Creature();
+            var kc = new keep_creatures();
 
             kc.ZoneId = plr.Zone.ZoneId;
             kc.DestroId = Convert.ToUInt32(destroId);
@@ -221,7 +222,7 @@ namespace WorldServer.Managers.Commands
             WorldMgr.Database.ForceSave();
             plr.SendClientMessage("Created keep creature");
 
-            GMCommandLog log = new GMCommandLog();
+            gm_commands_logs log = new gm_commands_logs();
             log.PlayerName = plr.Name;
             log.AccountId = (uint)plr.Client._Account.AccountId;
             log.Command = "SPAWN KEEP CREATURE " + kc.ZoneId + " " + plr._Value.WorldX + " " + plr._Value.WorldY;
@@ -249,10 +250,10 @@ namespace WorldServer.Managers.Commands
 
             if (database > 0)
             {
-                Creature_spawn spawn = obj.GetCreature().Spawn;
+                creature_spawns spawn = obj.GetCreature().Spawn;
                 WorldMgr.Database.DeleteObject(spawn);
 
-                GMCommandLog log = new GMCommandLog();
+                gm_commands_logs log = new gm_commands_logs();
                 log.PlayerName = plr.Name;
                 log.AccountId = (uint)plr.Client._Account.AccountId;
                 log.Command = "REMOVE CREATURE " + spawn.Entry + " " + spawn.Guid + " AT " + spawn.ZoneId + " " + spawn.WorldX + " " + spawn.WorldY;
@@ -389,7 +390,7 @@ namespace WorldServer.Managers.Commands
             int animID = GetInt(ref values);
 
             var Out = new PacketOut((byte)Opcodes.F_ANIMATION);
-
+            
             Out.WriteUInt16(target.Oid);
             Out.WriteByte(0);
             Out.WriteByte(0);
@@ -423,7 +424,7 @@ namespace WorldServer.Managers.Commands
                 WorldMgr.Database.SaveObject(creature.Spawn);
             else
             {
-                PQuest_Spawn pQSpawn = WorldMgr.Database.SelectObject<PQuest_Spawn>("pquest_spawns_ID='" + creature.PQSpawnId + "'");
+                pquest_spawns pQSpawn = WorldMgr.Database.SelectObject<pquest_spawns>("pquest_spawns_ID='" + creature.PQSpawnId + "'");
                 pQSpawn.Emote = (byte)animID;
                 WorldMgr.Database.SaveObject(pQSpawn);
             }
@@ -450,7 +451,7 @@ namespace WorldServer.Managers.Commands
                 WorldMgr.Database.SaveObject(creature.Spawn);
             else
             {
-                PQuest_Spawn pQSpawn = WorldMgr.Database.SelectObject<PQuest_Spawn>("pquest_spawns_ID='" + creature.PQSpawnId + "'");
+                pquest_spawns pQSpawn = WorldMgr.Database.SelectObject<pquest_spawns>("pquest_spawns_ID='" + creature.PQSpawnId + "'");
                 pQSpawn.Level = (byte)nPCLevel;
                 WorldMgr.Database.SaveObject(pQSpawn);
             }
@@ -481,6 +482,27 @@ namespace WorldServer.Managers.Commands
             {
                 go.Health = Convert.ToUInt32(go.TotalHealth * healthPercent / 100);
             }
+
+            return true;
+        }
+		
+		        /// <summary>
+        /// This method allow setting current health of NPC or GO
+        /// <param name="plr">Player that initiated the command</param>
+        /// <param name="values">List of command arguments (after command name)</param>
+        /// </summary>
+        public static bool NpcRevenge(Player plr, ref List<string> values)
+        {
+            var mobController = new RevengeMobController
+            {
+                RegionMgr = WorldMgr.GetRegion(11, false),
+                ZoneId = 105
+            };
+            mobController.SetPathway();
+            mobController.SetInitialLocation();
+            mobController.Initialise();
+            mobController.PlaceMobSpawns();
+            mobController.StartMovement();
 
             return true;
         }
@@ -562,7 +584,7 @@ namespace WorldServer.Managers.Commands
                 }
                 else
                 {
-                    PQuest_Spawn pQSpawn = WorldMgr.Database.SelectObject<PQuest_Spawn>("pquest_spawns_ID='" + creature.PQSpawnId + "'");
+                    pquest_spawns pQSpawn = WorldMgr.Database.SelectObject<pquest_spawns>("pquest_spawns_ID='" + creature.PQSpawnId + "'");
 
                     pQSpawn.Dirty = true;
                     pQSpawn.WorldX = plr._Value.WorldX;

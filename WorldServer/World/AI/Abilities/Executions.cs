@@ -27,16 +27,245 @@ namespace WorldServer.World.AI.Abilities
             Brain = brain;
         }
 
-        //public void IncrementPhase()
-        //{
-        //    // Phases must be ints in ascending order.
-        //    var currentPhase = CurrentPhase;
-        //    if (Phases.Count == currentPhase)
-        //        return;
-        //    CurrentPhase = currentPhase + 1;
+        /// <summary>
+        /// HUMANOIDS_SKAVEN_STORMVERMIN
+        /// </summary>
+        public void CleaveSoul()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Cleave Soul", 9552);
+        }
 
-        //    Brain.SpeakYourMind($" using Increment Phase vs {currentPhase}=>{CurrentPhase}");
-        //}
+        /// <summary>
+        /// HUMANOIDS_SKAVEN_PRIEST
+        /// </summary>
+        public void RottingFlesh()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Rotting Flesh", 13012);
+        }
+
+        public void EmptyMind()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Empty Mind", 12223);
+        }
+
+        public void HealingHand()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Healing Hand", 8241);
+        }
+
+        /// <summary>
+        /// HUMANOIDS_SKAVEN_CLANRAT
+        /// </summary>
+        public void RippingGnash()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Ripping Gnash", 12111);
+        }
+
+        /// <summary>
+        /// HUMANOIDS_SKAVEN_PLAGUE_MONK
+        /// </summary>
+        public void PlagueCrush()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Plague Crush", 13561);
+        }
+
+        public void Plague()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Plague", 13600);
+        }
+
+        /// <summary>
+        /// HUMANOIDS_SKAVEN_PACKMASTER
+        /// </summary>
+        public void InspiringAttack()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Inspiring Attack", 1364);
+        }
+
+        public void DemolishingStrike()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Demolishing Strike", 606);
+        }
+
+        public void PowerofthePack()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Power of the Pack", 12073);
+        }
+
+        /// <summary>
+        /// HUMANOIDS_SKAVEN_RAT_OGRE_BRUTE
+        /// </summary>
+        public void HardStomp()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Hard Stomp", 5305);
+        }
+
+        public void LaceratingTalons()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Lacerating Talons", 12301);
+        }
+
+        /// <summary>
+        /// HUMANOIDS_SKAVEN_RAT_OGRE
+        /// </summary>
+        public void RippingClaws()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Ripping Claws", 12221);
+        }
+
+        public void GroundPound()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Ground Pound", 13652);
+        }
+
+        /// <summary>
+        /// UNDEAD_SPIRITS_SPIRIT_HOST
+        /// </summary>
+        public void Chillwind()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Chillwind", 9471);
+        }
+
+        public void EtherealHand()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Ethereal Hand", 12451);
+        }
+
+        public void BloodCurse()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Blood Curse", 5036);
+        }
+
+        /// <summary>
+        /// HUMANOIDS_GREENSKINS_GAS_SQUIG
+        /// </summary>
+        public void SporeCloud()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Spore Cloud", 12);
+        }
+
+        public void GoopShootin()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Goop Shootin", 11);
+        }
+
+        /// <summary>
+        /// HUMANOIDS_GREENSKINS_SPIKED_SQUIG
+        /// </summary>
+        public void PoisonedSpine()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Poisoned Spine", 8);
+        }
+
+        public void SpineFling()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Spine Fling", 7);
+        }
+
+        /// <summary>
+        /// HUMANOIDS_GREENSKINS_HORNED_SQUIG
+        /// </summary>
+        public void HeadButt()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Head Butt", 10);
+        }
+
+        public void Gore()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Gore", 9);
+        }
+
+        /// <summary>
+        /// HUMANOIDS_GREENSKINS_SQUIG
+        /// </summary>
+        public void SquigSqueal()
+        {
+            Brain.SimpleCast(Owner, Owner, "Squig Squeal", 442);
+        }
+
+        public void DeathFromAbove()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Death From Above", 6);
+        }
+
+        /// <summary>
+        /// MECHANIC_FLAME_TURRET
+        /// </summary>
+        public void SteamVent()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Steam Vent", 28);
+        }
+
+        public void Flamethrower()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Flamethrower", 27);
+        }
+
+        /// <summary>
+        /// MECHANIC_BOMBARDMENT_TURRET
+        /// </summary>
+        public void HighExplosiveGrenade()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "High-Explosive Grenade", 25);
+        }
+
+        public void ShockGrenade()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Shock Grenade", 24);
+        }
+
+        /// <summary>
+        /// MECHANIC_GUN_TURRET
+        /// </summary>
+        public void MachineGun()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Machine Gun", 22);
+        }
+
+        public void PenetratingRound()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Penetrating Round", 21);
+        }
+
+        /// <summary>
+        /// DAEMONS_TZEENTCH_FLAMER
+        /// </summary>
+        public void FlamesofChange()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Flames of Change", 59);
+        }
+
+        public void FlameofTzeentch()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Flame of Tzeentch", 58);
+        }
+
+        public void DaemonicFire()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Daemonic Fire", 54);
+        }
+
+        /// <summary>
+        /// HUMANOIDS_HUMANS_MAGUS
+        /// </summary>
+        public void FlickeringRedFire()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Flickering Red Fire", 8470);
+        }
+
+        /// <summary>
+        /// HUMANOIDS_HUMANS_ZEALOT
+        /// </summary>
+        public void Scourge()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Scourge", 8548);
+        }
+
+        public void GleanMagic()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Glean Magic", 8482);
+        }
+
         public void ShatterBlessing()
         {
             Brain.SimpleCast(Owner, Combat.CurrentTarget, "Shatter Confidence", 8023);
@@ -50,11 +279,6 @@ namespace WorldServer.World.AI.Abilities
         public void PrecisionStrike()
         {
             Brain.SimpleCast(Owner, Combat.CurrentTarget, "PrecisionStrike", 8005);
-        }
-
-        public void ClawSweep()
-        {
-            Brain.SimpleCast(Owner, Combat.CurrentTarget, "ClawSweep", 42);
         }
 
         public void SeepingWound()
@@ -181,6 +405,9 @@ namespace WorldServer.World.AI.Abilities
             Brain.SimpleCast(Owner, Combat.CurrentTarget, "LowBlow", 5688);
         }
 
+        /// <summary>
+        /// ANIMALS_BEASTS_GREAT_CAT
+        /// </summary>
         public void Shred()
         { // Armor debuff
             Brain.SimpleCast(Owner, Combat.CurrentTarget, "Shred", 430);
@@ -194,11 +421,6 @@ namespace WorldServer.World.AI.Abilities
         public void BatScreech()
         { // 10 sec snare
             Brain.SimpleCast(Owner, Combat.CurrentTarget, "BatScreech", 12012);
-        }
-
-        public void DaemonicFire()
-        { // 10 sec snare
-            Brain.SimpleCast(Owner, Combat.CurrentTarget, "DaemonicFire", 54);
         }
 
         public void DaemonicConsumption()
@@ -271,6 +493,9 @@ namespace WorldServer.World.AI.Abilities
             Brain.SimpleCast(Owner, Combat.CurrentTarget, "BloodPulse", 5066);
         }
 
+        /// <summary>
+        /// HUMANOIDS_SKAVEN_RUNNER
+        /// </summary>
         public void ScytheGash()
         {
             Brain.SimpleCast(Owner, Combat.CurrentTarget, "ScytheGash", 12591);
@@ -286,9 +511,9 @@ namespace WorldServer.World.AI.Abilities
             Brain.SimpleCast(Owner, Combat.CurrentTarget, "RuneofStriking", 1586);
         }
 
-        public void Gore()
+        public void GoreBoar()
         {
-            Brain.SimpleCast(Owner, Combat.CurrentTarget, "Gore", 438);
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "GoreBoar", 438);
         }
 
         public void GunTurret()
@@ -299,6 +524,11 @@ namespace WorldServer.World.AI.Abilities
         public void MinorPotionofHealing()
         {
             Brain.SimpleCast(Owner, Combat.CurrentTarget, "MinorPotionofHealing", 7871);
+        }
+
+        public void ClawSweep()
+        {
+            Brain.SimpleCast(Owner, Combat.CurrentTarget, "ClawSweep", 42);
         }
 
         public void BloodscentAura()
@@ -312,6 +542,17 @@ namespace WorldServer.World.AI.Abilities
             }
         }
 
+        //public void IncrementPhase()
+        //{
+        //    // Phases must be ints in ascending order.
+        //    var currentPhase = CurrentPhase;
+        //    if (Phases.Count == currentPhase)
+        //        return;
+        //    CurrentPhase = currentPhase + 1;
+
+        //    Brain.SpeakYourMind($" using Increment Phase vs {currentPhase}=>{CurrentPhase}");
+        //}
+
         /// <summary>
         /// Aslong as the Banner of Bloodlust i s up,Borzhar will charge a t a new target
         /// and should s tay locked on the target for a medium duration before charging
@@ -322,7 +563,7 @@ namespace WorldServer.World.AI.Abilities
         {
             GameObject_proto proto = GameObjectService.GetGameObjectProto(3100412);
 
-            GameObject_spawn spawn = new GameObject_spawn
+            gameobject_spawns spawn = new gameobject_spawns
             {
                 Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                 WorldX = Owner.WorldPosition.X + StaticRandom.Instance.Next(50),
@@ -405,7 +646,7 @@ namespace WorldServer.World.AI.Abilities
             var newTarget = Brain.SetRandomTarget();
             if (newTarget != null)
             {
-                GameObject_spawn spawn = new GameObject_spawn
+                gameobject_spawns spawn = new gameobject_spawns
                 {
                     Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                     WorldO = 2093,
@@ -452,7 +693,7 @@ namespace WorldServer.World.AI.Abilities
             var Y = Owner.WorldPosition.Y;
             var Z = Owner.WorldPosition.Z;
 
-            var spawn = new Creature_spawn { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
+            var spawn = new creature_spawns { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
             var proto = CreatureService.GetCreatureProto(entry.ProtoId);
             if (proto == null)
                 return;

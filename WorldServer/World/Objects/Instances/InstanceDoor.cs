@@ -22,7 +22,7 @@ namespace WorldServer.World.Objects.Instances
             }
         }
 
-        public InstanceDoor(Instance instance, Instance_Object info) : base(instance, info)
+        public InstanceDoor(Instance instance, instance_objects info) : base(instance, info)
         {
         }
     }

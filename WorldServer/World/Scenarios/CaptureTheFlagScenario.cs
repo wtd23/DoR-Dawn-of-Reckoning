@@ -23,9 +23,9 @@ namespace WorldServer.World.Scenarios
 
         private readonly uint _captureScore;
 
-        public CaptureTheFlagScenario(Scenario_Info info, byte tier) : base(info, tier)
+        public CaptureTheFlagScenario(scenario_infos info, byte tier) : base(info, tier)
         {
-            foreach (Scenario_Object obj in info.ScenObjects)
+            foreach (scenario_objects obj in info.ScenObjects)
             {
                 if (obj.Type == "Flag")
                 {
@@ -35,13 +35,13 @@ namespace WorldServer.World.Scenarios
                     {
                         flag.VfxState = 2;
                         _captureScore = obj.PointGain;
-                        flag.SetActive(Realms.REALMS_REALM_DESTRUCTION);
+                        flag.SetActive(SetRealms.REALMS_REALM_DESTRUCTION);
                     }
                     else if (obj.ObjectiveName == "Destruction Flag")
                     {
                         flag.VfxState = 5;
                         _captureScore = obj.PointGain;
-                        flag.SetActive(Realms.REALMS_REALM_ORDER);
+                        flag.SetActive(SetRealms.REALMS_REALM_ORDER);
                     }
                     else
                     {
@@ -103,11 +103,11 @@ namespace WorldServer.World.Scenarios
 
             switch (hB.HeldObject.RealmCapturableFor)
             {
-                case Realms.REALMS_REALM_ORDER:
+                case SetRealms.REALMS_REALM_ORDER:
                     hB.FlagEffect = FLAG_EFFECTS.Red;
                     break;
 
-                case Realms.REALMS_REALM_DESTRUCTION:
+                case SetRealms.REALMS_REALM_DESTRUCTION:
                     hB.FlagEffect = FLAG_EFFECTS.Blue;
                     break;
 
@@ -153,7 +153,7 @@ namespace WorldServer.World.Scenarios
         {
             if (flagBase == _flagBases[0])
             {
-                if (capturer.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                if (capturer.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                 {
                     capturer.SendClientMessage("This is the enemy realm's flag return point", ChatLogFilters.CHATLOGFILTERS_C_ABILITY_ERROR);
                     return;
@@ -161,7 +161,7 @@ namespace WorldServer.World.Scenarios
             }
             else if (flagBase == _flagBases[1])
             {
-                if (capturer.Realm == Realms.REALMS_REALM_ORDER)
+                if (capturer.Realm == SetRealms.REALMS_REALM_ORDER)
                 {
                     capturer.SendClientMessage("This is the enemy realm's flag return point", ChatLogFilters.CHATLOGFILTERS_C_ABILITY_ERROR);
                     return;
@@ -193,14 +193,14 @@ namespace WorldServer.World.Scenarios
 
             PacketOut Out = new PacketOut((byte)Opcodes.F_PLAY_SOUND);
             Out.WriteByte(0);
-            Out.WriteUInt16(capturer.Realm == Realms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
+            Out.WriteUInt16(capturer.Realm == SetRealms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
             Out.Fill(0, 10);
 
             for (int i = 0; i < 2; ++i)
             {
                 foreach (Player player in Players[i])
                 {
-                    player.SendLocalizeString(new[] { capturer.Name, capturer.Realm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction", destFlag.name }, ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.TEXT_FLAG_CAPTURE);
+                    player.SendLocalizeString(new[] { capturer.Name, capturer.Realm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction", destFlag.name }, ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.TEXT_FLAG_CAPTURE);
                     player.SendPacket(Out);
                 }
             }
@@ -213,7 +213,7 @@ namespace WorldServer.World.Scenarios
         {
             if (flagDrop == _flagDrops[0])
             {
-                if (capturer.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                if (capturer.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                 {
                     capturer.SendClientMessage("This is the enemy realm's flag drop off point", ChatLogFilters.CHATLOGFILTERS_C_ABILITY_ERROR);
                     return;
@@ -221,7 +221,7 @@ namespace WorldServer.World.Scenarios
             }
             else if (flagDrop == _flagDrops[1])
             {
-                if (capturer.Realm == Realms.REALMS_REALM_ORDER)
+                if (capturer.Realm == SetRealms.REALMS_REALM_ORDER)
                 {
                     capturer.SendClientMessage("This is the enemy realm's flag drop off point", ChatLogFilters.CHATLOGFILTERS_C_ABILITY_ERROR);
                     return;
@@ -253,14 +253,14 @@ namespace WorldServer.World.Scenarios
 
             PacketOut Out = new PacketOut((byte)Opcodes.F_PLAY_SOUND);
             Out.WriteByte(0);
-            Out.WriteUInt16(capturer.Realm == Realms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
+            Out.WriteUInt16(capturer.Realm == SetRealms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
             Out.Fill(0, 10);
 
             for (int i = 0; i < 2; ++i)
             {
                 foreach (Player player in Players[i])
                 {
-                    player.SendClientMessage($"{capturer.Name} of {(capturer.Realm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction")} has dropped off the {destFlag.name}!", ChatLogFilters.CHATLOGFILTERS_C_WHITE);
+                    player.SendClientMessage($"{capturer.Name} of {(capturer.Realm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction")} has dropped off the {destFlag.name}!", ChatLogFilters.CHATLOGFILTERS_C_WHITE);
                     player.SendPacket(Out);
                 }
             }
@@ -271,7 +271,7 @@ namespace WorldServer.World.Scenarios
 
         public override bool TooCloseToSpawn(Player plr)
         {
-            return plr.Get2DDistanceToWorldPoint(RespawnLocations[plr.Realm == Realms.REALMS_REALM_ORDER ? 0 : 1]) < 100;
+            return plr.Get2DDistanceToWorldPoint(RespawnLocations[plr.Realm == SetRealms.REALMS_REALM_ORDER ? 0 : 1]) < 100;
         }
     }
 }

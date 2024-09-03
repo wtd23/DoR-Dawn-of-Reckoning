@@ -72,7 +72,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
         /// </summary>
         /// <param name="numberOfBagsToAward"></param>
         /// <param name="bagDefinitions"></param>
-        /// <param name="eligiblePlayers">List of Character and Eligibility values</param>
+        /// <param name="eligiblePlayers">List of characters and Eligibility values</param>
         /// <param name="bagBonuses"></param>
         /// <param name="randomRollBonuses"></param>
         /// <param name="pairingContributionBonuses"></param>
@@ -80,8 +80,8 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
         /// <returns></returns>
         public List<LootBagTypeDefinition> AssignLootToPlayers(int numberOfBagsToAward,
             List<LootBagTypeDefinition> bagDefinitions, List<KeyValuePair<uint, int>> eligiblePlayers,
-            IList<RVRPlayerBagBonus> bagBonuses, Dictionary<uint, int> randomRollBonuses,
-            Dictionary<uint, int> pairingContributionBonuses, WorldConfigs configSettings)
+            IList<characters_bag_bonus> bagBonuses, Dictionary<uint, int> randomRollBonuses,
+            Dictionary<uint, int> pairingContributionBonuses, WorldConfig configSettings)
         {
             var characterKeepTrackerList = new List<KeepLockTracker>();
             // Preload the tracker
@@ -182,7 +182,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
                     {
                         comparisonDictionary.Add(characterId, eligiblePlayer.Value + randomForCharacter + pairingContributionForCharacter);
                     }
-                    //Logger.Debug($"===== Loot Assignment Bonuses : Character {characterId}, Base {eligiblePlayer.Value} Random {randomForCharacter} Pairing {pairingContributionForCharacter}");
+                    //Logger.Debug($"===== Loot Assignment Bonuses : characters {characterId}, Base {eligiblePlayer.Value} Random {randomForCharacter} Pairing {pairingContributionForCharacter}");
                 }
 
                 // Sort the comparison dictionary
@@ -191,7 +191,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
 
                 foreach (var keyValuePair in comparisonList)
                 {
-                    Logger.Debug($"======= Post modification values for comparison : Character {keyValuePair.Key}, Value {keyValuePair.Value}");
+                    Logger.Debug($"======= Post modification values for comparison : characters {keyValuePair.Key}, Value {keyValuePair.Value}");
                 }
 
                 if (comparisonList.Count > 0)

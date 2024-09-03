@@ -16,10 +16,10 @@ namespace WorldServer.World.Scenarios
     {
         private readonly Dictionary<HoldObject, int> _murderballTicks = new Dictionary<HoldObject, int>();
 
-        public MurderballScenario(Scenario_Info info, int tier)
+        public MurderballScenario(scenario_infos info, int tier)
             : base(info, tier)
         {
-            foreach (Scenario_Object obj in info.ScenObjects)
+            foreach (scenario_objects obj in info.ScenObjects)
             {
                 HoldObject ball;
 
@@ -70,7 +70,7 @@ namespace WorldServer.World.Scenarios
                 foreach (Player plr in Players[i])
                 {
                     SendObjectiveStates(plr);
-                    plr.SendLocalizeString(new[] { pickedBy.GenderedName, (pickedBy.Realm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction"), ball.name }, ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.TEXT_FLAG_PICKUP);
+                    plr.SendLocalizeString(new[] { pickedBy.GenderedName, (pickedBy.Realm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction"), ball.name }, ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.TEXT_FLAG_PICKUP);
                 }
 
             EvtInterface.AddEvent(UpdateMapPosition, 1000, 0);
@@ -124,7 +124,7 @@ namespace WorldServer.World.Scenarios
                     }
                 }
                 else
-                    GivePoints((hostBuff.Caster.Realm == Realms.REALMS_REALM_ORDER ? 1 : 2), (uint)(2 * ((_murderballTicks[ball] / 3) + 1)));
+                    GivePoints((hostBuff.Caster.Realm == SetRealms.REALMS_REALM_ORDER ? 1 : 2), (uint)(2 * ((_murderballTicks[ball] / 3) + 1)));
             }
 
             ++_murderballTicks[ball];
@@ -156,33 +156,33 @@ namespace WorldServer.World.Scenarios
         {
             if (Info.MapId == 232)
             {
-                if (plr.Get2DDistanceToWorldPoint(torAnrocGuardPoints[plr.Realm == Realms.REALMS_REALM_ORDER ? 0 : 1][0]) < 250 ||
-                    plr.Get2DDistanceToWorldPoint(torAnrocGuardPoints[plr.Realm == Realms.REALMS_REALM_ORDER ? 0 : 1][1]) < 250 ||
-                    plr.Get2DDistanceToWorldPoint(torAnrocGuardPoints[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 0 : 1][0]) < 250 ||
-                    plr.Get2DDistanceToWorldPoint(torAnrocGuardPoints[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 0 : 1][1]) < 250)
+                if (plr.Get2DDistanceToWorldPoint(torAnrocGuardPoints[plr.Realm == SetRealms.REALMS_REALM_ORDER ? 0 : 1][0]) < 250 ||
+                    plr.Get2DDistanceToWorldPoint(torAnrocGuardPoints[plr.Realm == SetRealms.REALMS_REALM_ORDER ? 0 : 1][1]) < 250 ||
+                    plr.Get2DDistanceToWorldPoint(torAnrocGuardPoints[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 0 : 1][0]) < 250 ||
+                    plr.Get2DDistanceToWorldPoint(torAnrocGuardPoints[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 0 : 1][1]) < 250)
                 {
                     return true;
                 }
             }
             else if (Info.MapId == 31)
             {
-                if (plr.Get2DDistanceToWorldPoint(RespawnLocations[plr.Realm == Realms.REALMS_REALM_ORDER ? 0 : 1]) < 150 ||
-                    plr.Get2DDistanceToWorldPoint(RespawnLocations[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 0 : 1]) < 150)
+                if (plr.Get2DDistanceToWorldPoint(RespawnLocations[plr.Realm == SetRealms.REALMS_REALM_ORDER ? 0 : 1]) < 150 ||
+                    plr.Get2DDistanceToWorldPoint(RespawnLocations[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 0 : 1]) < 150)
                 {
                     return true;
                 }
             }
             else if (Info.MapId == 133)
             {
-                if (plr.Get2DDistanceToWorldPoint(mawGuardPoints[plr.Realm == Realms.REALMS_REALM_ORDER ? 0 : 1][0]) < 250 ||
-                    plr.Get2DDistanceToWorldPoint(mawGuardPoints[plr.Realm == Realms.REALMS_REALM_ORDER ? 0 : 1][1]) < 250 ||
-                    plr.Get2DDistanceToWorldPoint(mawGuardPoints[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 0 : 1][0]) < 250 ||
-                    plr.Get2DDistanceToWorldPoint(mawGuardPoints[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 0 : 1][1]) < 250)
+                if (plr.Get2DDistanceToWorldPoint(mawGuardPoints[plr.Realm == SetRealms.REALMS_REALM_ORDER ? 0 : 1][0]) < 250 ||
+                    plr.Get2DDistanceToWorldPoint(mawGuardPoints[plr.Realm == SetRealms.REALMS_REALM_ORDER ? 0 : 1][1]) < 250 ||
+                    plr.Get2DDistanceToWorldPoint(mawGuardPoints[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 0 : 1][0]) < 250 ||
+                    plr.Get2DDistanceToWorldPoint(mawGuardPoints[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 0 : 1][1]) < 250)
                 {
                     return true;
                 }
             }
-            return plr.Get2DDistanceToWorldPoint(RespawnLocations[plr.Realm == Realms.REALMS_REALM_ORDER ? 0 : 1]) < 100;
+            return plr.Get2DDistanceToWorldPoint(RespawnLocations[plr.Realm == SetRealms.REALMS_REALM_ORDER ? 0 : 1]) < 100;
         }
 
         public override void SendObjectiveStates(Player plr)

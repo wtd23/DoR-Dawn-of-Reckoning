@@ -274,7 +274,7 @@ namespace WorldServer.World.Interfaces
             if (victim is GameObject && victim.GetGameObject().IsAttackable == 0)
                 return false;
 
-            if (victim is GameObject && (victim.Realm == Realms.REALMS_REALM_NEUTRAL || victim.Realm == attacker.Realm))
+            if (victim is GameObject && (victim.Realm == SetRealms.REALMS_REALM_NEUTRAL || victim.Realm == attacker.Realm))
                 return false;
 
             if (victim is GameObject && attacker is Creature && !(attacker is Pet) && !(attacker is Siege))

@@ -112,7 +112,7 @@ namespace WorldServer.World.Scenarios.Objects
             if (glowProto == null)
                 return;
 
-            GameObject_spawn spawn = new GameObject_spawn
+            gameobject_spawns spawn = new gameobject_spawns
             {
                 Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                 WorldO = Heading,
@@ -144,22 +144,22 @@ namespace WorldServer.World.Scenarios.Objects
             _evtInterface.Update(msTick);
         }
 
-        private void SetGlowColorFor(Realms realm)
+        private void SetGlowColorFor(SetRealms realm)
         {
             switch (realm)
             {
-                case Realms.REALMS_REALM_NEUTRAL:
+                case SetRealms.REALMS_REALM_NEUTRAL:
                     _glowObject.VfxState = 0;
                     break;
 
-                case Realms.REALMS_REALM_ORDER:
+                case SetRealms.REALMS_REALM_ORDER:
                     if (ColorMatchesRealm)
                         _glowObject.VfxState = 1;
                     else
                         _glowObject.VfxState = 2;
                     break;
 
-                case Realms.REALMS_REALM_DESTRUCTION:
+                case SetRealms.REALMS_REALM_DESTRUCTION:
                     if (ColorMatchesRealm)
                         _glowObject.VfxState = 2;
                     else
@@ -243,9 +243,9 @@ namespace WorldServer.World.Scenarios.Objects
 
         #endregion Capturing
 
-        public Realms RealmCapturableFor { get; protected set; }
+        public SetRealms RealmCapturableFor { get; protected set; }
 
-        public void SetActive(Realms realmAssociation)
+        public void SetActive(SetRealms realmAssociation)
         {
             SetRealmAssociation(realmAssociation);
 
@@ -293,7 +293,7 @@ namespace WorldServer.World.Scenarios.Objects
             }
         }
 
-        public void SetRealmAssociation(Realms realm)
+        public void SetRealmAssociation(SetRealms realm)
         {
             if (RealmCapturableFor == realm)
                 return;

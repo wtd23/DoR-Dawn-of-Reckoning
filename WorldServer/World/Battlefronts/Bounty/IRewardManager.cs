@@ -36,31 +36,31 @@ namespace WorldServer.World.Battlefronts.Bounty
             ConcurrentDictionary<Player, int> allEligiblePlayers,
             ConcurrentDictionary<Player, int> winningEligiblePlayers,
             ConcurrentDictionary<Player, int> losingEligiblePlayers,
-            Realms lockingRealm,
+            SetRealms lockingRealm,
             int zoneId,
             List<RVRRewardItem> lootOptions,
             LootChest destructionLootChest,
             LootChest orderLootChest,
-            Keep_Info keep,
+            keep_infos keep,
             int playersKilledInRange,
             int forceNumberBags = 0);
 
         void DistributeKeepTakeBaseRewards(ConcurrentDictionary<Player, int> eligibleLosingRealmPlayers,
             ConcurrentDictionary<Player, int> eligibleWinningRealmPlayers,
-            Realms lockingRealm,
+            SetRealms lockingRealm,
             int baselineContribution,
             float tierRewardScale,
             List<Player> allPlayersInZone,
-            List<RVRKeepLockReward> rvrKeepRewards);
+            List<rvr_keep_lock_reward> rvrKeepRewards);
 
         void DistributeZoneFlipBaseRewards(ConcurrentDictionary<Player, int> eligibleLosingRealmPlayers,
             ConcurrentDictionary<Player, int> eligibleWinningRealmPlayers,
-            Realms lockingRealm,
+            SetRealms lockingRealm,
             int baselineContribution,
             float tierRewardScale,
             List<Player> allPlayersInZone);
 
-        void MailItem(uint keyCharacterId, Item_Info itemToSend, int count, string senderName, string title = "",
+        void MailItem(uint keyCharacterId, item_infos itemToSend, int count, string senderName, string title = "",
             string content = "");
     }
 }

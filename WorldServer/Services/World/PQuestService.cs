@@ -7,65 +7,65 @@ namespace WorldServer.Services.World
     [Service(typeof(CreatureService), typeof(GameObjectService), typeof(ItemService))]
     public class PQuestService : ServiceBase
     {
-        public static Dictionary<uint, PQuest_Info> _PQuests;
+        public static Dictionary<uint, pquest_info> _PQuests;
 
         [LoadingFunction(true)]
         public static void LoadPQuest_Info()
         {
-            _PQuests = Database.MapAllObjects<uint, PQuest_Info>("Entry", "PinX != 0 AND PinY != 0");
+            _PQuests = Database.MapAllObjects<uint, pquest_info>("Entry", "PinX != 0 AND PinY != 0");
 
             Log.Success("WorldMgr", "Loaded " + _PQuests.Count + " Public Quests Info");
         }
 
-        public static Dictionary<uint, List<PQuest_Objective>> _PQuest_Objectives;
+        public static Dictionary<uint, List<pquest_objectives>> _PQuest_Objectives;
 
         [LoadingFunction(true)]
         public static void LoadPQuest_Objective()
         {
-            _PQuest_Objectives = new Dictionary<uint, List<PQuest_Objective>>();
+            _PQuest_Objectives = new Dictionary<uint, List<pquest_objectives>>();
 
-            IList<PQuest_Objective> PObjectives = Database.SelectObjects<PQuest_Objective>("Type != 0");
+            IList<pquest_objectives> PObjectives = Database.SelectObjects<pquest_objectives>("Type != 0");
 
-            foreach (PQuest_Objective Obj in PObjectives)
+            foreach (pquest_objectives Obj in PObjectives)
             {
-                List<PQuest_Objective> Objs;
+                List<pquest_objectives> Objs;
                 if (!_PQuest_Objectives.TryGetValue(Obj.Entry, out Objs))
                 {
-                    Objs = new List<PQuest_Objective>();
+                    Objs = new List<pquest_objectives>();
                     _PQuest_Objectives.Add(Obj.Entry, Objs);
                 }
 
                 Objs.Add(Obj);
             }
 
-            Log.Success("WorldMgr", "Loaded " + PObjectives.Count + " Public Quest Objectives");
+            Log.Success("WorldMgr", "Loaded " + PObjectives.Count + " Public quests Objectives");
         }
 
-        public static Dictionary<uint, List<PQuest_Spawn>> _PQuest_Spawns;
+        public static Dictionary<uint, List<pquest_spawns>> _PQuest_Spawns;
 
         [LoadingFunction(true)]
         public static void LoadPQuest_Creatures()
         {
-            _PQuest_Spawns = new Dictionary<uint, List<PQuest_Spawn>>();
+            _PQuest_Spawns = new Dictionary<uint, List<pquest_spawns>>();
 
-            IList<PQuest_Spawn> PQSpawns = Database.SelectAllObjects<PQuest_Spawn>();
+            IList<pquest_spawns> PQSpawns = Database.SelectAllObjects<pquest_spawns>();
 
-            foreach (PQuest_Spawn Obj in PQSpawns)
+            foreach (pquest_spawns Obj in PQSpawns)
             {
-                List<PQuest_Spawn> Objs;
+                List<pquest_spawns> Objs;
                 if (!_PQuest_Spawns.TryGetValue(Obj.Objective, out Objs))
                 {
-                    Objs = new List<PQuest_Spawn>();
+                    Objs = new List<pquest_spawns>();
                     _PQuest_Spawns.Add(Obj.Objective, Objs);
                 }
 
                 Objs.Add(Obj);
             }
 
-            Log.Success("WorldMgr", "Loaded " + PQSpawns.Count + " Public Quest Spawns");
+            Log.Success("WorldMgr", "Loaded " + PQSpawns.Count + " Public quests Spawns");
         }
 
-        public static void GeneratePQuestObjective(PQuest_Objective Obj, PQuest_Info Q)
+        public static void GeneratePQuestObjective(pquest_objectives Obj, pquest_info Q)
         {
             switch ((Objective_Type)Obj.Type)
             {
@@ -131,25 +131,25 @@ namespace WorldServer.Services.World
             }
         }
 
-        public static List<PQuest_Loot> _PQLoot;
+        public static List<pquest_loot> _PQLoot;
 
         [LoadingFunction(true)]
         public static void LoadPQ_Loot()
         {
             Log.Debug("WorldMgr", "PQLoot ...");
-            _PQLoot = Database.SelectAllObjects<PQuest_Loot>() as List<PQuest_Loot>;
+            _PQLoot = Database.SelectAllObjects<pquest_loot>() as List<pquest_loot>;
             Log.Success("PQLoot", "Loaded " + _PQLoot.Count + " Items");
 
             LoadPQ_Loot_Crafting();
         }
 
-        public static List<PQuest_Loot_Crafting> _PQLoot_Crafting;
+        public static List<pquest_loot_crafting> _PQLoot_Crafting;
 
         [LoadingFunction(true)]
         public static void LoadPQ_Loot_Crafting()
         {
             Log.Debug("WorldMgr", "PQLootCrafting ...");
-            _PQLoot_Crafting = Database.SelectAllObjects<PQuest_Loot_Crafting>() as List<PQuest_Loot_Crafting>;
+            _PQLoot_Crafting = Database.SelectAllObjects<pquest_loot_crafting>() as List<pquest_loot_crafting>;
             if (_PQLoot != null)
                 Log.Success("PQLootCrafting", "Loaded " + _PQLoot.Count + " Items");
         }

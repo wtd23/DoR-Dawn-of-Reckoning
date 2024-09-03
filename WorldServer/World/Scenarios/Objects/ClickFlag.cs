@@ -120,7 +120,7 @@ namespace WorldServer.World.Scenarios.Objects
 
                 if (glowProto != null)
                 {
-                    GameObject_spawn spawn = new GameObject_spawn
+                    gameobject_spawns spawn = new gameobject_spawns
                     {
                         Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                         WorldO = Heading,

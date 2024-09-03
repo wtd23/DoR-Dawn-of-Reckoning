@@ -24,7 +24,7 @@ namespace WorldServer.World.Battlefronts.Keeps
         public AIInterface NearAiInterface = null;
         public int DefenceRank { get; set; }
 
-        public KeepCreature(Creature_spawn spawn, KeepNpcCreature flagGuard, BattleFrontKeep keep) : base(spawn)
+        public KeepCreature(creature_spawns spawn, KeepNpcCreature flagGuard, BattleFrontKeep keep) : base(spawn)
         {
             _keep = keep;
             FlagGuard = flagGuard;
@@ -140,12 +140,12 @@ namespace WorldServer.World.Battlefronts.Keeps
                 return;
             }
 
-            /*Log.Info(_keep.Info.Name, (_keep.Realm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " keep lord slain by " + killer.Name + " of " + (killer.Realm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction"));*/
+            /*Log.Info(_keep.Info.Name, (_keep.Realm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " keep lord slain by " + killer.Name + " of " + (killer.Realm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction"));*/
 
             if (_keep.Realm == killer.Realm)
             {
                 /*if (FlagGuard.Info.KeepLord)
-                    Log.Info(_keep.Info.Name, (_keep.Realm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " keep lord respawned.");*/
+                    Log.Info(_keep.Info.Name, (_keep.Realm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " keep lord respawned.");*/
                 _logger.Debug($"Kill request from own realm {killer.Name} {_keep.Realm}");
                 FlagGuard.Creature = new KeepCreature(Spawn, FlagGuard, _keep);
                 Region.AddObject(FlagGuard.Creature, Spawn.ZoneId);

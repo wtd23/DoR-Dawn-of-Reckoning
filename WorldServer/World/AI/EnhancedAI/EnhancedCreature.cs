@@ -29,7 +29,7 @@ namespace WorldServer.World.AI.EnhancedAI
             DebugMode = false;
         }
 
-        public new Zone_Info Zone { get; set; }
+        public new zone_infos Zone { get; set; }
 
         public IUnitAdaptor UnitAdaptor { get; set; }
         public bool InCombat { get; set; }

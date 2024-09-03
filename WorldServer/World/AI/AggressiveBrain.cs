@@ -19,8 +19,8 @@ namespace WorldServer.World.AI
         public long NextAbilityExecution { get; set; }
         public Conditions ConditionManager { get; set; }
         public Executions ExecutionManager { get; set; }
-        public IEnumerable<CreatureSmartAbilities> Abilities { get; set; }
-        public Dictionary<CreatureSmartAbilities, long> AbilityTracker { get; set; }
+        public IEnumerable<creature_smart_abilities> Abilities { get; set; }
+        public Dictionary<creature_smart_abilities, long> AbilityTracker { get; set; }
 
         private new static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
@@ -31,8 +31,8 @@ namespace WorldServer.World.AI
             NextAbilityExecution = 0;
             ConditionManager = new Conditions(_unit, Combat);
             ExecutionManager = new Executions(_unit, Combat, this);
-            Abilities = new List<CreatureSmartAbilities>();
-            AbilityTracker = new Dictionary<CreatureSmartAbilities, long>();
+            Abilities = new List<creature_smart_abilities>();
+            AbilityTracker = new Dictionary<creature_smart_abilities, long>();
             if (_unit is Creature)
                 Proto = (_unit as Creature).Spawn.Proto;
             else
@@ -187,14 +187,14 @@ namespace WorldServer.World.AI
             }
         }
 
-        public void PerformSound(CreatureSmartAbilities key)
+        public void PerformSound(creature_smart_abilities key)
         {
             if (!string.IsNullOrEmpty(key.SpellCastSound))
                 foreach (var plr in GetClosePlayers(300))
                     plr.PlaySound(Convert.ToUInt16(key.SpellCastSound));
         }
 
-        public void PerformSpeech(CreatureSmartAbilities key)
+        public void PerformSpeech(creature_smart_abilities key)
         {
             if (!string.IsNullOrEmpty(key.SpellCastSpeech))
                 _unit.Say(key.SpellCastSpeech, ChatLogFilters.CHATLOGFILTERS_MONSTER_SAY);

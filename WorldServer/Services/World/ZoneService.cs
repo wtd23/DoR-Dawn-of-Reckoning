@@ -16,7 +16,7 @@ namespace WorldServer.Services.World
     [Service]
     public class ZoneService : ServiceBase
     {
-        public static List<Zone_Info> _Zone_Info;
+        public static List<zone_infos> _Zone_Info;
         public static IOcclusionProvider OcclusionProvider = new Occlusion();
 
         [LoadingFunction(true)]
@@ -24,7 +24,7 @@ namespace WorldServer.Services.World
         {
             Log.Debug("WorldMgr", "Loading Zone_Info...");
 
-            _Zone_Info = Database.SelectAllObjects<Zone_Info>() as List<Zone_Info>;
+            _Zone_Info = Database.SelectAllObjects<zone_infos>() as List<zone_infos>;
 
             Log.Success("LoadZone_Info", "Loaded " + _Zone_Info.Count + " Zone_Info");
 
@@ -49,7 +49,7 @@ namespace WorldServer.Services.World
         /// </summary>
         /// <param name="RegionId">Identifier of returned zone.</param>
         /// <returns>Zone or null if was not fount</returns>
-        public static Zone_Info GetZone_Info(ushort ZoneId)
+        public static zone_infos GetZone_Info(ushort ZoneId)
         {
             return _Zone_Info.FirstOrDefault(zone => zone != null && zone.ZoneId == ZoneId);
         }
@@ -59,18 +59,18 @@ namespace WorldServer.Services.World
         /// </summary>
         /// <param name="RegionId">Region id to get zones of.</param>
         /// <returns>List on known regions, cannot be null, may be empty</returns>
-        public static List<Zone_Info> GetZoneRegion(ushort RegionId)
+        public static List<zone_infos> GetZoneRegion(ushort RegionId)
         {
-            List<Zone_Info> list = new List<Zone_Info>();
-            foreach (Zone_Info zone in _Zone_Info)
+            List<zone_infos> list = new List<zone_infos>();
+            foreach (zone_infos zone in _Zone_Info)
                 if (zone != null && zone.Region == RegionId)
                     list.Add(zone);
             return list;
         }
 
-        public static Zone_Info GetZoneFromOffsets(int OffsetX, int OffsetY)
+        public static zone_infos GetZoneFromOffsets(int OffsetX, int OffsetY)
         {
-            foreach (Zone_Info Info in _Zone_Info)
+            foreach (zone_infos Info in _Zone_Info)
             {
                 if (OffsetX >= Info.OffX && OffsetX < Info.OffX + 16
                     && OffsetY >= Info.OffY && OffsetY < Info.OffY + 16)
@@ -84,16 +84,16 @@ namespace WorldServer.Services.World
 
         #region Zone Portals
 
-        public static Dictionary<uint, Zone_jump> Zone_Jumps;
+        public static Dictionary<uint, zone_jumps> Zone_Jumps;
 
         public static void LoadZoneJumps()
         {
             Log.Debug("WorldMgr", "Loading Zone_Jump...");
 
-            Zone_Jumps = new Dictionary<uint, Zone_jump>();
-            IList<Zone_jump> Jumps = Database.SelectAllObjects<Zone_jump>() as List<Zone_jump>;
+            Zone_Jumps = new Dictionary<uint, zone_jumps>();
+            IList<zone_jumps> Jumps = Database.SelectAllObjects<zone_jumps>() as List<zone_jumps>;
 
-            foreach (Zone_jump Jump in Jumps)
+            foreach (zone_jumps Jump in Jumps)
             {
                 if (GetZone_Info(Jump.ZoneID) != null && !Zone_Jumps.ContainsKey(Jump.Entry))
                 {
@@ -106,16 +106,16 @@ namespace WorldServer.Services.World
             Log.Success("LoadZone_Jump", "Loaded " + Zone_Jumps.Count + " Zone_Jump");
         }
 
-        public static Zone_jump GetZoneJump(uint Entry)
+        public static zone_jumps GetZoneJump(uint Entry)
         {
-            Zone_jump jump;
+            zone_jumps jump;
             Zone_Jumps.TryGetValue(Entry, out jump);
             return jump;
         }
 
-        public static Zone_jump GetZoneJumpByInstanceId(uint instanceID)
+        public static zone_jumps GetZoneJumpByInstanceId(uint instanceID)
         {
-            foreach (Zone_jump jump in Zone_Jumps.Values)
+            foreach (zone_jumps jump in Zone_Jumps.Values)
             {
                 if (jump.InstanceID == instanceID)
                     return jump;
@@ -127,16 +127,16 @@ namespace WorldServer.Services.World
 
         #region Zone Areas
 
-        public static Dictionary<int, List<Zone_Area>> _Zone_Area;
+        public static Dictionary<int, List<zone_areas>> _Zone_Area;
 
         [LoadingFunction(true)]
         public static void LoadZone_Area()
         {
             Log.Debug("WorldMgr", "Loading Zone_Area...");
 
-            _Zone_Area = new Dictionary<int, List<Zone_Area>>();
-            IList<Zone_Area> Infos = Database.SelectAllObjects<Zone_Area>();
-            foreach (Zone_Area Area in Infos)
+            _Zone_Area = new Dictionary<int, List<zone_areas>>();
+            IList<zone_areas> Infos = Database.SelectAllObjects<zone_areas>();
+            foreach (zone_areas Area in Infos)
             {
                 AddZoneArea(Area);
             }
@@ -144,23 +144,23 @@ namespace WorldServer.Services.World
             Log.Success("LoadZone_Info", "Loaded " + Infos.Count + " Zone_Area");
         }
 
-        public static void AddZoneArea(Zone_Area Area)
+        public static void AddZoneArea(zone_areas Area)
         {
-            List<Zone_Area> Areas;
+            List<zone_areas> Areas;
             if (!_Zone_Area.TryGetValue(Area.ZoneId, out Areas))
             {
-                Areas = new List<Zone_Area>();
+                Areas = new List<zone_areas>();
                 _Zone_Area.Add(Area.ZoneId, Areas);
             }
 
             Areas.Add(Area);
         }
 
-        public static List<Zone_Area> GetZoneAreas(ushort ZoneID)
+        public static List<zone_areas> GetZoneAreas(ushort ZoneID)
         {
-            List<Zone_Area> Areas;
+            List<zone_areas> Areas;
             if (!_Zone_Area.TryGetValue(ZoneID, out Areas))
-                return new List<Zone_Area>();
+                return new List<zone_areas>();
             return Areas;
         }
 
@@ -168,24 +168,24 @@ namespace WorldServer.Services.World
 
         #region Zone Respawns
 
-        private static Dictionary<int, List<Zone_Respawn>> _zoneRespawnDic;
-        private static List<Zone_Respawn> _zoneRespawns = new List<Zone_Respawn>();
+        private static Dictionary<int, List<zone_respawns>> _zoneRespawnDic;
+        private static List<zone_respawns> _zoneRespawns = new List<zone_respawns>();
 
         [LoadingFunction(true)]
         public static void LoadZone_Respawn()
         {
             Log.Debug("WorldMgr", "Loading LoadZone_Respawn...");
 
-            _zoneRespawnDic = new Dictionary<int, List<Zone_Respawn>>();
+            _zoneRespawnDic = new Dictionary<int, List<zone_respawns>>();
 
-            List<Zone_Respawn> respawns = Database.SelectAllObjects<Zone_Respawn>().OrderBy(res => res.RespawnID).ToList();
+            List<zone_respawns> respawns = Database.SelectAllObjects<zone_respawns>().OrderBy(res => res.RespawnID).ToList();
 
-            foreach (Zone_Respawn respawn in respawns)
+            foreach (zone_respawns respawn in respawns)
             {
-                List<Zone_Respawn> L;
+                List<zone_respawns> L;
                 if (!_zoneRespawnDic.TryGetValue(respawn.ZoneID, out L))
                 {
-                    L = new List<Zone_Respawn>();
+                    L = new List<zone_respawns>();
                     _zoneRespawnDic.Add(respawn.ZoneID, L);
                 }
 
@@ -201,9 +201,9 @@ namespace WorldServer.Services.World
         /// </summary>
         /// <param name="respawnId">Zone respawn id to search</param>
         /// <returns>Respawn info or null if does not exists</returns>
-        public static Zone_Respawn GetZoneRespawn(ushort respawnId)
+        public static zone_respawns GetZoneRespawn(ushort respawnId)
         {
-            foreach (Zone_Respawn respawn in _zoneRespawns)
+            foreach (zone_respawns respawn in _zoneRespawns)
                 if (respawn.RespawnID == respawnId)
                     return respawn;
             return null;
@@ -215,9 +215,9 @@ namespace WorldServer.Services.World
         /// <param name="zoneId">Zone to search respawn in</param>
         /// <param name="realm">Realm of returned respawn</param>
         /// <returns>Zone respawn of default one (wut ?)</returns>
-        public static Zone_Respawn GetZoneRespawn(int zoneId, byte realm)
+        public static zone_respawns GetZoneRespawn(int zoneId, byte realm)
         {
-            foreach (Zone_Respawn res in _zoneRespawns)
+            foreach (zone_respawns res in _zoneRespawns)
                 if (res.Realm == realm && res.ZoneID == zoneId)
                     return res;
             return _zoneRespawns[0]; // weird...
@@ -228,9 +228,9 @@ namespace WorldServer.Services.World
         /// </summary>
         /// <param name="respawnId">Zone id to search</param>
         /// <returns>Respawn info list or null if zone does not exists</returns>
-        public static List<Zone_Respawn> GetZoneRespawns(ushort respawnId)
+        public static List<zone_respawns> GetZoneRespawns(ushort respawnId)
         {
-            List<Zone_Respawn> respawns;
+            List<zone_respawns> respawns;
             _zoneRespawnDic.TryGetValue(respawnId, out respawns);
             return respawns;
         }
@@ -239,22 +239,22 @@ namespace WorldServer.Services.World
 
         #region Inter-Zone Flight
 
-        public static Dictionary<ushort, Zone_Taxi[]> _Zone_Taxi = new Dictionary<ushort, Zone_Taxi[]>();
+        public static Dictionary<ushort, zone_taxis[]> _Zone_Taxi = new Dictionary<ushort, zone_taxis[]>();
 
         [LoadingFunction(true)]
         public static void LoadZone_Taxi()
         {
             Log.Debug("LoadZone_Info", "Loading Zone_Taxis...");
 
-            IList<Zone_Taxi> Taxis = Database.SelectAllObjects<Zone_Taxi>();
-            _Zone_Taxi = new Dictionary<ushort, Zone_Taxi[]>();
+            IList<zone_taxis> Taxis = Database.SelectAllObjects<zone_taxis>();
+            _Zone_Taxi = new Dictionary<ushort, zone_taxis[]>();
 
-            foreach (Zone_Taxi Taxi in Taxis)
+            foreach (zone_taxis Taxi in Taxis)
             {
-                Zone_Taxi[] Tax;
+                zone_taxis[] Tax;
                 if (!_Zone_Taxi.TryGetValue(Taxi.ZoneID, out Tax))
                 {
-                    Tax = new Zone_Taxi[(int)(Realms.REALMS_TOTAL_REALMS)];
+                    Tax = new zone_taxis[(int)(SetRealms.REALMS_TOTAL_REALMS)];
                     _Zone_Taxi.Add(Taxi.ZoneID, Tax);
                 }
 
@@ -264,9 +264,9 @@ namespace WorldServer.Services.World
             Log.Success("LoadZone_Info", "Loaded " + Taxis.Count + " Zone_Taxis");
         }
 
-        public static Zone_Taxi GetZoneTaxi(ushort ZoneId, byte Realm)
+        public static zone_taxis GetZoneTaxi(ushort ZoneId, byte Realm)
         {
-            Zone_Taxi[] Taxis;
+            zone_taxis[] Taxis;
             if (_Zone_Taxi.TryGetValue(ZoneId, out Taxis))
                 return Taxis[Realm];
 
@@ -277,7 +277,7 @@ namespace WorldServer.Services.World
 
         #region Utilities
 
-        public static ushort CalculPin(Zone_Info Info, int WorldPos, bool x)
+        public static ushort CalculPin(zone_infos Info, int WorldPos, bool x)
         {
             ushort Pin = 0;
 
@@ -297,7 +297,7 @@ namespace WorldServer.Services.World
         /// <param name="PinY">Y coordinate in zone (as seen in map in game)</param>
         /// <param name="PinZ">Z coordinate in zone (as seen in map in game)</param>
         /// <returns>World coordinates</returns>
-        public static Point3D GetWorldPosition(Zone_Info Info, ushort PinX, ushort PinY, ushort PinZ)
+        public static Point3D GetWorldPosition(zone_infos Info, ushort PinX, ushort PinY, ushort PinZ)
         {
             int x = PinX > 32768 ? PinX - 32768 : PinX;
             int y = PinY > 32768 ? PinY - 32768 : PinY;
@@ -312,7 +312,7 @@ namespace WorldServer.Services.World
             return worldPosition;
         }
 
-        public static uint CalcOffset(Zone_Info Info, ushort Pin, bool x)
+        public static uint CalcOffset(zone_infos Info, ushort Pin, bool x)
         {
             return (uint)Math.Truncate((decimal)(Pin / 4096 + (x ? Info.OffX : Info.OffY))) << 12;
         }

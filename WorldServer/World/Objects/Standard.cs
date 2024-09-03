@@ -13,16 +13,16 @@ namespace WorldServer.World.Objects
     {
         public Player Owner { get; }
         private byte Bannertyp = 0;
-        private Realms RealmStandard;
+        private SetRealms RealmStandard;
 
-        public Standard(Creature_spawn spawn, Player owner, byte bannertyp)
+        public Standard(creature_spawns spawn, Player owner, byte bannertyp)
         {
             Spawn = spawn;
             Name = owner.GldInterface.Guild.Info.Name;
             Owner = owner;
             RealmStandard = owner.Realm;
             Bannertyp = bannertyp;
-            Faction = (byte)(owner.Realm == Realms.REALMS_REALM_DESTRUCTION ? 8 : 6);
+            Faction = (byte)(owner.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 8 : 6);
         }
 
         public override void Destroy()
@@ -53,9 +53,9 @@ namespace WorldServer.World.Objects
             uint itemid = 0;
             switch (Bannertyp)
             {
-                case 0: itemid = (uint)(RealmStandard == Realms.REALMS_REALM_DESTRUCTION ? 187704 : 187701); break;
-                case 1: itemid = (uint)(RealmStandard == Realms.REALMS_REALM_DESTRUCTION ? 187705 : 187702); break;
-                case 2: itemid = (uint)(RealmStandard == Realms.REALMS_REALM_DESTRUCTION ? 187706 : 187703); break;
+                case 0: itemid = (uint)(RealmStandard == SetRealms.REALMS_REALM_DESTRUCTION ? 187704 : 187701); break;
+                case 1: itemid = (uint)(RealmStandard == SetRealms.REALMS_REALM_DESTRUCTION ? 187705 : 187702); break;
+                case 2: itemid = (uint)(RealmStandard == SetRealms.REALMS_REALM_DESTRUCTION ? 187706 : 187703); break;
             }
 
             if (player == Owner)
@@ -73,7 +73,7 @@ namespace WorldServer.World.Objects
             }
             else if (player.Realm == RealmStandard)
             {
-                Character_mail Mail = new Character_mail();
+                characters_mails Mail = new characters_mails();
                 Mail.Guid = CharMgr.GenerateMailGuid();
                 Mail.CharacterId = Owner.CharacterId;
                 Mail.CharacterIdSender = player.CharacterId;
@@ -84,7 +84,7 @@ namespace WorldServer.World.Objects
                 Mail.Content = "Found your Guild Standard";
                 Mail.Money = 0;
                 Mail.Opened = false;
-                Mail.Items.Add(new MailItem(itemid, 1));
+                Mail.Items.Add(new mail_item(itemid, 1));
                 CharMgr.AddMail(Mail);
             }
             else
@@ -112,7 +112,7 @@ namespace WorldServer.World.Objects
 
             Out.WriteByte(50);
             Out.WriteByte(Owner.GldInterface.Guild.Info.Level);
-            if (RealmStandard == Realms.REALMS_REALM_DESTRUCTION)
+            if (RealmStandard == SetRealms.REALMS_REALM_DESTRUCTION)
                 Out.WriteByte(128);
             else
                 Out.WriteByte(64);

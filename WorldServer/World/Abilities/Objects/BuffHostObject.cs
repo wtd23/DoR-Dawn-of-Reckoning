@@ -29,7 +29,7 @@ namespace WorldServer.World.Abilities.Objects
             WorldPosition.Y = spawnVec.Y;
             WorldPosition.Z = spawnVec.Z;
             Level = Owner.EffectiveLevel;
-            Faction = Realm == Realms.REALMS_REALM_ORDER ? (byte)0x40 : (byte)0x80;
+            Faction = Realm == SetRealms.REALMS_REALM_ORDER ? (byte)0x40 : (byte)0x80;
 
             ExpireTime = expireTime;
 

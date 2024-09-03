@@ -49,7 +49,7 @@ namespace WorldServer.World.Interfaces
                 return;
             locked = true;
 
-            Item_Info itm = _myPlayer.ItmInterface.GetItemInSlot(slot).Info;
+            item_infos itm = _myPlayer.ItmInterface.GetItemInSlot(slot).Info;
 
             if (itm == null)
             {

@@ -42,37 +42,49 @@ namespace WorldServer.World.Interfaces
 
         public bool HasQuestFinisher(ushort questID)
         {
-            List<Quest> quests = QuestService.GetFinishersQuests(Entry);
+            List<quests> quests = QuestService.GetFinishersQuests(Entry);
             if (quests != null)
                 return QuestService.GetFinishersQuests(Entry).Find(info => info.Entry == questID) != null;
 
             return false;
         }
 
-        public bool CreatureHasQuestToComplete(Player plr)
+        public bool CreatureHasQuestForPlayer(Player plr)
         {
             if (Entry == 0)
                 return false;
 
-            List<Quest> finisher = QuestService.GetFinishersQuests(Entry);
+            List<quests> finisher = QuestService.GetFinishersQuests(Entry);
             if (finisher == null)
                 return false;
 
             return finisher.Find(q => plr.QtsInterface.CanEndQuest(q)) != null;
         }
 
-        public bool CreatureHasQuestToAchieve(Player plr)
+        public bool CreatureHasRepeatableQuestToComplete(Player plr)
         {
             if (Entry == 0)
                 return false;
 
-            List<Quest> finisher = QuestService.GetFinishersQuests(Entry);
+            List<quests> finisher = QuestService.GetFinishersQuests(Entry);
             if (finisher == null)
                 return false;
 
-            foreach (Quest q in finisher)
+            return finisher.Find(q => plr.QtsInterface.CanEndQuest(q) && q.Repeatable) != null;
+        }
+
+        public bool CreatureHasQuestInProgress(Player plr)
+        {
+            if (Entry == 0)
+                return false;
+
+            List<quests> finisher = QuestService.GetFinishersQuests(Entry);
+            if (finisher == null)
+                return false;
+
+            foreach (quests q in finisher)
             {
-                Character_quest cq = plr.QtsInterface.GetQuest(q.Entry);
+                characters_quests cq = plr.QtsInterface.GetQuest(q.Entry);
                 if (cq != null && !cq.IsDone())
                     return true;
             }
@@ -85,11 +97,11 @@ namespace WorldServer.World.Interfaces
             if (Entry == 0)
                 return false;
 
-            List<Quest> starter = QuestService.GetStartQuests(Entry);
+            List<quests> starter = QuestService.GetStartQuests(Entry);
             if (starter == null)
                 return false;
 
-            foreach (Quest quest in starter)
+            foreach (quests quest in starter)
             {
                 if (quest.Repeatable && plr.QtsInterface.CanStartQuest(quest))
                     return true;
@@ -98,12 +110,12 @@ namespace WorldServer.World.Interfaces
             return false;
         }
 
-        public bool CreatureHasStartQuest(Player plr)
+        public bool CreatureHasCompletedQuest(Player plr)
         {
             if (Entry == 0)
                 return false;
 
-            List<Quest> starter = QuestService.GetStartQuests(Entry);
+            List<quests> starter = QuestService.GetStartQuests(Entry);
 
             return starter?.Find(q => plr.QtsInterface.CanStartQuest(q)) != null;
         }
@@ -113,9 +125,9 @@ namespace WorldServer.World.Interfaces
             if (Entry == 0)
                 return false;
 
-            List<Quest> starter = crea.Spawn.Proto.StartingQuests;
-            List<Quest> finisher = crea.Spawn.Proto.FinishingQuests;
-            List<Quest> inProgress = starter?.FindAll(info => plr.QtsInterface.HasQuest(info.Entry) && !plr.QtsInterface.HasDoneQuest(info.Entry));
+            List<quests> starter = crea.Spawn.Proto.StartingQuests;
+            List<quests> finisher = crea.Spawn.Proto.FinishingQuests;
+            List<quests> inProgress = starter?.FindAll(info => plr.QtsInterface.HasQuest(info.Entry) && !plr.QtsInterface.HasDoneQuest(info.Entry));
 
             if (starter != null && starter.FindAll(q => plr.QtsInterface.CanStartQuest(q)).Count > 0)
                 return true;
@@ -131,19 +143,19 @@ namespace WorldServer.World.Interfaces
 
         public void BuildInteract(Player plr, Creature crea, PacketOut Out)
         {
-            List<Quest> starter = crea.Spawn.Proto.StartingQuests;
-            List<Quest> finisher = crea.Spawn.Proto.FinishingQuests;
-            List<Quest> inProgress = starter != null ? starter.FindAll(info => plr.QtsInterface.HasQuest(info.Entry) && !plr.QtsInterface.HasDoneQuest(info.Entry)) : null;
+            List<quests> starter = crea.Spawn.Proto.StartingQuests;
+            List<quests> finisher = crea.Spawn.Proto.FinishingQuests;
+            List<quests> inProgress = starter != null ? starter.FindAll(info => plr.QtsInterface.HasQuest(info.Entry) && !plr.QtsInterface.HasDoneQuest(info.Entry)) : null;
 
             Out.WriteUInt32(0);
             Out.WriteUInt16(plr.Oid);
 
             if (starter != null)
             {
-                List<Quest> starts = starter.FindAll(q => plr.QtsInterface.CanStartQuest(q));
+                List<quests> starts = starter.FindAll(q => plr.QtsInterface.CanStartQuest(q));
 
                 Out.WriteByte((byte)starts.Count);
-                foreach (Quest q in starts)
+                foreach (quests q in starts)
                 {
                     Out.WriteByte(0);
                     Out.WriteUInt16(q.Entry);
@@ -156,10 +168,10 @@ namespace WorldServer.World.Interfaces
 
             if (finisher != null)
             {
-                List<Quest> finishs = finisher.FindAll(q => plr.QtsInterface.CanEndQuest(q));
+                List<quests> finishs = finisher.FindAll(q => plr.QtsInterface.CanEndQuest(q));
 
                 Out.WriteByte((byte)finishs.Count);
-                foreach (Quest q in finishs)
+                foreach (quests q in finishs)
                 {
                     Out.WriteByte(0);
                     Out.WriteUInt16(q.Entry);
@@ -169,7 +181,7 @@ namespace WorldServer.World.Interfaces
             else if (inProgress != null)
             {
                 Out.WriteByte((byte)inProgress.Count);
-                foreach (Quest q in inProgress)
+                foreach (quests q in inProgress)
                 {
                     Out.WriteByte(0);
                     Out.WriteUInt16(q.Entry);
@@ -184,14 +196,14 @@ namespace WorldServer.World.Interfaces
 
         #region Players
 
-        public Dictionary<ushort, Character_quest> Quests = new Dictionary<ushort, Character_quest>();
+        public Dictionary<ushort, characters_quests> Quests = new Dictionary<ushort, characters_quests>();
 
-        public void Load(List<Character_quest> quests)
+        public void Load(List<characters_quests> quests)
         {
             if (quests == null)
                 return;
 
-            foreach (Character_quest quest in quests)
+            foreach (characters_quests quest in quests)
             {
                 quest.Quest = QuestService.GetQuest(quest.QuestID);
                 if (quest.Quest == null)
@@ -210,7 +222,7 @@ namespace WorldServer.World.Interfaces
 
         public override void Save()
         {
-            foreach (KeyValuePair<ushort, Character_quest> kp in Quests)
+            foreach (KeyValuePair<ushort, characters_quests> kp in Quests)
                 CharMgr.Database.SaveObject(kp.Value);
 
             // Lock? Threadsafe?
@@ -247,14 +259,14 @@ namespace WorldServer.World.Interfaces
             return GetQuest(questID).Done;
         }
 
-        public Character_quest GetQuest(ushort questID)
+        public characters_quests GetQuest(ushort questID)
         {
-            Character_quest quest;
+            characters_quests quest;
             Quests.TryGetValue(questID, out quest);
             return quest;
         }
 
-        public bool CanStartQuest(Quest quest)
+        public bool CanStartQuest(quests quest)
         {
             if (GetPlayer() == null)
                 return false;
@@ -286,7 +298,7 @@ namespace WorldServer.World.Interfaces
             return true;
         }
 
-        public bool CanEndQuest(Quest quest)
+        public bool CanEndQuest(quests quest)
         {
             if (GetPlayer() == null)
                 return false;
@@ -294,7 +306,7 @@ namespace WorldServer.World.Interfaces
             if (quest == null)
                 return false;
 
-            foreach (Quest_Objectives qo in quest.Objectives)
+            foreach (quests_objectives qo in quest.Objectives)
             {
                 if (qo.ObjType == (byte)Objective_Type.QUEST_SPEAK_TO && HasQuest(quest.Entry) && !HasDoneQuest(quest.Entry))
                     return true;
@@ -313,7 +325,7 @@ namespace WorldServer.World.Interfaces
 
         private const int MAX_ACTIVE_QUESTS = 60;
 
-        public bool AcceptQuest(Quest quest)
+        public bool AcceptQuest(quests quest)
         {
             if (quest == null)
                 return false;
@@ -330,13 +342,13 @@ namespace WorldServer.World.Interfaces
                 return false;
             }
 
-            Character_quest cQuest = new Character_quest();
+            characters_quests cQuest = new characters_quests();
             cQuest.QuestID = quest.Entry;
             cQuest.Done = false;
             cQuest.CharacterId = GetPlayer().CharacterId;
             cQuest.Quest = quest;
 
-            foreach (Quest_Objectives qObj in quest.Objectives)
+            foreach (quests_objectives qObj in quest.Objectives)
             {
                 Character_Objectives cObj = new Character_Objectives();
                 cObj.Quest = cQuest;
@@ -360,7 +372,7 @@ namespace WorldServer.World.Interfaces
 
         public void AbandonQuest(ushort questID)
         {
-            Character_quest quest = GetQuest(questID);
+            characters_quests quest = GetQuest(questID);
             if (quest == null)
                 return;
 
@@ -394,13 +406,15 @@ namespace WorldServer.World.Interfaces
         {
             QuestsInterface qtsInterface = creature.QtsInterface;
 
-            if (qtsInterface.CreatureHasQuestToComplete(plr))
+            if (qtsInterface.CreatureHasQuestForPlayer(plr))
                 return true;
             else if (qtsInterface.CreatureHasStartRepeatingQuest(plr))
                 return true;
-            else if (qtsInterface.CreatureHasStartQuest(plr))
+            else if (qtsInterface.CreatureHasRepeatableQuestToComplete(plr))
                 return true;
-            else if (qtsInterface.CreatureHasQuestToAchieve(plr))
+            else if (qtsInterface.CreatureHasCompletedQuest(plr))
+                return true;
+            else if (qtsInterface.CreatureHasQuestInProgress(plr))
                 return true;
             return false;
         }
@@ -408,21 +422,23 @@ namespace WorldServer.World.Interfaces
         public QuestStateOpcode GetQuestStatusFor(Player plr, Creature creature)
         {
             QuestsInterface qtsInterface = creature.QtsInterface;
-            if (qtsInterface.CreatureHasQuestToComplete(plr))
-                return QuestStateOpcode.QuestCompleted;
+            if (qtsInterface.CreatureHasQuestForPlayer(plr))
+                return QuestStateOpcode.QuestAvailable;
             else if (qtsInterface.CreatureHasStartRepeatingQuest(plr))
                 return QuestStateOpcode.DailyAvailable;
-            else if (qtsInterface.CreatureHasStartQuest(plr))
-                return QuestStateOpcode.QuestAvailable;
-            else if (qtsInterface.CreatureHasQuestToAchieve(plr))
-                return QuestStateOpcode.QuestsTaken;
+            else if (qtsInterface.CreatureHasRepeatableQuestToComplete(plr))
+                return QuestStateOpcode.DailyCompleted;
+            else if (qtsInterface.CreatureHasCompletedQuest(plr))
+                return QuestStateOpcode.QuestCompleted;
+            else if (qtsInterface.CreatureHasQuestInProgress(plr))
+                return QuestStateOpcode.QuestTaken;
 
             return QuestStateOpcode.None;
         }
 
         public bool DoneQuest(ushort questID)
         {
-            Character_quest quest = GetQuest(questID);
+            characters_quests quest = GetQuest(questID);
             bool save = true;
 
             if (quest == null || !quest.IsDone() || quest.Done)
@@ -430,7 +446,7 @@ namespace WorldServer.World.Interfaces
 
             Player plr = GetPlayer();
 
-            Dictionary<Item_Info, uint> choices = GenerateRewards(quest.Quest, plr);
+            Dictionary<item_infos, uint> choices = GenerateRewards(quest.Quest, plr);
 
             if (quest.Quest.Choice != null && quest.Quest.Choice.Length > 0 && quest.SelectedRewards.Count == 0)
             {
@@ -444,7 +460,7 @@ namespace WorldServer.World.Interfaces
                 return false;
             }
 
-            foreach (Quest_Objectives obj in quest.Quest.Objectives)
+            foreach (quests_objectives obj in quest.Quest.Objectives)
             {
                 if ((Objective_Type)obj.ObjType == Objective_Type.QUEST_GET_ITEM
                     || (Objective_Type)obj.ObjType == Objective_Type.QUEST_USE_ITEM)
@@ -472,7 +488,7 @@ namespace WorldServer.World.Interfaces
             }
 
             byte num = 0;
-            foreach (KeyValuePair<Item_Info, uint> kp in choices)
+            foreach (KeyValuePair<item_infos, uint> kp in choices)
             {
                 if (quest.SelectedRewards.Contains(num))
                 {
@@ -496,7 +512,7 @@ namespace WorldServer.World.Interfaces
             return true;
         }
 
-        public void FinishQuest(Quest quest)
+        public void FinishQuest(quests quest)
         {
             if (quest == null)
                 return;
@@ -527,7 +543,7 @@ namespace WorldServer.World.Interfaces
                 _Owner.GetPet().Owner.QtsInterface.HandleEvent(type, entry, count, true);
 
             // Check every quest a player has...
-            foreach (KeyValuePair<ushort, Character_quest> questKp in Quests)
+            foreach (KeyValuePair<ushort, characters_quests> questKp in Quests)
             {
                 // For each objective in every quest...
                 foreach (Character_Objectives objective in questKp.Value._Objectives)
@@ -623,7 +639,7 @@ namespace WorldServer.World.Interfaces
                                     if (target != null)
                                     {
                                         GameObject go = target.GetGameObject();
-                                        if (go != null && go.IsGameObject()&& go.Interactable)
+                                        if (go != null && go.IsGameObject())
                                         {
                                             if (go.Spawn.AllowVfxUpdate == 1) go.VfxState = 1;
                                             go.Interactable = false;
@@ -710,7 +726,7 @@ namespace WorldServer.World.Interfaces
 
         public void SelectRewards(ushort questID, byte num)
         {
-            Character_quest quest = GetQuest(questID);
+            characters_quests quest = GetQuest(questID);
             if (quest == null || !quest.IsDone())
                 return;
 
@@ -726,7 +742,7 @@ namespace WorldServer.World.Interfaces
 
         #endregion Players
 
-        public static void BuildQuestInfo(PacketOut Out, Player plr, Quest q)
+        public static void BuildQuestInfo(PacketOut Out, Player plr, quests q)
         {
             BuildQuestHeader(Out, plr, q, true);
 
@@ -737,7 +753,7 @@ namespace WorldServer.World.Interfaces
             Out.WriteByte(0);
         }
 
-        public static void BuildQuestHeader(PacketOut Out, Player plr, Quest q, bool particular)
+        public static void BuildQuestHeader(PacketOut Out, Player plr, quests q, bool particular)
         {
             Out.WritePascalString(q.Name);
 
@@ -754,7 +770,7 @@ namespace WorldServer.World.Interfaces
             Out.WriteUInt32(q.Xp);
         }
 
-        public static void BuildQuestInProgress(PacketOut Out, Quest q, bool particular)
+        public static void BuildQuestInProgress(PacketOut Out, quests q, bool particular)
         {
             Out.WritePascalString(q.Name);
 
@@ -775,7 +791,7 @@ namespace WorldServer.World.Interfaces
         /// <summary>
         /// Writes 13 + quest name length + description length + particular length.
         /// </summary>
-        public static void BuildQuestComplete(PacketOut Out, Quest q, bool particular)
+        public static void BuildQuestComplete(PacketOut Out, quests q, bool particular)
         {
             Out.WritePascalString(q.Name);
 
@@ -800,15 +816,15 @@ namespace WorldServer.World.Interfaces
             Out.WriteUInt32(q.Xp);
         }
 
-        public static void BuildQuestRewards(PacketOut Out, Player plr, Quest q)
+        public static void BuildQuestRewards(PacketOut Out, Player plr, quests q)
         {
-            Dictionary<Item_Info, uint> choices = GenerateRewards(q, plr);
+            Dictionary<item_infos, uint> choices = GenerateRewards(q, plr);
 
             Out.WriteByte(Math.Min(q.ChoiceCount, (byte)choices.Count));
             Out.WriteByte(0);
             Out.WriteByte((byte)choices.Count);
 
-            foreach (KeyValuePair<Item_Info, uint> kp in choices)
+            foreach (KeyValuePair<item_infos, uint> kp in choices)
                 Item.BuildItem(ref Out, null, kp.Key, null, 0, (ushort)kp.Value);
         }
 
@@ -826,7 +842,7 @@ namespace WorldServer.World.Interfaces
 
         public void BuildQuest(ushort questID, Player plr)
         {
-            Quest q = QuestService.GetQuest(questID);
+            quests q = QuestService.GetQuest(questID);
             if (q == null)
                 return;
 
@@ -844,19 +860,19 @@ namespace WorldServer.World.Interfaces
         }
 
         /// <summary>Writes 2 bytes.</summary>
-        public void BuildQuest(PacketOut Out, Quest q)
+        public void BuildQuest(PacketOut Out, quests q)
         {
             Out.WriteByte(q.ChoiceCount);
             Out.WriteByte(0);
         }
 
-        public static void BuildObjectives(PacketOut Out, List<Quest_Objectives> objs)
+        public static void BuildObjectives(PacketOut Out, List<quests_objectives> objs)
         {
             Out.WriteByte((byte)objs.Count);
 
-            List<Quest_Objectives> SortedObjectives = objs.OrderBy(x => x.Entry).ThenBy(x => x.Guid).ToList();
+            List<quests_objectives> SortedObjectives = objs.OrderBy(x => x.Entry).ThenBy(x => x.Guid).ToList();
 
-            foreach (Quest_Objectives objective in SortedObjectives)
+            foreach (quests_objectives objective in SortedObjectives)
             {
                 Out.WriteByte((byte)objective.ObjCount);
                 Out.WritePascalString(objective.Description);
@@ -880,17 +896,17 @@ namespace WorldServer.World.Interfaces
 
         public void SendQuest(ushort questID)
         {
-            Character_quest cQuest = GetQuest(questID);
+            characters_quests cQuest = GetQuest(questID);
             SendQuest(cQuest);
         }
 
         public void SendQuests()
         {
-            List<Character_quest> quests = Quests.Values.ToList().FindAll(q => q.Done == false);
+            List<characters_quests> quests = Quests.Values.ToList().FindAll(q => q.Done == false);
 
             PacketOut Out = new PacketOut((byte)Opcodes.F_QUEST_LIST, 1 + quests.Count * 14);
             Out.WriteByte((byte)quests.Count);
-            foreach (Character_quest quest in quests)
+            foreach (characters_quests quest in quests)
             {
                 Out.WriteUInt16(quest.QuestID);
                 Out.WriteByte(0);
@@ -901,7 +917,7 @@ namespace WorldServer.World.Interfaces
             GetPlayer().SendPacket(Out);
         }
 
-        public void SendQuest(Character_quest cQuest)
+        public void SendQuest(characters_quests cQuest)
         {
             if (cQuest == null)
             {
@@ -911,16 +927,16 @@ namespace WorldServer.World.Interfaces
 
             PacketOut packet = new PacketOut((byte)Opcodes.F_QUEST_INFO);
             packet.WriteUInt16(cQuest.QuestID);
-            packet.WriteByte(cQuest.Quest.Type); // Quest Type (database is wrong)
+            packet.WriteByte(cQuest.Quest.Type); // quests Type (database is wrong)
             BuildQuestHeader(packet, GetPlayer(), cQuest.Quest, true);
 
-            Dictionary<Item_Info, uint> rewards = GenerateRewards(cQuest.Quest, GetPlayer());
+            Dictionary<item_infos, uint> rewards = GenerateRewards(cQuest.Quest, GetPlayer());
 
             packet.WriteByte(cQuest.Quest.ChoiceCount);
             packet.WriteByte(0);
             packet.WriteByte((byte)rewards.Count);
 
-            foreach (KeyValuePair<Item_Info, uint> kp in rewards)
+            foreach (KeyValuePair<item_infos, uint> kp in rewards)
             {
                 Item.BuildItem(ref packet, null, kp.Key, null, 0, (ushort)kp.Value);
             }
@@ -929,9 +945,9 @@ namespace WorldServer.World.Interfaces
 
             BuildObjectives(packet, cQuest._Objectives);
 
-            List<Quest_Map> SortedMaps = cQuest.Quest.Maps.OrderBy(x => x.Entry).ThenByDescending(x => x.Id).ToList();
+            List<quests_maps> SortedMaps = cQuest.Quest.Maps.OrderBy(x => x.Entry).ThenByDescending(x => x.Id).ToList();
 
-            foreach (Quest_Map map in SortedMaps)
+            foreach (quests_maps map in SortedMaps)
             {
                 packet.WriteByte(map.Id);
                 packet.WritePascalString(map.Name);
@@ -951,7 +967,7 @@ namespace WorldServer.World.Interfaces
 
         public void SendQuestDoneInfo(Player plr, ushort questID)
         {
-            Character_quest quest = plr.QtsInterface.GetQuest(questID);
+            characters_quests quest = plr.QtsInterface.GetQuest(questID);
 
             if (quest == null)
                 return;
@@ -971,7 +987,7 @@ namespace WorldServer.World.Interfaces
 
         public void SendQuestInProgressInfo(Player plr, ushort questID)
         {
-            Character_quest quest = plr.QtsInterface.GetQuest(questID);
+            characters_quests quest = plr.QtsInterface.GetQuest(questID);
 
             if (quest == null)
                 return;
@@ -987,7 +1003,7 @@ namespace WorldServer.World.Interfaces
             plr.SendPacket(Out);
         }
 
-        public void SendQuestState(Quest quest, QuestCompletion state)
+        public void SendQuestState(quests quest, QuestCompletion state)
         {
             PacketOut Out = new PacketOut((byte)Opcodes.F_QUEST_LIST_UPDATE, 32);
             Out.WriteUInt16(quest.Entry);
@@ -1005,7 +1021,7 @@ namespace WorldServer.World.Interfaces
             GetPlayer().SendPacket(Out);
         }
 
-        public void SendQuestUpdate(Character_quest quest)
+        public void SendQuestUpdate(characters_quests quest)
         {
             if (GetPlayer() == null)
                 return;
@@ -1022,11 +1038,11 @@ namespace WorldServer.World.Interfaces
             GetPlayer().SendPacket(Out);
         }
 
-        public static Dictionary<Item_Info, uint> GenerateRewards(Quest q, Player plr)
+        public static Dictionary<item_infos, uint> GenerateRewards(quests q, Player plr)
         {
-            Dictionary<Item_Info, uint> rewards = new Dictionary<Item_Info, uint>();
+            Dictionary<item_infos, uint> rewards = new Dictionary<item_infos, uint>();
 
-            foreach (KeyValuePair<Item_Info, uint> kp in q.Rewards)
+            foreach (KeyValuePair<item_infos, uint> kp in q.Rewards)
                 if (ItemsInterface.CanUse(kp.Key, plr, true, false))
                     rewards.Add(kp.Key, kp.Value);
 
@@ -1035,7 +1051,7 @@ namespace WorldServer.World.Interfaces
 
         public bool GameObjectNeeded(uint entry)
         {
-            foreach (KeyValuePair<ushort, Character_quest> questKp in Quests)
+            foreach (KeyValuePair<ushort, characters_quests> questKp in Quests)
             {
                 foreach (Character_Objectives objective in questKp.Value._Objectives)
                 {
@@ -1073,13 +1089,16 @@ namespace WorldServer.World.Interfaces
             {
                 if (obj.IsGameObject())
                 {
-					gameObject = obj.GetGameObject();
+                    gameObject = obj.GetGameObject();
+                    //Loot Loots = LootsMgr.GenerateLoot(GameObject, _Owner.GetPlayer());
+                    //if (Loots != null && Loots.IsLootable())
+                    gameObject.SendRemove(_Owner.GetPlayer());
                     Timer timer = new Timer(delegate (object state)
                     {
                         Player plr2 = ((object[])state)[0] as Player;
                         if (plr2 != null)
                             gameObject.SendMeTo(plr2);
-                    }, (object)(new object[] { _Owner.GetPlayer() }), 100, Timeout.Infinite);
+                    }, (object)(new object[] { _Owner.GetPlayer() }), 500, Timeout.Infinite);
                 }
             }
         }

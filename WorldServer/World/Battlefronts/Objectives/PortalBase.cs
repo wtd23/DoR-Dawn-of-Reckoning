@@ -18,7 +18,7 @@ namespace WorldServer.World.Battlefronts.Objectives
 
         private Random random = new Random();
 
-        internal PortalBase(BattleFrontObject origin)
+        internal PortalBase(battlefront_objects origin)
         {
             Spawn = CreateSpawn(origin);
         }
@@ -28,7 +28,7 @@ namespace WorldServer.World.Battlefronts.Objectives
             Spawn = CreateSpawn(zoneId, x, y, z, o);
         }
 
-        internal PortalBase(GameObject_spawn spawn)
+        internal PortalBase(gameobject_spawns spawn)
         {
             Spawn = spawn;
         }
@@ -38,12 +38,12 @@ namespace WorldServer.World.Battlefronts.Objectives
         /// </summary>
         /// <param name="battleFrontObject">Portal object providing raw data</param>
         /// <returns>newly created spawn entity</returns>
-        private GameObject_spawn CreateSpawn(BattleFrontObject battleFrontObject)
+        private gameobject_spawns CreateSpawn(battlefront_objects battleFrontObject)
         {
             GameObject_proto proto = GameObjectService.GetGameObjectProto(PORTAL_PROTO_ENTRY);
             proto = (GameObject_proto)proto.Clone();
 
-            GameObject_spawn spawn = new GameObject_spawn();
+            gameobject_spawns spawn = new gameobject_spawns();
             spawn.BuildFromProto(proto);
 
             // boule blanche : 3457
@@ -67,12 +67,12 @@ namespace WorldServer.World.Battlefronts.Objectives
         /// </summary>
         /// <param name="battleFrontObject">Portal object providing raw data</param>
         /// <returns>newly created spawn entity</returns>
-        private GameObject_spawn CreateSpawn(int zoneId, int x, int y, int z, int o)
+        private gameobject_spawns CreateSpawn(int zoneId, int x, int y, int z, int o)
         {
             GameObject_proto proto = GameObjectService.GetGameObjectProto(PORTAL_PROTO_ENTRY);
             proto = (GameObject_proto)proto.Clone();
 
-            GameObject_spawn spawn = new GameObject_spawn();
+            gameobject_spawns spawn = new gameobject_spawns();
             spawn.BuildFromProto(proto);
 
             // boule blanche : 3457
@@ -94,9 +94,9 @@ namespace WorldServer.World.Battlefronts.Objectives
             return spawn;
         }
 
-        protected Point3D GetWorldPosition(BattleFrontObject bObject)
+        protected Point3D GetWorldPosition(battlefront_objects bObject)
         {
-            Zone_Info zone = ZoneService.GetZone_Info(bObject.ZoneId);
+            zone_infos zone = ZoneService.GetZone_Info(bObject.ZoneId);
             return ZoneService.GetWorldPosition(zone, (ushort)bObject.X, (ushort)bObject.Y, (ushort)bObject.Z);
         }
 

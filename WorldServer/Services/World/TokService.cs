@@ -7,23 +7,23 @@ namespace WorldServer.Services.World
     [Service]
     public class TokService : ServiceBase
     {
-        public static Dictionary<ushort, Tok_Info> _Toks;
-        public static List<Tok_Info> DiscoveringToks;
-        public static Dictionary<ushort, Tok_Bestary> _ToksBestary;
+        public static Dictionary<ushort, tok_infos> _Toks;
+        public static List<tok_infos> DiscoveringToks;
+        public static Dictionary<ushort, tok_bestiary> _ToksBestary;
 
         [LoadingFunction(true)]
         public static void LoadTok_Infos()
         {
             Log.Debug("WorldMgr", "Loading LoadTok_Infos...");
 
-            _Toks = new Dictionary<ushort, Tok_Info>();
+            _Toks = new Dictionary<ushort, tok_infos>();
 
-            IList<Tok_Info> IToks = Database.SelectAllObjects<Tok_Info>();
-            DiscoveringToks = new List<Tok_Info>();
+            IList<tok_infos> IToks = Database.SelectAllObjects<tok_infos>();
+            DiscoveringToks = new List<tok_infos>();
 
             if (IToks != null)
             {
-                foreach (Tok_Info Info in IToks)
+                foreach (tok_infos Info in IToks)
                 {
                     _Toks.Add(Info.Entry, Info);
                     if (Info.EventName.Contains("discovered") || Info.EventName.Contains("unlocked"))
@@ -41,13 +41,13 @@ namespace WorldServer.Services.World
         {
             Log.Debug("WorldMgr", "Loading LoadTok_Bestary...");
 
-            _ToksBestary = new Dictionary<ushort, Tok_Bestary>();
+            _ToksBestary = new Dictionary<ushort, tok_bestiary>();
 
-            IList<Tok_Bestary> IToks = Database.SelectAllObjects<Tok_Bestary>();
+            IList<tok_bestiary> IToks = Database.SelectAllObjects<tok_bestiary>();
 
             if (IToks != null)
             {
-                foreach (Tok_Bestary Info in IToks)
+                foreach (tok_bestiary Info in IToks)
                 {
                     _ToksBestary.Add(Info.Creature_Sub_Type, Info);
                 }
@@ -56,16 +56,16 @@ namespace WorldServer.Services.World
             Log.Success("LoadTok_Bestary", "Loaded " + _ToksBestary.Count + " Tok_Bestary");
         }
 
-        public static Tok_Info GetTok(ushort Entry)
+        public static tok_infos GetTok(ushort Entry)
         {
-            Tok_Info tok;
+            tok_infos tok;
             _Toks.TryGetValue(Entry, out tok);
             return tok;
         }
 
-        public static Tok_Bestary GetTokBestary(ushort subTypeId)
+        public static tok_bestiary GetTokBestary(ushort subTypeId)
         {
-            Tok_Bestary bestiary;
+            tok_bestiary bestiary;
             _ToksBestary.TryGetValue(subTypeId, out bestiary);
             return bestiary;
         }

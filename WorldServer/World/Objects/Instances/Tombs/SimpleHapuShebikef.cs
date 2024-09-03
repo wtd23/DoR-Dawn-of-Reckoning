@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.Tombs
     {
         #region Constructors
 
-        public SimpleHapuShebikef(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleHapuShebikef(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

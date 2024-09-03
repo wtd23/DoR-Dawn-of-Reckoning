@@ -35,7 +35,7 @@ namespace WorldServer.World.Objects
 
         public override string Name => Spawn.Proto.Name;
 
-        public Boss(Creature_spawn spawn, uint protoId) : base(spawn)
+        public Boss(creature_spawns spawn, uint protoId) : base(spawn)
         {
             BossProtoId = protoId;
             EvtInterface.AddEventNotify(EventName.OnEnterCombat, OnEnterCombat);
@@ -65,7 +65,7 @@ namespace WorldServer.World.Objects
             base.Update(msTick);
         }
 
-        public override void ApplyKnockback(Unit caster, AbilityKnockbackInfo kbInfo)
+        public override void ApplyKnockback(Unit caster, ability_knockback_info kbInfo)
         {
             if (CanBeKnockedBack)
                 base.ApplyKnockback(caster, kbInfo);

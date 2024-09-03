@@ -7,7 +7,7 @@ namespace WorldServer.Services.World
     [Service]
     public class BagService : ServiceBase
     {
-        public static Dictionary<uint, Characters_bag_pools> _BagPools;
+        public static Dictionary<uint, characters_bag_pools> _BagPools;
 
         /* [LoadingFunction(true)]
          public static void LoadBag_Pools()
@@ -19,11 +19,11 @@ namespace WorldServer.Services.World
              Log.Success("LoadBag_Pools", "Loaded " + _BagPools.Count + " Characters_bag_pools");
          }*/
 
-        public static Characters_bag_pools GetBagType(ushort Bag_Type)
+        public static characters_bag_pools GetBagType(ushort Bag_Type)
         {
-            List<Characters_bag_pools> BagPools = new List<Characters_bag_pools>();
+            List<characters_bag_pools> BagPools = new List<characters_bag_pools>();
 
-            foreach (Characters_bag_pools bagPool in _BagPools.Values)
+            foreach (characters_bag_pools bagPool in _BagPools.Values)
                 if (bagPool.Bag_Type == Bag_Type)
                     return bagPool;
             return null;

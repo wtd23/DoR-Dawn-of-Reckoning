@@ -15,7 +15,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
     {
         public static void RecordContributionAnalytics(Player player, ConcurrentDictionary<short, ContributionStage> playerContributionList)
         {
-            var analyticsRecord = new ContributionAnalytics
+            var analyticsRecord = new bounty_contribution_analytics
             {
                 Timestamp = DateTime.Now,
                 CharacterId = player.CharacterId,
@@ -53,7 +53,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             {
                 var characterId = contribution.Key;
                 var contributionSerialised = JsonConvert.SerializeObject(contribution.Value);
-                var recordToWrite = new Common.Database.World.Battlefront.PlayerContribution
+                var recordToWrite = new Common.Database.World.Battlefront.rvr_player_contribution
                 {
                     CharacterId = characterId,
                     BattleFrontId = battleFrontId,
@@ -69,7 +69,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         {
             var contributionDictionary = new ConcurrentDictionary<uint, List<PlayerContribution>>();
             var contributions =
-                WorldMgr.Database.SelectObjects<Common.Database.World.Battlefront.PlayerContribution>(
+                WorldMgr.Database.SelectObjects<Common.Database.World.Battlefront.rvr_player_contribution>(
                     $"BattleFrontId = {battleFrontId.ToString()}");
 
             foreach (var contribution in contributions)

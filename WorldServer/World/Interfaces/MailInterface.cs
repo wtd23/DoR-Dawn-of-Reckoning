@@ -37,11 +37,11 @@ namespace WorldServer.World.Interfaces
         private static uint MAIL_EXPIRE_UNREAD = 28 * 24 * 60 * 60; // 28 Days
         private static uint MAIL_EXPIRE_READ = 3 * 24 * 60 * 60; // 28 Days
 
-        private readonly List<Character_mail> _mails = new List<Character_mail>();
+        private readonly List<characters_mails> _mails = new List<characters_mails>();
         private uint _nextSend;
         private uint MAIL_PRICE = 30;
 
-        public void Load(IList<Character_mail> mails)
+        public void Load(IList<characters_mails> mails)
         {
             if (mails != null)
                 _mails.AddRange(mails);
@@ -53,7 +53,7 @@ namespace WorldServer.World.Interfaces
 
         public override void Save()
         {
-            foreach (Character_mail mail in _mails)
+            foreach (characters_mails mail in _mails)
                 CharMgr.Database.SaveObject(mail);
 
             ((Player)_Owner).Info.Mails = _mails.ToList();
@@ -161,7 +161,7 @@ namespace WorldServer.World.Interfaces
             }
             else
             {
-                Character receiver = CharMgr.GetCharacter(Player.AsCharacterName(name), false);
+                characters receiver = CharMgr.GetCharacter(Player.AsCharacterName(name), false);
 
                 if (receiver == null || receiver.Realm != (byte)plr.Realm)
                 {
@@ -189,11 +189,11 @@ namespace WorldServer.World.Interfaces
             }
         }
 
-        public void SendMail(Character receiver, string subject, string message, uint money, bool cashOnDelivery, List<ushort> itemSlots = null)
+        public void SendMail(characters receiver, string subject, string message, uint money, bool cashOnDelivery, List<ushort> itemSlots = null)
         {
             Player sender = (Player)_Owner;
 
-            Character_mail cMail = new Character_mail
+            characters_mails cMail = new characters_mails
             {
                 Guid = CharMgr.GenerateMailGuid(),
                 CharacterId = receiver.CharacterId,
@@ -216,7 +216,7 @@ namespace WorldServer.World.Interfaces
                     // This should never happen, double check.
                     if (itm != null && itm.Info != null)
                     {
-                        cMail.Items.Add(new MailItem(itm.Info.Entry, itm.GetTalismans(), itm.GetPrimaryDye(), itm.GetSecondaryDye(), itm.Count));
+                        cMail.Items.Add(new mail_item(itm.Info.Entry, itm.GetTalismans(), itm.GetPrimaryDye(), itm.GetSecondaryDye(), itm.Count));
                         sender.ItmInterface.DeleteItem(itmslot, itm.Count);
                         itm.Owner = null;
                     }
@@ -230,13 +230,13 @@ namespace WorldServer.World.Interfaces
             _nextSend = (uint)TCPManager.GetTimeStamp() + 5;
         }
 
-        public void AddMail(Character_mail mail)
+        public void AddMail(characters_mails mail)
         {
             _mails.Add(mail);
             SendMailCount();
         }
 
-        public void RemoveMail(Character_mail mail)
+        public void RemoveMail(characters_mails mail)
         {
             _mails.Remove(mail);
             SendResult(MailResult.TEXT_MAIL_RESULT12);
@@ -245,13 +245,13 @@ namespace WorldServer.World.Interfaces
         /// <summary>
         /// Returns an expired mail to its sender.
         /// </summary>
-        private static MailResult ReturnMail(Character_mail mail)
+        private static MailResult ReturnMail(characters_mails mail)
         {
             // Can't return auction mail.
             if (mail.AuctionType != 0)
                 return MailResult.TEXT_MAIL_RESULT11;
 
-            Character receiver = CharMgr.GetCharacter(mail.SenderName, false);
+            characters receiver = CharMgr.GetCharacter(mail.SenderName, false);
 
             // No one to return mail to.
             if (receiver == null)
@@ -266,7 +266,7 @@ namespace WorldServer.World.Interfaces
 
             CharMgr.DeleteMail(mail);
 
-            Character_mail returnMail = new Character_mail
+            characters_mails returnMail = new characters_mails
             {
                 // Sender -> Reciever, Reciever -> Sender
                 Guid = CharMgr.GenerateMailGuid(),
@@ -285,7 +285,7 @@ namespace WorldServer.World.Interfaces
             return MailResult.TEXT_MAIL_UNK;
         }
 
-        public static long TimeToExpire(Character_mail mail)
+        public static long TimeToExpire(characters_mails mail)
         {
             long sentTime = TCPManager.GetTimeStamp() - mail.SendDate;
             long readTime = TCPManager.GetTimeStamp() - mail.ReadDate;
@@ -298,16 +298,16 @@ namespace WorldServer.World.Interfaces
         /// </summary>
         public void CheckMailExpired()
         {
-            List<Character_mail> toDelete = _mails.Where(mail => TimeToExpire(mail) <= 0).ToList();
+            List<characters_mails> toDelete = _mails.Where(mail => TimeToExpire(mail) <= 0).ToList();
 
-            foreach (Character_mail mail in toDelete)
+            foreach (characters_mails mail in toDelete)
                 MailExpired(mail);
         }
 
         /// <summary>
         /// Removes or returns an expired mail.
         /// </summary>
-        private static void MailExpired(Character_mail mail)
+        private static void MailExpired(characters_mails mail)
         {
             if (mail.AuctionType != 0 || (mail.Money == 0 && mail.Items.Count == 0))
             {
@@ -315,7 +315,7 @@ namespace WorldServer.World.Interfaces
                 return;
             }
 
-            Character receiver = CharMgr.GetCharacter(mail.SenderName, false);
+            characters receiver = CharMgr.GetCharacter(mail.SenderName, false);
 
             if (receiver != null)
                 ReturnMail(mail);
@@ -327,7 +327,7 @@ namespace WorldServer.World.Interfaces
         {
             lock (_lockObject)
             {
-                Character_mail mail = _mails.FirstOrDefault(match => match.Guid == guid);
+                characters_mails mail = _mails.FirstOrDefault(match => match.Guid == guid);
 
                 if (mail == null)
                     return;
@@ -384,7 +384,7 @@ namespace WorldServer.World.Interfaces
                         {
                             return;
                         }
-                        MailItem item = mail.Items.ElementAt(itemnum);
+                        mail_item item = mail.Items.ElementAt(itemnum);
                         ushort freeSlot = _Owner.GetPlayer().ItmInterface.GetFreeInventorySlot(ItemService.GetItem_Info(item.id), false);
                         if (freeSlot == 0)
                         {
@@ -418,9 +418,9 @@ namespace WorldServer.World.Interfaces
                             mail.Money = 0;
                         }
                         // Take as many items as you can before inventory is full
-                        List<MailItem> toRemove = new List<MailItem>();
+                        List<mail_item> toRemove = new List<mail_item>();
 
-                        foreach (MailItem curritem in mail.Items)
+                        foreach (mail_item curritem in mail.Items)
                         {
                             ushort slot = _Owner.GetPlayer().ItmInterface.GetFreeInventorySlot(ItemService.GetItem_Info(curritem.id));
                             if (slot == 0)
@@ -432,7 +432,7 @@ namespace WorldServer.World.Interfaces
                             toRemove.Add(curritem);
                         }
 
-                        foreach (MailItem remove in toRemove)
+                        foreach (mail_item remove in toRemove)
                             mail.Items.Remove(remove);
 
                         mail.Dirty = true;
@@ -447,7 +447,7 @@ namespace WorldServer.World.Interfaces
 
         #region Packets
 
-        public void BuildPreMail(PacketOut Out, Character_mail mail)
+        public void BuildPreMail(PacketOut Out, characters_mails mail)
         {
             if (mail == null)
                 return;
@@ -519,7 +519,7 @@ namespace WorldServer.World.Interfaces
             if (mail.Items.Count > 8)
                 Out.WriteByte(0);
 
-            foreach (MailItem item in mail.Items)
+            foreach (mail_item item in mail.Items)
             {
                 if (ItemService.GetItem_Info(item.id) != null)
                     Out.WriteUInt32(ItemService.GetItem_Info(item.id).ModelId);
@@ -537,7 +537,7 @@ namespace WorldServer.World.Interfaces
 
             ushort counts = 0;
 
-            foreach (Character_mail mail in _mails)
+            foreach (characters_mails mail in _mails)
                 if (!mail.Opened && mail.AuctionType == 0)
                     counts++;
 
@@ -546,7 +546,7 @@ namespace WorldServer.World.Interfaces
 
             ushort auctionCounts = 0;
 
-            foreach (Character_mail mail in _mails)
+            foreach (characters_mails mail in _mails)
                 if (!mail.Opened && mail.AuctionType != 0)
                     auctionCounts++;
 
@@ -585,7 +585,7 @@ namespace WorldServer.World.Interfaces
                 Out.WriteByte(0x0A);
                 Out.WriteByte((byte)MailboxType.MAILBOXTYPE_PLAYER);
                 Out.WriteUInt16((ushort)_mails.Count(info => info.AuctionType == 0));
-                foreach (Character_mail mail in _mails)
+                foreach (characters_mails mail in _mails)
                     if (mail.AuctionType == 0)
                         BuildPreMail(Out, mail);
                 Out.WriteUInt16((ushort)_mails.Count);
@@ -598,7 +598,7 @@ namespace WorldServer.World.Interfaces
                 Out.WriteByte(0x0A);
                 Out.WriteByte((byte)MailboxType.MAILBOXTYPE_AUCTION);
                 Out.WriteUInt16((ushort)_mails.Count(info => info.AuctionType != 0));
-                foreach (Character_mail mail in _mails)
+                foreach (characters_mails mail in _mails)
                     if (mail.AuctionType != 0)
                         BuildPreMail(Out, mail);
                 Out.WriteUInt16((ushort)_mails.Count);
@@ -607,7 +607,7 @@ namespace WorldServer.World.Interfaces
             }
         }
 
-        public void SendMailUpdate(Character_mail mail)
+        public void SendMailUpdate(characters_mails mail)
         {
             if (mail == null)
                 return;
@@ -619,7 +619,7 @@ namespace WorldServer.World.Interfaces
             GetPlayer().SendPacket(Out);
         }
 
-        public void SendMail(Character_mail mail)
+        public void SendMail(characters_mails mail)
         {
             if (mail == null)
             {
@@ -683,7 +683,7 @@ namespace WorldServer.World.Interfaces
             }
 
             Out.WriteByte((byte)mail.Items.Count);
-            foreach (MailItem item in mail.Items)
+            foreach (mail_item item in mail.Items)
             {
                 Item.BuildItem(ref Out, null, null, item, 0, item.count);
             }

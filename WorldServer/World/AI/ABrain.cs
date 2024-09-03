@@ -65,7 +65,7 @@ namespace WorldServer.World.AI
         }
 
         // Random movement
-        private static Random _walkRandom = new Random(Convert.ToInt32(DateTime.Now.ToString("ss")));
+        private static readonly Random _walkRandom = new Random(Convert.ToInt32(DateTime.Now.ToString("ss")));
 
         public virtual void Think(long tick)
         {
@@ -83,7 +83,7 @@ namespace WorldServer.World.AI
                         creature.MvtInterface.SetBaseSpeed(50);//50
                         creature.MvtInterface.Move(returnHome);
                         creature.MvtInterface.SetBaseSpeed(100);// 100
-                        creature.NextMove = Core.TickCount + _walkRandom.Next(2000, 10000);
+                        creature.NextMove = Core.TickCount + _walkRandom.Next(2000, 6000);
                     }
                     else
                     {
@@ -91,8 +91,8 @@ namespace WorldServer.World.AI
                         //to zone coords
                         point.X -= creature.Zone.Info.OffX << 12;
                         point.Y -= creature.Zone.Info.OffY << 12;
-                        int Z = ZoneService.OcclusionProvider.GetTerrainZ((int)creature.ZoneId, point.X, point.Y);
-                        bool losHit = creature.LOSHit(new Point3D(point.X, point.Y, Z), out OcclusionInfo info);
+                        int Z = ZoneService.OcclusionProvider.GetTerrainZ((int)creature.Spawn.ZoneId, creature.Spawn.WorldX, creature.Spawn.WorldY);
+                        bool losHit = creature.LOSHit(new Point3D(creature.Spawn.WorldX, creature.Spawn.WorldY, creature.Spawn.WorldZ), out OcclusionInfo info);
                         if (!losHit)
                         {
                             //occlusion already handles zone->server coordinate conversion
@@ -111,14 +111,14 @@ namespace WorldServer.World.AI
                         creature.MvtInterface.SetBaseSpeed(50);// 50
                         creature.MvtInterface.Move(point.X, point.Y, Z);
                         creature.MvtInterface.SetBaseSpeed(100);// 100
-                        creature.NextMove = Core.TickCount + _walkRandom.Next(2000, 10000);
+                        creature.NextMove = Core.TickCount + _walkRandom.Next(2000, 6000);
 
                         if (creature.MvtInterface.MoveState == MovementInterface.EMoveState.None)
                         {
-                            creature.MvtInterface.Move(creature.WorldPosition.X, creature.WorldPosition.Y, creature.WorldPosition.Z);
+                            creature.MvtInterface.Move(creature.Spawn.WorldX + 10, creature.Spawn.WorldY + 10, creature.Spawn.WorldZ);
                         }
 
-                        if (creature.LOSHit(new Point3D(creature.WorldPosition.X, creature.WorldPosition.Y, creature.WorldPosition.Z)))
+                        if (creature.LOSHit(new Point3D(creature.Spawn.WorldX + 10, creature.Spawn.WorldY + 10, creature.WorldPosition.Z)))
                         {
                             var returnHome = new Point3D(creature.Spawn.WorldX, creature.Spawn.WorldY, creature.Spawn.WorldZ);
 
@@ -209,13 +209,13 @@ namespace WorldServer.World.AI
             {
                 _unit.MvtInterface?.Follow(fighter, (int)crea.BaseRadius, (int)crea.BaseRadius + 1, false, ForceMove);
             }
-            else
+            else if (crea.CanWalk)
             {
                 _unit.MvtInterface.Follow(fighter,
-            Math.Max(Constants.UNITS_TO_FEET_MIN, NewRange - Constants.UNITS_TO_FEET_MIN),
-            Math.Max(Constants.UNITS_TO_FEET_MAX, NewRange),
-            false,
-            ForceMove);
+                    Math.Max(Constants.UNITS_TO_FEET_MIN, NewRange - Constants.UNITS_TO_FEET_MIN),
+                    Math.Max(Constants.UNITS_TO_FEET_MAX, NewRange),
+                    false,
+                    ForceMove);
             }
         }
 
@@ -240,8 +240,7 @@ namespace WorldServer.World.AI
                         return;
                     }
 
-                    Player playerTarget = Combat.CurrentTarget as Player;
-                    if (playerTarget != null && (playerTarget.StealthLevel > 0) && !_pet.WorldPosition.IsWithinRadiusFeet(playerTarget.WorldPosition, 30))
+                    if (Combat.CurrentTarget is Player playerTarget && (playerTarget.StealthLevel > 0) && !_pet.WorldPosition.IsWithinRadiusFeet(playerTarget.WorldPosition, 30))
                     {
                         _pet.AiInterface.ProcessCombatEnd();
                         AI.Debugger?.SendClientMessage("[MR]: Lost track of stealthed player " + playerTarget.Name + ", ending combat.");
@@ -282,8 +281,12 @@ namespace WorldServer.World.AI
                     return;
                 }
             }
-
-            if (_unit != null && !_unit.IsDisabled || _unit != null && !_unit.IsStaggered)
+            else if (_unit != null && _unit is Creature creature &&
+                (creature.Ranged >= 65))
+            {
+                TryUseAbilities();
+            }
+            else
             {
                 Combat.TryAttack();
                 TryUseAbilities();
@@ -304,7 +307,6 @@ namespace WorldServer.World.AI
             if (!_unit.IsPet())
             {
                 ulong maxHatred = 0;
-                int nextTargetOid = 0;
                 Unit nextTarget = null;
 
                 foreach (Player player in _unit.PlayersInRange.ToList())
@@ -346,7 +348,7 @@ namespace WorldServer.World.AI
                                 if (aggro.Value.Hatred > maxHatred)
                                 {
                                     maxHatred = aggro.Value.Hatred;
-                                    nextTargetOid = obj.Oid;
+                                    int nextTargetOid = obj.Oid;
                                     nextTarget = u;
                                 }
                             }

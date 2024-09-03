@@ -26,7 +26,7 @@ namespace WorldServer.Managers.Commands
             if (obj == null)
                 return false;
 
-            Creature_item item = new Creature_item();
+            creature_items item = new creature_items();
             item.SlotId = (ushort)slot;
             item.ModelId = (ushort)model;
             item.Entry = obj.Entry;

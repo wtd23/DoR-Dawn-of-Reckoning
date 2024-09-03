@@ -6,7 +6,7 @@ namespace WorldServer.World.Objects.PublicQuests
     {
         public PQuestObjective Objective;
 
-        public PQuestGameObject(GameObject_spawn spawn, PQuestObjective objective)
+        public PQuestGameObject(gameobject_spawns spawn, PQuestObjective objective)
         {
             this.Spawn = spawn;
             Name = spawn.Proto.Name;

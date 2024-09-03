@@ -98,7 +98,7 @@ namespace WorldServer.World.Battlefronts
 
             if (_toRemove.Count > 0)
             {
-                Item_Info medallionInfo = ItemService.GetItem_Info((uint)(208399 + _tier));
+                item_infos medallionInfo = ItemService.GetItem_Info((uint)(208399 + _tier));
 
                 uint rpCap = (uint)(_tier * 7000);
 
@@ -135,7 +135,7 @@ namespace WorldServer.World.Battlefronts
                             if (medallionCount > 0)
 
                             {
-                                Character_mail medallionMail = new Character_mail
+                                characters_mails medallionMail = new characters_mails
                                 {
                                     Guid = CharMgr.GenerateMailGuid(),
                                     CharacterId = player.CharacterId,
@@ -148,14 +148,14 @@ namespace WorldServer.World.Battlefronts
                                     Money = 0,
                                     Opened = false
                                 };
-                                medallionMail.Items.Add(new MailItem(medallionInfo.Entry, medallionCount));
+                                medallionMail.Items.Add(new mail_item(medallionInfo.Entry, medallionCount));
                                 CharMgr.AddMail(medallionMail);
                             }
                         }
                     }
                     else
                     {
-                        Character chara = CharMgr.GetCharacter(kVr.Key, false);
+                        characters chara = CharMgr.GetCharacter(kVr.Key, false);
 
                         if (chara != null && chara.Value != null)
                         {
@@ -166,7 +166,7 @@ namespace WorldServer.World.Battlefronts
 
                             if (medallionCount > 0)
                             {
-                                Character_mail medallionMail = new Character_mail
+                                characters_mails medallionMail = new characters_mails
                                 {
                                     Guid = CharMgr.GenerateMailGuid(),
                                     CharacterId = chara.CharacterId,
@@ -179,7 +179,7 @@ namespace WorldServer.World.Battlefronts
                                     Money = 0,
                                     Opened = false
                                 };
-                                medallionMail.Items.Add(new MailItem(medallionInfo.Entry, medallionCount));
+                                medallionMail.Items.Add(new mail_item(medallionInfo.Entry, medallionCount));
                                 CharMgr.AddMail(medallionMail);
                             }
                         }
@@ -195,7 +195,7 @@ namespace WorldServer.World.Battlefronts
         /// Gets a ream players contribution.
         /// </summary>
         /// <returns>ContributionManagerInstance infos indexed by character id</returns>
-        public Dictionary<uint, ContributionInfo> GetContributorsFromRealm(Realms realm)
+        public Dictionary<uint, ContributionInfo> GetContributorsFromRealm(SetRealms realm)
         {
             Dictionary<uint, ContributionInfo> newDic = new Dictionary<uint, ContributionInfo>();
 
@@ -209,7 +209,7 @@ namespace WorldServer.World.Battlefronts
         }
 
         [Obsolete] // Should remove ?
-        public List<ContributionInfo> GetContributionListFromRealm(Realms realm)
+        public List<ContributionInfo> GetContributionListFromRealm(SetRealms realm)
         {
             List<ContributionInfo> newList = new List<ContributionInfo>();
 
@@ -236,21 +236,21 @@ namespace WorldServer.World.Battlefronts
         /// </summary>
         /// <param name="keep">Taken keep</param>
         /// <param name="realm">Realm that gained control of the keep</param>
-        internal void CreateGoldChest(Realms realm)
+        internal void CreateGoldChest(SetRealms realm)
         {
             Dictionary<uint, ContributionInfo> contributors = GetContributorsFromRealm(realm);
             _logger.Debug($"Creating Gold Chest -- not implemented. Contributor Count = {contributors.Count}");
             if (contributors.Count > 0)
             {
-                //Log.Info("Campaign", $"Creating gold chest for {keep.Info.Name} for {contributors.Count} {((Realms)keep.Info.Realm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction")} contributors");
-                //GoldChest.Create(_region, keep.Info.PQuest, ref contributors, (Realms)keep.Info.Realm == realm ? WinnerShare : LoserShare);
+                //Log.Info("Campaign", $"Creating gold chest for {keep.Info.Name} for {contributors.Count} {((SetRealms)keep.Info.Realm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction")} contributors");
+                //GoldChest.Create(_region, keep.Info.PQuest, ref contributors, (SetRealms)keep.Info.Realm == realm ? WinnerShare : LoserShare);
             }
         }
 
         /// <summary>
         /// Rewards players based on their contribution, converting it to XP, RP, Influence and Medallions.
         /// </summary>
-        internal void HandleLockReward(Realms realm, float winnerRewardScale, string lockMessage, int zoneId, int tier)
+        internal void HandleLockReward(SetRealms realm, float winnerRewardScale, string lockMessage, int zoneId, int tier)
         {
             /*
             Some general notes on this.
@@ -298,7 +298,7 @@ namespace WorldServer.World.Battlefronts
 
             #region Init loser rewards
 
-            Dictionary<uint, ContributionInfo> loserContrib = GetContributorsFromRealm(realm == Realms.REALMS_REALM_ORDER ? Realms.REALMS_REALM_DESTRUCTION : Realms.REALMS_REALM_ORDER);
+            Dictionary<uint, ContributionInfo> loserContrib = GetContributorsFromRealm(realm == SetRealms.REALMS_REALM_ORDER ? SetRealms.REALMS_REALM_DESTRUCTION : SetRealms.REALMS_REALM_ORDER);
 
             uint loserMaxContrib = GetMaxContribution(loserContrib);
 
@@ -313,9 +313,9 @@ namespace WorldServer.World.Battlefronts
 
             #endregion Init loser rewards
 
-            Item_Info medallionInfo = ItemService.GetItem_Info((uint)(208399 + tier));
-            Item_Info T3Token = ItemService.GetItem_Info(2165);
-            Item_Info T4Token = ItemService.GetItem_Info(2166);
+            item_infos medallionInfo = ItemService.GetItem_Info((uint)(208399 + tier));
+            item_infos T3Token = ItemService.GetItem_Info(2165);
+            item_infos T4Token = ItemService.GetItem_Info(2166);
 
             ushort tokenCount = 2;
 
@@ -323,7 +323,7 @@ namespace WorldServer.World.Battlefronts
             {
                 Player plr = Player.GetPlayer(kV.Key);
 
-                Character chara = plr != null ? plr.Info : CharMgr.GetCharacter(kV.Key, false);
+                characters chara = plr != null ? plr.Info : CharMgr.GetCharacter(kV.Key, false);
 
                 if (chara == null)
                     continue;
@@ -331,7 +331,7 @@ namespace WorldServer.World.Battlefronts
                 if (plr != null)
                 {
                     plr.SendLocalizeString(lockMessage, ChatLogFilters.CHATLOGFILTERS_RVR, Localized_text.CHAT_TAG_DEFAULT);
-                    plr.SendLocalizeString(lockMessage, realm == Realms.REALMS_REALM_ORDER ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE, Localized_text.CHAT_TAG_DEFAULT);
+                    plr.SendLocalizeString(lockMessage, realm == SetRealms.REALMS_REALM_ORDER ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE, Localized_text.CHAT_TAG_DEFAULT);
                     // AAO multiplier needs to be multiplied with 20 to get the AAO that player sees.
                     // AAO mult is the global value for the server to grab the difference in size of the teams while AAOBonus is the players individual bonus
                     int aaoBuff = Convert.ToInt32(plr.AAOBonus);
@@ -377,7 +377,7 @@ namespace WorldServer.World.Battlefronts
                                 plr.AddRenown(Math.Min(rpCap, (uint)(winRP * contributionFactor + (tokenCount * 100))), false, RewardType.ZoneKeepCapture, zoneName);
                                 if (plr.CurrentArea != null)
                                 {
-                                    ushort influenceId = realm == Realms.REALMS_REALM_ORDER ? (ushort)plr.CurrentArea.OrderInfluenceId : (ushort)plr.CurrentArea.DestroInfluenceId;
+                                    ushort influenceId = realm == SetRealms.REALMS_REALM_ORDER ? (ushort)plr.CurrentArea.OrderInfluenceId : (ushort)plr.CurrentArea.DestroInfluenceId;
                                     plr.AddInfluence(influenceId, Math.Min(infCap, (ushort)(winInf * contributionFactor + (tokenCount * 100))));
                                 }
                             }
@@ -386,7 +386,7 @@ namespace WorldServer.World.Battlefronts
                                 plr.AddRenown(Math.Min(rpCap, (uint)(winRP * contributionFactor)), false, RewardType.ZoneKeepCapture, zoneName);
                                 if (plr.CurrentArea != null)
                                 {
-                                    ushort influenceId = realm == Realms.REALMS_REALM_ORDER ? (ushort)plr.CurrentArea.OrderInfluenceId : (ushort)plr.CurrentArea.DestroInfluenceId;
+                                    ushort influenceId = realm == SetRealms.REALMS_REALM_ORDER ? (ushort)plr.CurrentArea.OrderInfluenceId : (ushort)plr.CurrentArea.DestroInfluenceId;
                                     plr.AddInfluence(influenceId, Math.Min(infCap, (ushort)(winInf * contributionFactor)));
                                 }
                             }
@@ -431,7 +431,7 @@ namespace WorldServer.World.Battlefronts
                         }
                         else
                         {
-                            Character_mail medallionMail = new Character_mail
+                            characters_mails medallionMail = new characters_mails
                             {
                                 Guid = CharMgr.GenerateMailGuid(),
                                 CharacterId = chara.CharacterId,
@@ -444,14 +444,14 @@ namespace WorldServer.World.Battlefronts
                                 Money = 0,
                                 Opened = false
                             };
-                            medallionMail.Items.Add(new MailItem(medallionInfo.Entry, resultantCount));
+                            medallionMail.Items.Add(new mail_item(medallionInfo.Entry, resultantCount));
                             if (tier == 2 || tier == 3)
                             {
-                                medallionMail.Items.Add(new MailItem(T3Token.Entry, tokenCount));
+                                medallionMail.Items.Add(new mail_item(T3Token.Entry, tokenCount));
                             }
                             if (tier == 4)
                             {
-                                medallionMail.Items.Add(new MailItem(T4Token.Entry, tokenCount));
+                                medallionMail.Items.Add(new mail_item(T4Token.Entry, tokenCount));
                             }
                             CharMgr.AddMail(medallionMail);
                         }
@@ -487,7 +487,7 @@ namespace WorldServer.World.Battlefronts
                                 plr.AddRenown((uint)Math.Min(rpCap * 0.9f, lossRP * scaleFactor + (tokenCount * 100)), false, RewardType.ObjectiveDefense, zoneName);
                                 if (plr.CurrentArea != null)
                                 {
-                                    ushort influenceId = realm == Realms.REALMS_REALM_ORDER ? (ushort)plr.CurrentArea.OrderInfluenceId : (ushort)plr.CurrentArea.DestroInfluenceId;
+                                    ushort influenceId = realm == SetRealms.REALMS_REALM_ORDER ? (ushort)plr.CurrentArea.OrderInfluenceId : (ushort)plr.CurrentArea.DestroInfluenceId;
                                     plr.AddInfluence(influenceId, (ushort)Math.Min(infCap * 0.9f, lossInf * scaleFactor + (tokenCount * 100)));
                                 }
                             }
@@ -496,7 +496,7 @@ namespace WorldServer.World.Battlefronts
                                 plr.AddRenown((uint)Math.Min(rpCap * 0.9f, lossRP * scaleFactor), false, RewardType.ObjectiveDefense, zoneName);
                                 if (plr.CurrentArea != null)
                                 {
-                                    ushort influenceId = realm == Realms.REALMS_REALM_ORDER ? (ushort)plr.CurrentArea.OrderInfluenceId : (ushort)plr.CurrentArea.DestroInfluenceId;
+                                    ushort influenceId = realm == SetRealms.REALMS_REALM_ORDER ? (ushort)plr.CurrentArea.OrderInfluenceId : (ushort)plr.CurrentArea.DestroInfluenceId;
                                     plr.AddInfluence(influenceId, (ushort)Math.Min(infCap * 0.9f, lossInf * scaleFactor));
                                 }
                             }
@@ -540,7 +540,7 @@ namespace WorldServer.World.Battlefronts
                         }
                         else
                         {
-                            Character_mail medallionMail = new Character_mail
+                            characters_mails medallionMail = new characters_mails
                             {
                                 Guid = CharMgr.GenerateMailGuid(),
                                 CharacterId = chara.CharacterId,
@@ -553,14 +553,14 @@ namespace WorldServer.World.Battlefronts
                                 Money = 0,
                                 Opened = false
                             };
-                            medallionMail.Items.Add(new MailItem(medallionInfo.Entry, resultantCount));
+                            medallionMail.Items.Add(new mail_item(medallionInfo.Entry, resultantCount));
                             if (tier == 2 || tier == 3)
                             {
-                                medallionMail.Items.Add(new MailItem(T3Token.Entry, tokenCount));
+                                medallionMail.Items.Add(new mail_item(T3Token.Entry, tokenCount));
                             }
                             if (tier == 4)
                             {
-                                medallionMail.Items.Add(new MailItem(T4Token.Entry, tokenCount));
+                                medallionMail.Items.Add(new mail_item(T4Token.Entry, tokenCount));
                             }
                             CharMgr.AddMail(medallionMail);
                         }

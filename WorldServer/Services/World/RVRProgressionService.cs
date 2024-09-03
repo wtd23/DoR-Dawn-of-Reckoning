@@ -9,44 +9,44 @@ namespace WorldServer.Services.World
     [Service]
     public class RVRProgressionService : ServiceBase
     {
-        public static List<RVRProgression> _RVRProgressions;
-        public static List<RVRPairing> _RVRPairings;
-        public static List<CampaignObjectiveBuff> _CampaignObjectiveBuffs;
-        public static List<RVRAreaPolygon> _RVRAreaPolygons;
+        public static List<rvr_progression> RVRProgressions;
+        public static List<pairing_infos> RVRPairings;
+        public static List<campaign_objective_buff> CampaignObjectiveBuffs;
+        public static List<rvr_area_polygon> RVRAreaPolygons;
 
         [LoadingFunction(true)]
         public static void LoadRVRProgressions()
         {
             Log.Debug("WorldMgr", "Loading RVR Progression...");
-            _RVRProgressions = Database.SelectAllObjects<RVRProgression>() as List<RVRProgression>;
-            Log.Success("RVRProgression", "Loaded " + _RVRProgressions.Count + " RVRProgressions");
+            RVRProgressions = Database.SelectAllObjects<rvr_progression>() as List<rvr_progression>;
+            Log.Success("RVRProgression", "Loaded " + RVRProgressions.Count + " RVRProgressions");
         }
 
         [LoadingFunction(true)]
         public static void LoadPairings()
         {
             Log.Debug("WorldMgr", "Loading RVR Pairings...");
-            _RVRPairings = Database.SelectAllObjects<RVRPairing>() as List<RVRPairing>;
-            Log.Success("RVRProgression", "Loaded " + _RVRProgressions.Count + " Pairings");
+            RVRPairings = Database.SelectObjects<pairing_infos>("Enabled=1") as List<pairing_infos>;
+            Log.Success("RVRProgression", "Loaded " + RVRProgressions.Count + " Pairings");
         }
 
         [LoadingFunction(true)]
         public static void LoadCampaignObjectiveBuffs()
         {
             Log.Debug("WorldMgr", "Loading Campaign Objective Buffs...");
-            _CampaignObjectiveBuffs = Database.SelectAllObjects<CampaignObjectiveBuff>() as List<CampaignObjectiveBuff>;
-            Log.Success("RVRProgression", "Loaded " + _CampaignObjectiveBuffs.Count + " Campaign Objective Buffs");
+            CampaignObjectiveBuffs = Database.SelectAllObjects<campaign_objective_buff>() as List<campaign_objective_buff>;
+            Log.Success("RVRProgression", "Loaded " + CampaignObjectiveBuffs.Count + " Campaign Objective Buffs");
         }
 
         [LoadingFunction(true)]
         public static void LoadRVRAreaPolygons()
         {
             Log.Debug("RVRProgression", "Loading RVR Area Polygons...");
-            _RVRAreaPolygons = Database.SelectAllObjects<RVRAreaPolygon>() as List<RVRAreaPolygon>;
-            Log.Success("RVRProgression", "Loaded " + _RVRAreaPolygons.Count + " RVR Area Polygons");
+            RVRAreaPolygons = Database.SelectAllObjects<rvr_area_polygon>() as List<rvr_area_polygon>;
+            Log.Success("RVRProgression", "Loaded " + RVRAreaPolygons.Count + " RVR Area Polygons");
         }
 
-        public static void SaveRVRProgression(List<RVRProgression> rvrProg)
+        public static void SaveRVRProgression(List<rvr_progression> rvrProg)
         {
             if (rvrProg == null || rvrProg.Count <= 0)
                 return;
@@ -68,7 +68,7 @@ namespace WorldServer.Services.World
 
         public static void SaveBattleFrontKeepState(byte keepId, SM.ProcessState state)
         {
-            var statusEntity = new BattleFrontKeepStatus { KeepId = keepId, Status = (int)state };
+            var statusEntity = new battlefront_keep_status { KeepId = keepId, Status = (int)state };
 
             Log.Debug("WorldMgr", $"Saving battlefront keep status {keepId} {(int)state}...");
             RemoveBattleFrontKeepStatus(keepId);
@@ -81,9 +81,9 @@ namespace WorldServer.Services.World
             Database.ExecuteNonQuery($"DELETE FROM battlefront_keep_status WHERE keepId={keepId}");
         }
 
-        public static BattleFrontKeepStatus GetBattleFrontKeepStatus(byte keepId)
+        public static battlefront_keep_status GetBattleFrontKeepStatus(byte keepId)
         {
-            var status = Database.SelectObject<BattleFrontKeepStatus>($"KeepId={keepId}");
+            var status = Database.SelectObject<battlefront_keep_status>($"KeepId={keepId}");
             return status;
         }
     }

@@ -3,7 +3,7 @@
 
 
 
-Discord: https://discordapp.com/invite/VPRNDWjz49
+Discord: https://discord.gg/CMTSzkJrGk
 
 
 # install mysql and db video

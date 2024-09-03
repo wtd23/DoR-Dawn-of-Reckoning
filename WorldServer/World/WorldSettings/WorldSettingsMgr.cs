@@ -9,7 +9,7 @@ namespace WorldServer.World.WorldSettings
     {
         // Medallions setting
         //World_Settings WorldSettings = WorldMgr.Database.SelectObject<World_Settings>("SettingId = 2");
-        private List<World_Settings> WorldSettings = WorldMgr.Database.SelectAllObjects<World_Settings>().ToList();
+        private List<world_settings> WorldSettings = WorldMgr.Database.SelectAllObjects<world_settings>().ToList();
 
         public WorldSettingsMgr()
         {

@@ -15,7 +15,7 @@ namespace WorldServer.World.Abilities.Components
         {
         }
 
-        public AbilityInfo(DBAbilityInfo dbObj)
+        public AbilityInfo(abilities dbObj)
         {
             Entry = dbObj.Entry;
             CareerLine = dbObj.CareerLine;
@@ -35,11 +35,11 @@ namespace WorldServer.World.Abilities.Components
             Time = dbObj.Time;
         }
 
-        public static List<AbilityInfo> Convert(List<DBAbilityInfo> dbObjs)
+        public static List<AbilityInfo> Convert(List<abilities> dbObjs)
         {
             List<AbilityInfo> objects = new List<AbilityInfo>();
 
-            foreach (DBAbilityInfo dbObj in dbObjs)
+            foreach (abilities dbObj in dbObjs)
             {
                 if (dbObj.AbilityType != (int)AbilityType.Effect)
                     objects.Add(new AbilityInfo(dbObj));
@@ -159,5 +159,6 @@ namespace WorldServer.World.Abilities.Components
         public ushort abilityID;
         public ushort effectID2;
         public ushort Time;
+        internal Creature Caster;
     }
 }

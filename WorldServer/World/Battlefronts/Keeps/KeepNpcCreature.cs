@@ -13,17 +13,17 @@ namespace WorldServer.World.Battlefronts.Keeps
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         public RegionMgr Region;
         public KeepCreature Creature;
-        public Keep_Creature Info;
+        public keep_creatures Info;
         public BattleFrontKeep Keep;
 
-        public KeepNpcCreature(RegionMgr region, Keep_Creature info, BattleFrontKeep keep)
+        public KeepNpcCreature(RegionMgr region, keep_creatures info, BattleFrontKeep keep)
         {
             Region = region;
             Info = info;
             Keep = keep;
         }
 
-        public void SpawnGuard(Realms realm)
+        public void SpawnGuard(SetRealms realm)
         {
             if (Creature != null)
             {
@@ -31,13 +31,13 @@ namespace WorldServer.World.Battlefronts.Keeps
                 Creature = null;
             }
 
-            if (realm != Realms.REALMS_REALM_NEUTRAL)
+            if (realm != SetRealms.REALMS_REALM_NEUTRAL)
             {
-                if (Info.DestroId == 0 && realm == Realms.REALMS_REALM_DESTRUCTION)
+                if (Info.DestroId == 0 && realm == SetRealms.REALMS_REALM_DESTRUCTION)
                     _logger.Trace($"Creature Id = 0, no spawning");
                 else
                 {
-                    Creature_proto proto = CreatureService.GetCreatureProto(realm == Realms.REALMS_REALM_ORDER ? Info.OrderId : Info.DestroId);
+                    Creature_proto proto = CreatureService.GetCreatureProto(realm == SetRealms.REALMS_REALM_ORDER ? Info.OrderId : Info.DestroId);
 
                     if (proto == null)
                     {
@@ -46,7 +46,7 @@ namespace WorldServer.World.Battlefronts.Keeps
                     }
                     _logger.Trace($"Spawning Guard {proto.Name} ({proto.Entry})");
 
-                    Creature_spawn spawn = new Creature_spawn();
+                    creature_spawns spawn = new creature_spawns();
                     spawn.BuildFromProto(proto);
                     spawn.WorldO = Info.O;
                     spawn.WorldX = Info.X;
@@ -64,7 +64,7 @@ namespace WorldServer.World.Battlefronts.Keeps
             }
         }
 
-        //public void SpawnGuardNear(Realms realm, KeepNpcCreature nearPatrol)
+        //public void SpawnGuardNear(SetRealms realm, KeepNpcCreature nearPatrol)
         //{
         //    if (Creature != null)
         //    {
@@ -72,9 +72,9 @@ namespace WorldServer.World.Battlefronts.Keeps
         //        Creature = null;
         //    }
 
-        //    if (realm != Realms.REALMS_REALM_NEUTRAL)
+        //    if (realm != SetRealms.REALMS_REALM_NEUTRAL)
         //    {
-        //        Creature_proto proto = CreatureService.GetCreatureProto(realm == Realms.REALMS_REALM_ORDER ? Info.OrderId : Info.DestroId);
+        //        Creature_proto proto = CreatureService.GetCreatureProto(realm == SetRealms.REALMS_REALM_ORDER ? Info.OrderId : Info.DestroId);
 
         //        _logger.Trace($"Spawning Guard Near {proto.Name} ({proto.Entry})");
 

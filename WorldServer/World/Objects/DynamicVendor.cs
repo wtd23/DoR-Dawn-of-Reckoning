@@ -9,11 +9,11 @@ namespace WorldServer.World.Objects
 {
     public class RenownLevelVendorItem
     {
-        public List<Vendor_items> items = new List<Vendor_items>();
+        public List<creature_vendors> items = new List<creature_vendors>();
 
         public RenownLevelVendorItem(int renown, int level)
         {
-            var item = new Vendor_items
+            var item = new creature_vendors
             {
                 Info = ItemService.GetItem_Info(2),
                 ItemId = 2,
@@ -27,7 +27,7 @@ namespace WorldServer.World.Objects
 
     public class RealmCaptainVendorItem
     {
-        public List<Vendor_items> items = new List<Vendor_items>();
+        public List<creature_vendors> items = new List<creature_vendors>();
 
         public RealmCaptainVendorItem(Player player)
         {
@@ -37,7 +37,7 @@ namespace WorldServer.World.Objects
             }
         }
 
-        private List<Vendor_items> GetRealmCaptainItems(Player player)
+        private List<creature_vendors> GetRealmCaptainItems(Player player)
         {
             var realmCaptainItems = new Dictionary<int, string>
             {
@@ -48,7 +48,7 @@ namespace WorldServer.World.Objects
 
             foreach (var realmCaptainBuff in realmCaptainItems)
             {
-                var item = new Vendor_items
+                var item = new creature_vendors
                 {
                     Info = ItemService.GetItem_Info((uint)realmCaptainBuff.Key),
                     ItemId = (uint)realmCaptainBuff.Key,
@@ -60,7 +60,7 @@ namespace WorldServer.World.Objects
             return items;
         }
 
-        public bool IsValidItemForPlayer(Player player, HonorReward honorReward)
+        public bool IsValidItemForPlayer(Player player, honor_rewards honorReward)
         {
             if (honorReward.Realm == 0 || honorReward.Realm == (int)player.Realm)
             {

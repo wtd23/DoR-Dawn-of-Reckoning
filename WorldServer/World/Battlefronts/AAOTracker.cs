@@ -52,8 +52,8 @@ namespace WorldServer.World.Battlefronts
             if (newMult == _againstAllOddsMult)
                 return; // No change
 
-            Realms newRealm = GetAaoRealm(newMult);
-            Realms previousRealm = GetAaoRealm(_againstAllOddsMult);
+            SetRealms newRealm = GetAaoRealm(newMult);
+            SetRealms previousRealm = GetAaoRealm(_againstAllOddsMult);
 
             if (newRealm != previousRealm)
             {
@@ -72,9 +72,9 @@ namespace WorldServer.World.Battlefronts
         /// Initializes new aao buffs for the given realm.
         /// </summary>
         /// <param name="realm">Realm that got aao, can be neutral</param>
-        private void InitAAOBuffs(Realms realm, IList<Player> players)
+        private void InitAAOBuffs(SetRealms realm, IList<Player> players)
         {
-            if (realm == Realms.REALMS_REALM_NEUTRAL)
+            if (realm == SetRealms.REALMS_REALM_NEUTRAL)
                 return;
 
             foreach (Player plr in players)
@@ -122,7 +122,7 @@ namespace WorldServer.World.Battlefronts
             if (aaoBuff == null)
                 return;
 
-            Realms aaoRealm = GetAaoRealm(_againstAllOddsMult);
+            SetRealms aaoRealm = GetAaoRealm(_againstAllOddsMult);
             short aaoValue = (short)(Math.Abs(_againstAllOddsMult) * 20);
             float aaoBonus = Math.Abs(_againstAllOddsMult) * 0.2f;
 
@@ -146,7 +146,7 @@ namespace WorldServer.World.Battlefronts
         /// </summary>
         /// <param name="realm">Realm that have aao, can be neutral</param>
         /// <param name="newMult">Signed multiplier</param>
-        private void UpdateAAOBuffs(Realms realm, float newMult)
+        private void UpdateAAOBuffs(SetRealms realm, float newMult)
         {
             List<NewBuff> buffs = GetAaoBuffs(realm);
             if (buffs == null)
@@ -177,7 +177,7 @@ namespace WorldServer.World.Battlefronts
         /// </summary>
         /// <param name="realm">Realm that lost aao, can be neutral</param>
         /// <param name="newMult">Signed multiplicator</param>
-        private void ClearAAOBuffs(Realms realm)
+        private void ClearAAOBuffs(SetRealms realm)
         {
             List<NewBuff> buffs = GetAaoBuffs(realm);
             if (buffs == null)
@@ -199,14 +199,14 @@ namespace WorldServer.World.Battlefronts
         /// </summary>
         /// <param name="realm">Realm to update aao of, can be neutral</param>
         /// <returns>Buff list, null if neutral</returns>
-        private List<NewBuff> GetAaoBuffs(Realms realm)
+        private List<NewBuff> GetAaoBuffs(SetRealms realm)
         {
             switch (realm)
             {
-                case Realms.REALMS_REALM_ORDER:
+                case SetRealms.REALMS_REALM_ORDER:
                     return _orderAAOBuffs;
 
-                case Realms.REALMS_REALM_DESTRUCTION:
+                case SetRealms.REALMS_REALM_DESTRUCTION:
                     return _orderAAOBuffs;
 
                 default:
@@ -219,14 +219,14 @@ namespace WorldServer.World.Battlefronts
         /// </summary>
         /// <param name="newMult">Signed multiplier, positive for destro aao, negative for order aao</param>
         /// <returns>Realm of players to buff, can be neutral</returns>
-        private Realms GetAaoRealm(float mult)
+        private SetRealms GetAaoRealm(float mult)
         {
             if (mult == 0)
-                return Realms.REALMS_REALM_NEUTRAL;
+                return SetRealms.REALMS_REALM_NEUTRAL;
             if (mult > 0) // destro
-                return Realms.REALMS_REALM_DESTRUCTION;
+                return SetRealms.REALMS_REALM_DESTRUCTION;
             else // order
-                return Realms.REALMS_REALM_ORDER;
+                return SetRealms.REALMS_REALM_ORDER;
         }
     }
 }

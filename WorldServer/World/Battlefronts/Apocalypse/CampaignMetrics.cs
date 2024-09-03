@@ -26,15 +26,15 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                             logger.Trace($"Recording metrics for BF Status : ({status.BattleFrontId}) {status.Description}");
                             if (!status.Locked)
                             {
-                                var metrics = new RVRMetrics
+                                var metrics = new rvr_metrics
                                 {
                                     BattlefrontId = status.BattleFrontId,
                                     BattlefrontName = status.Description,
-                                    DestructionVictoryPoints = (int)battleFrontManager.ActiveBattleFront.DestroVP,
-                                    OrderVictoryPoints = (int)battleFrontManager.ActiveBattleFront.OrderVP,
+                                    DestructionVictoryPoints = battleFrontManager.GetActiveBattleFrontFromProgression(status.PairingId).DestroVP,
+                                    OrderVictoryPoints = (int)battleFrontManager.GetActiveBattleFrontFromProgression(status.PairingId).OrderVP,
                                     Locked = status.LockStatus,
-                                    OrderPlayersInLake = PlayerUtil.GetTotalOrderPVPPlayerCountInZone(battleFrontManager.ActiveBattleFront.ZoneId),
-                                    DestructionPlayersInLake = PlayerUtil.GetTotalDestPVPPlayerCountInZone(battleFrontManager.ActiveBattleFront.ZoneId),
+                                    OrderPlayersInLake = PlayerUtil.GetTotalOrderPVPPlayerCountInZone(battleFrontManager.GetActiveBattleFrontFromProgression(status.PairingId).OrderZoneId),
+                                    DestructionPlayersInLake = PlayerUtil.GetTotalDestPVPPlayerCountInZone(battleFrontManager.GetActiveBattleFrontFromProgression(status.PairingId).DestroZoneId),
                                     Tier = tier,
                                     Timestamp = DateTime.UtcNow,
                                     GroupId = groupId,

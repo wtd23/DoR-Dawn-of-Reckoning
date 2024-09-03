@@ -16,10 +16,10 @@ namespace WorldServer.World.Scenarios
         private readonly List<CapturePoint> _capturePoints = new List<CapturePoint>();
         private readonly HoldObject _flag;
 
-        public FlagDominationScenario(Scenario_Info info, int tier)
+        public FlagDominationScenario(scenario_infos info, int tier)
             : base(info, tier)
         {
-            foreach (Scenario_Object obj in info.ScenObjects)
+            foreach (scenario_objects obj in info.ScenObjects)
             {
                 if (obj.Type == "Capture Point")
                 {
@@ -88,9 +88,9 @@ namespace WorldServer.World.Scenarios
 
         public void OnCapture(CapturePoint captured)
         {
-            Realms targetRealm = captured.OwningRealm;
+            SetRealms targetRealm = captured.OwningRealm;
 
-            if (targetRealm == Realms.REALMS_REALM_NEUTRAL)
+            if (targetRealm == SetRealms.REALMS_REALM_NEUTRAL)
                 return;
 
             GivePoints((int)captured.OwningRealm, 35);
@@ -119,7 +119,7 @@ namespace WorldServer.World.Scenarios
 
             PacketOut Out = new PacketOut((byte)Opcodes.F_PLAY_SOUND);
             Out.WriteByte(0);
-            Out.WriteUInt16(_capturePoints[0].OwningRealm == Realms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
+            Out.WriteUInt16(_capturePoints[0].OwningRealm == SetRealms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
             Out.Fill(0, 10);
 
             foreach (Object obj in Region.Objects)
@@ -128,7 +128,7 @@ namespace WorldServer.World.Scenarios
                 if (plr == null)
                     continue;
 
-                plr.SendLocalizeString((_capturePoints[0].OwningRealm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " has pacified all of the Trolls!", ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.CHAT_TAG_DEFAULT);
+                plr.SendLocalizeString((_capturePoints[0].OwningRealm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " has pacified all of the Trolls!", ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.CHAT_TAG_DEFAULT);
                 plr.SendPacket(Out);
             }
 
@@ -193,10 +193,10 @@ namespace WorldServer.World.Scenarios
                         Point3D flagLocation = cPoint.WorldPosition;
                         if (!plr.IsDead && !plr.IsDisposed && plr.IsInWorld() && plr.PointWithinRadiusFeet(flagLocation, 50))
                         {
-                            if (!cPoint.PlayersInCloseRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
+                            if (!cPoint.PlayersInCloseRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
                                 cPoint.AddInCloseRange(plr);
                         }
-                        else if (cPoint.PlayersInCloseRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
+                        else if (cPoint.PlayersInCloseRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
                             cPoint.RemoveInCloseRange(plr);
                     }
                 }

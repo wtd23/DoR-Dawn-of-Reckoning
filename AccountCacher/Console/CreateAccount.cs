@@ -37,7 +37,7 @@ namespace AccountCacher
             else
             {
                 account.Password = password;
-                account.CryptPassword = Account.ConvertSHA256(userName + ":" + password);
+                account.CryptPassword = accounts.ConvertSHA256(userName + ":" + password);
                 AccountMgr.Database.SaveObject(account);
                 AccountMgr.Database.ForceSave();
                 Log.Success("ResetPassword", $"Password reset for {userName} to {password}");

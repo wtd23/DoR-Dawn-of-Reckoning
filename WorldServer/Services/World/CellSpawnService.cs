@@ -10,29 +10,29 @@ namespace WorldServer.Services.World
     [Service(typeof(CreatureService), typeof(GameObjectService), typeof(ZoneService))]
     internal class CellSpawnService : ServiceBase
     {
-        public static Dictionary<ushort, CellSpawns[,]> _RegionCells = new Dictionary<ushort, CellSpawns[,]>();
+        public static Dictionary<ushort, cell_spawns[,]> _RegionCells = new Dictionary<ushort, cell_spawns[,]>();
 
-        public static CellSpawns GetRegionCell(ushort RegionId, ushort X, ushort Y)
+        public static cell_spawns GetRegionCell(ushort RegionId, ushort X, ushort Y)
         {
             X = (ushort)Math.Min(RegionMgr.MaxCellID - 1, X);
             Y = (ushort)Math.Min(RegionMgr.MaxCellID - 1, Y);
 
             if (!_RegionCells.ContainsKey(RegionId))
-                _RegionCells.Add(RegionId, new CellSpawns[RegionMgr.MaxCellID, RegionMgr.MaxCellID]);
+                _RegionCells.Add(RegionId, new cell_spawns[RegionMgr.MaxCellID, RegionMgr.MaxCellID]);
 
             if (_RegionCells[RegionId][X, Y] == null)
             {
-                CellSpawns Sp = new CellSpawns(RegionId, X, Y);
+                cell_spawns Sp = new cell_spawns(RegionId, X, Y);
                 _RegionCells[RegionId][X, Y] = Sp;
             }
 
             return _RegionCells[RegionId][X, Y];
         }
 
-        public static CellSpawns[,] GetCells(ushort RegionId)
+        public static cell_spawns[,] GetCells(ushort RegionId)
         {
             if (!_RegionCells.ContainsKey(RegionId))
-                _RegionCells.Add(RegionId, new CellSpawns[RegionMgr.MaxCellID, RegionMgr.MaxCellID]);
+                _RegionCells.Add(RegionId, new cell_spawns[RegionMgr.MaxCellID, RegionMgr.MaxCellID]);
 
             return _RegionCells[RegionId];
         }
@@ -49,13 +49,13 @@ namespace WorldServer.Services.World
         public static void LoadRegionSpawns()
         {
             long InvalidSpawns = 0;
-            Zone_Info Info = null;
+            zone_infos Info = null;
             ushort X, Y = 0;
             Dictionary<string, int> RegionCount = new Dictionary<string, int>();
 
             {
-                Creature_spawn Spawn;
-                foreach (KeyValuePair<uint, Creature_spawn> Kp in CreatureService.CreatureSpawns)
+                creature_spawns Spawn;
+                foreach (KeyValuePair<uint, creature_spawns> Kp in CreatureService.CreatureSpawns)
                 {
                     Spawn = Kp.Value;
                     Spawn.Proto = CreatureService.GetCreatureProto(Spawn.Entry);
@@ -88,8 +88,8 @@ namespace WorldServer.Services.World
             }
 
             {
-                GameObject_spawn Spawn;
-                foreach (KeyValuePair<uint, GameObject_spawn> Kp in GameObjectService.GameObjectSpawns)
+                gameobject_spawns Spawn;
+                foreach (KeyValuePair<uint, gameobject_spawns> Kp in GameObjectService.GameObjectSpawns)
                 {
                     Spawn = Kp.Value;
                     Spawn.Proto = GameObjectService.GetGameObjectProto(Spawn.Entry);
@@ -134,11 +134,11 @@ namespace WorldServer.Services.World
             int[] Removed = new int[255];
             List<uint> Guids = new List<uint>();
 
-            Zone_Info Info = null;
+            zone_infos Info = null;
             int i, y, Px, Py, SPx, Spy;
-            CellSpawns[,] Cell;
+            cell_spawns[,] Cell;
 
-            foreach (KeyValuePair<ushort, CellSpawns[,]> Kp in _RegionCells)
+            foreach (KeyValuePair<ushort, cell_spawns[,]> Kp in _RegionCells)
             {
                 Cell = Kp.Value;
                 for (i = 0; i < Cell.GetLength(0); ++i)
@@ -148,7 +148,7 @@ namespace WorldServer.Services.World
                         if (Cell[i, y] == null)
                             continue;
 
-                        foreach (Creature_spawn Sp in Cell[i, y].CreatureSpawns.ToArray())
+                        foreach (creature_spawns Sp in Cell[i, y].CreatureSpawns.ToArray())
                         {
                             if (Sp != null || Sp.Proto == null || QuestService.GetStartQuests(Sp.Proto.Entry) != null)
                                 continue;
@@ -159,7 +159,7 @@ namespace WorldServer.Services.World
                             Px = ZoneService.CalculPin(Info, Sp.WorldX, true);
                             Py = ZoneService.CalculPin(Info, Sp.WorldY, false);
 
-                            foreach (Creature_spawn SubSp in Cell[i, y].CreatureSpawns.ToArray())
+                            foreach (creature_spawns SubSp in Cell[i, y].CreatureSpawns.ToArray())
                             {
                                 if (SubSp.Proto == null || Sp.Entry != SubSp.Entry || Sp == SubSp)
                                     continue;

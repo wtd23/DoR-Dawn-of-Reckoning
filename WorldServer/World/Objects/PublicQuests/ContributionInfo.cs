@@ -10,7 +10,7 @@ namespace WorldServer.World.Objects.PublicQuests
     {
         public uint PlayerCharId;
         public string PlayerName;
-        public Realms PlayerRealm;
+        public SetRealms PlayerRealm;
         public byte PlayerCareerLine;
         public byte PlayerLevel;
 

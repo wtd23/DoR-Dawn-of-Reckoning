@@ -56,7 +56,7 @@ namespace WorldServer.World.Scenarios.Objects
         public PartDelegate Lost;
         public PartDelegate DroppedOff;
 
-        public Part(GameObject_spawn spawn, FLAG_EFFECTS? flagEffect, int pickUpTime = 0, int dropTime = 0) : base(spawn)
+        public Part(gameobject_spawns spawn, FLAG_EFFECTS? flagEffect, int pickUpTime = 0, int dropTime = 0) : base(spawn)
         {
             _pickupTime = pickUpTime;
             _dropTime = dropTime;

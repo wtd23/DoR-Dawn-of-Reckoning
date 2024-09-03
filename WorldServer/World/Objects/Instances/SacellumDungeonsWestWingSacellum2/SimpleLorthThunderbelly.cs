@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.SacellumDungeonsWestWingSacellum2
     {
         #region Constructors
 
-        public SimpleLorthThunderbelly(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleLorthThunderbelly(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

@@ -26,13 +26,13 @@ namespace WorldServer.World.Battlefronts.Bounty
         public ConcurrentDictionary<uint, List<PlayerContribution>> ContributionDictionary { get; set; }
 
         // Reference contribution factors
-        public List<ContributionDefinition> ContributionFactors { get; }
+        public List<bounty_contribution_definition> ContributionFactors { get; }
 
         public BountyService BountyService { get; }
 
         private const short MAXIMUM_CONTRIBUTION = 515;  // based upon sum of all contribution values in bounty_contribution_definition
 
-        public ContributionManager(ConcurrentDictionary<uint, List<PlayerContribution>> contributionDictionary, List<ContributionDefinition> contributionFactors)
+        public ContributionManager(ConcurrentDictionary<uint, List<PlayerContribution>> contributionDictionary, List<bounty_contribution_definition> contributionFactors)
         {
             ContributionDictionary = contributionDictionary;
             ContributionFactors = contributionFactors;
@@ -118,14 +118,14 @@ namespace WorldServer.World.Battlefronts.Bounty
             if (contributionValue > short.MaxValue)
             {
                 RewardLogger.Error(
-                    $"ContributionManagerInstance exceeds max (over short.maxvalue) for Character {targetCharacterId}. {contributionList.Count} contribution records.");
+                    $"ContributionManagerInstance exceeds max (over short.maxvalue) for characters {targetCharacterId}. {contributionList.Count} contribution records.");
                 contributionValue = short.MaxValue;
             }
 
             if (contributionValue > MAXIMUM_CONTRIBUTION)
             {
                 RewardLogger.Error(
-                    $"ContributionManagerInstance exceeds max ({MAXIMUM_CONTRIBUTION}) for Character {targetCharacterId}. {contributionList.Count} contribution records.");
+                    $"ContributionManagerInstance exceeds max ({MAXIMUM_CONTRIBUTION}) for characters {targetCharacterId}. {contributionList.Count} contribution records.");
                 contributionValue = MAXIMUM_CONTRIBUTION;
             }
 
@@ -163,7 +163,7 @@ namespace WorldServer.World.Battlefronts.Bounty
         /// <param name="contributionFactors"></param>
         /// <returns></returns>
         public ConcurrentDictionary<short, ContributionStage> GetContributionStageDictionary(List<PlayerContribution> contributionList,
-            List<ContributionDefinition> contributionFactors)
+            List<bounty_contribution_definition> contributionFactors)
         {
             var result = new ConcurrentDictionary<short, ContributionStage>();
             // For each reference contribution type, prepare a dictionary.
@@ -233,7 +233,7 @@ namespace WorldServer.World.Battlefronts.Bounty
         }
 
         /// <summary>
-        /// Add Character to ContributionManagerInstance Dictionary
+        /// Add characters to ContributionManagerInstance Dictionary
         /// </summary>
         public void AddCharacter(uint characterId)
         {
@@ -241,7 +241,7 @@ namespace WorldServer.World.Battlefronts.Bounty
         }
 
         /// <summary>
-        /// Remove Character from ContributionManagerInstance Dict
+        /// Remove characters from ContributionManagerInstance Dict
         /// </summary>
         /// <param name="characterId"></param>
         public bool RemoveCharacter(uint characterId)
@@ -306,7 +306,7 @@ namespace WorldServer.World.Battlefronts.Bounty
                     if (player != null)
                     {
                         RewardLogger.Debug($"{player.Name} found..");
-                        if (player.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                        if (player.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                         {
                             if (destructionRealmCaptain == null)
                             {
@@ -361,7 +361,7 @@ namespace WorldServer.World.Battlefronts.Bounty
         /// <param name="logger"></param>
         /// <param name="lockingRealm"></param>
         /// <returns></returns>
-        public Tuple<ConcurrentDictionary<Player, int>, ConcurrentDictionary<Player, int>, ConcurrentDictionary<Player, int>> DetermineEligiblePlayers(ILogger logger, Realms lockingRealm)
+        public Tuple<ConcurrentDictionary<Player, int>, ConcurrentDictionary<Player, int>, ConcurrentDictionary<Player, int>> DetermineEligiblePlayers(ILogger logger, SetRealms lockingRealm)
         {
             ConcurrentDictionary<Player, int> winningRealmPlayers;
             ConcurrentDictionary<Player, int> losingRealmPlayers;

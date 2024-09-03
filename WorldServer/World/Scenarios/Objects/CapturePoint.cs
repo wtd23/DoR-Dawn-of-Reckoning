@@ -25,7 +25,7 @@ namespace WorldServer.World.Scenarios.Objects
 
         private int _x, _y, _z, _o;
 
-        public Realms OwningRealm;
+        public SetRealms OwningRealm;
 
         public bool Locked;
 
@@ -50,7 +50,7 @@ namespace WorldServer.World.Scenarios.Objects
             CaptureDuration = 3;
         }
 
-        public CapturePoint(Scenario_Object scenarioObject, Func<Player, bool> captureCheck, Action<CapturePoint> onCapture)
+        public CapturePoint(scenario_objects scenarioObject, Func<Player, bool> captureCheck, Action<CapturePoint> onCapture)
         {
             ObjectiveID = scenarioObject.Identifier;
             ObjectiveName = scenarioObject.ObjectiveName;
@@ -92,7 +92,7 @@ namespace WorldServer.World.Scenarios.Objects
             if (glowProto == null)
                 return;
 
-            GameObject_spawn spawn = new GameObject_spawn
+            gameobject_spawns spawn = new gameobject_spawns
             {
                 Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                 WorldO = Heading,
@@ -150,13 +150,13 @@ namespace WorldServer.World.Scenarios.Objects
 
         public void AddInCloseRange(Player plr)
         {
-            PlayersInCloseRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Add(plr);
+            PlayersInCloseRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Add(plr);
             SendObjectiveInfo(plr);
         }
 
         public void RemoveInCloseRange(Player plr)
         {
-            PlayersInCloseRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Remove(plr);
+            PlayersInCloseRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Remove(plr);
             SendObjectiveLeft(plr);
         }
 
@@ -212,12 +212,12 @@ namespace WorldServer.World.Scenarios.Objects
 
             PacketOut Out = new PacketOut((byte)Opcodes.F_PLAY_SOUND);
             Out.WriteByte(0);
-            Out.WriteUInt16(OwningRealm == Realms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
+            Out.WriteUInt16(OwningRealm == SetRealms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
             Out.Fill(0, 10);
 
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
-            sb.Append(OwningRealm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction");
+            sb.Append(OwningRealm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction");
             sb.Append(" ");
             sb.Append(_captureAnnouncement);
             sb.Append(" ");
@@ -268,7 +268,7 @@ namespace WorldServer.World.Scenarios.Objects
         {
             CountdownTimerEnd = 0;
 
-            OwningRealm = Realms.REALMS_REALM_NEUTRAL;
+            OwningRealm = SetRealms.REALMS_REALM_NEUTRAL;
 
             foreach (Player plr in PlayersInRange)
                 UpdateGlow(plr);

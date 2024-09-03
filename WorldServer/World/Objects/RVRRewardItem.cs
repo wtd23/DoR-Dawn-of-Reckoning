@@ -12,7 +12,7 @@ namespace WorldServer.World.Objects
         public int ItemCount { get; set; }
         public byte CanAwardDuplicate { get; set; }
 
-        public RVRRewardItem(RVRRewardFortItems fortItem)
+        public RVRRewardItem(rvr_reward_fort_items fortItem)
         {
             RewardId = fortItem.RewardId;
             Rarity = fortItem.Rarity;
@@ -23,7 +23,7 @@ namespace WorldServer.World.Objects
             CanAwardDuplicate = fortItem.CanAwardDuplicate;
         }
 
-        public RVRRewardItem(RVRRewardKeepItems keepItem)
+        public RVRRewardItem(rvr_reward_keep_items keepItem)
         {
             RewardId = keepItem.RewardId;
             Rarity = keepItem.Rarity;

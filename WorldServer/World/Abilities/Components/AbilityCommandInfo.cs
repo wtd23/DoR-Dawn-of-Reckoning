@@ -23,7 +23,7 @@ namespace WorldServer.World.Abilities.Components
         {
         }
 
-        public AbilityCommandInfo(DBAbilityCommandInfo dbObj)
+        public AbilityCommandInfo(ability_commands dbObj)
         {
             Entry = dbObj.Entry;
             AbilityName = dbObj.AbilityName;
@@ -48,11 +48,11 @@ namespace WorldServer.World.Abilities.Components
         /// <summary>
         /// Converts a list containing the database representations of this class to the server versions.
         /// </summary>
-        public static List<AbilityCommandInfo> Convert(List<DBAbilityCommandInfo> dbObjs)
+        public static List<AbilityCommandInfo> Convert(List<ability_commands> dbObjs)
         {
             List<AbilityCommandInfo> objects = new List<AbilityCommandInfo>();
 
-            foreach (DBAbilityCommandInfo dbObj in dbObjs)
+            foreach (ability_commands dbObj in dbObjs)
                 objects.Add(new AbilityCommandInfo(dbObj));
 
             return objects;

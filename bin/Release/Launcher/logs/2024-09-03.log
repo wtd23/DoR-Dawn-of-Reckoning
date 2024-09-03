@@ -1,0 +1,2 @@
+2024-09-03 20:07:14.0856 DEBUG Launcher.ApocLauncher.Form1_Load :: Calling Patcher Server on 127.0.0.1:8080
+2024-09-03 20:07:14.1545 INFO Launcher.Patcher.Patch :: Requesting files to update from 127.0.0.1:8080

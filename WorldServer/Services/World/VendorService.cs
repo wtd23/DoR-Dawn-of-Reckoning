@@ -9,22 +9,22 @@ namespace WorldServer.Services.World
     {
         public static int MAX_ITEM_PAGE = 3;
 
-        public static Dictionary<ushort, List<Vendor_items>> _newVendors = new Dictionary<ushort, List<Vendor_items>>();
+        public static Dictionary<ushort, List<creature_vendors>> _newVendors = new Dictionary<ushort, List<creature_vendors>>();
 
-        public static List<Vendor_items> GetVendorItems(ushort id)
+        public static List<creature_vendors> GetVendorItems(ushort id)
         {
             if (!_newVendors.ContainsKey(id))
             {
                 Log.Debug("WorldMgr", "Loading Vendors of " + id + " ...");
 
-                IList<Vendor_items> IVendors = Database.SelectObjects<Vendor_items>("VendorId=" + id);
-                List<Vendor_items> Vendors = new List<Vendor_items>();
+                IList<creature_vendors> IVendors = Database.SelectObjects<creature_vendors>("VendorId=" + id);
+                List<creature_vendors> Vendors = new List<creature_vendors>();
                 Vendors.AddRange(IVendors);
 
                 _newVendors.Add(id, Vendors);
                 // commenting out this next line as it does not seem to be used...
                 //  Item_Info Req;
-                foreach (Vendor_items Info in Vendors.ToArray())
+                foreach (creature_vendors Info in Vendors.ToArray())
                 {
                     if ((Info.Info = ItemService.GetItem_Info(Info.ItemId)) == null)
                     {

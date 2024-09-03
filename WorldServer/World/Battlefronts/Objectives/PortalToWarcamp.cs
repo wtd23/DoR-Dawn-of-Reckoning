@@ -16,13 +16,13 @@ namespace WorldServer.World.Battlefronts.Objectives
         private const string NAME = "Portal to warcamp";
 
         /// <summary>Portal targets depending on realm</summary>
-        private BattleFrontObject _orderTarget, _destroTarget;
+        private battlefront_objects _orderTarget, _destroTarget;
 
         private Point3D _orderTargetPos, _destroTargetPos;
 
         public PortalToWarcamp(
-            BattleFrontObject origin,
-            BattleFrontObject orderTarget, BattleFrontObject destroTarget)
+            battlefront_objects origin,
+            battlefront_objects orderTarget, battlefront_objects destroTarget)
             : base(origin)
         {
             Name = NAME;
@@ -44,9 +44,9 @@ namespace WorldServer.World.Battlefronts.Objectives
             }
 
             // Gets the port target
-            BattleFrontObject target;
+            battlefront_objects target;
             Point3D targetPos;
-            if (player.Realm == Realms.REALMS_REALM_ORDER)
+            if (player.Realm == SetRealms.REALMS_REALM_ORDER)
             {
                 target = _orderTarget;
                 targetPos = _orderTargetPos;

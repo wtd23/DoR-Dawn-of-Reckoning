@@ -86,9 +86,9 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             get { return OrderVictoryPoints * 100 / BattleFrontConstants.LOCK_VICTORY_POINTS; }
         }
 
-        public void AddPlayerKill(Realms killerRealm)
+        public void AddPlayerKill(SetRealms killerRealm)
         {
-            if (killerRealm == Realms.REALMS_REALM_ORDER)
+            if (killerRealm == SetRealms.REALMS_REALM_ORDER)
             {
                 if (NumberOrderPlayerKills <= MAX_NUMBER_PLAYER_KILLS)
                 {
@@ -96,7 +96,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                 }
             }
 
-            if (killerRealm == Realms.REALMS_REALM_DESTRUCTION)
+            if (killerRealm == SetRealms.REALMS_REALM_DESTRUCTION)
             {
                 if (NumberDestructionPlayerKills <= MAX_NUMBER_PLAYER_KILLS)
                 {
@@ -105,9 +105,9 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             }
         }
 
-        public void AddScenarioWin(Realms winningRealm)
+        public void AddScenarioWin(SetRealms winningRealm)
         {
-            if (winningRealm == Realms.REALMS_REALM_ORDER)
+            if (winningRealm == SetRealms.REALMS_REALM_ORDER)
             {
                 if (NumberOrderScenarioWins <= MAX_NUMBER_SCENARIO_WINS)
                 {
@@ -115,7 +115,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                 }
             }
 
-            if (winningRealm == Realms.REALMS_REALM_DESTRUCTION)
+            if (winningRealm == SetRealms.REALMS_REALM_DESTRUCTION)
             {
                 if (NumberDestructionScenarioWins <= MAX_NUMBER_SCENARIO_WINS)
                 {
@@ -130,20 +130,20 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                 $"Order VP:{OrderVictoryPoints} ({OrderVictoryPointPercentage}%) Destruction VP:{DestructionVictoryPoints} ({DestructionVictoryPointPercentage}%)";
         }
 
-        public void Lock(Realms lockingRealm)
+        public void Lock(SetRealms lockingRealm)
         {
             _logger.Debug($"Locking Realm : {lockingRealm}");
-            if (lockingRealm == Realms.REALMS_REALM_DESTRUCTION)
+            if (lockingRealm == SetRealms.REALMS_REALM_DESTRUCTION)
             {
                 DestructionVictoryPoints = BattleFrontConstants.LOCK_VICTORY_POINTS;
                 OrderVictoryPoints = 0;
             }
-            if (lockingRealm == Realms.REALMS_REALM_ORDER)
+            if (lockingRealm == SetRealms.REALMS_REALM_ORDER)
             {
                 OrderVictoryPoints = BattleFrontConstants.LOCK_VICTORY_POINTS;
                 DestructionVictoryPoints = 0;
             }
-            if (lockingRealm == Realms.REALMS_REALM_NEUTRAL)
+            if (lockingRealm == SetRealms.REALMS_REALM_NEUTRAL)
             {
                 OrderVictoryPoints = 0;
                 DestructionVictoryPoints = 0;
@@ -155,15 +155,15 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// </summary>
         public void Reset(Campaign BattleFront)
         {
-            _logger.Debug($"Resetting Campaign VP {BattleFront.ActiveCampaignName} to Neutral");
+          //  _logger.Debug($"Resetting Campaign VP {BattleFront.ActiveZoneName} to Neutral");
             OrderVictoryPoints = 0;
             DestructionVictoryPoints = 0;
         }
 
-        //public void AddKeepTake(Realms attackingRealm)
+        //public void AddKeepTake(SetRealms attackingRealm)
         //{
         //    _logger.Debug($"AddKeepTake {attackingRealm} ");
-        //    if (attackingRealm == Realms.REALMS_REALM_ORDER)
+        //    if (attackingRealm == SetRealms.REALMS_REALM_ORDER)
         //    {
         //        OrderVictoryPoints += 300;
         //    }
@@ -173,10 +173,10 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         //    }
         //}
 
-        //public void KeepLost(Realms losingRealm)
+        //public void KeepLost(SetRealms losingRealm)
         //{
         //    _logger.Debug($"KeepLost {losingRealm} ");
-        //    if (losingRealm == Realms.REALMS_REALM_ORDER)
+        //    if (losingRealm == SetRealms.REALMS_REALM_ORDER)
         //    {
         //        OrderVictoryPoints -= 300;
         //    }
@@ -186,10 +186,10 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         //    }
         //}
 
-        //public void BOWon(Realms attackingRealm, string name)
+        //public void BOWon(SetRealms attackingRealm, string name)
         //{
         //    _logger.Debug($"BOWon {attackingRealm} {name}");
-        //    if (attackingRealm == Realms.REALMS_REALM_ORDER)
+        //    if (attackingRealm == SetRealms.REALMS_REALM_ORDER)
         //    {
         //        OrderVictoryPoints += 50;
         //    }
@@ -199,10 +199,10 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         //    }
         //}
 
-        //public void BOLost(Realms losingRealm, string name)
+        //public void BOLost(SetRealms losingRealm, string name)
         //{
         //    _logger.Debug($"BOLost {losingRealm} {name}");
-        //    if (losingRealm == Realms.REALMS_REALM_ORDER)
+        //    if (losingRealm == SetRealms.REALMS_REALM_ORDER)
         //    {
         //        OrderVictoryPoints -= 50;
         //    }
@@ -221,22 +221,25 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
             foreach (var battleFrontKeep in campaign.Keeps)
             {
-                foreach (var keep in campaign.ActiveBattleFrontStatus.KeepList)
+                foreach (BattleFrontStatus status in campaign.ApocBattleFrontStatuses)
                 {
-                    if (keep.KeepId == battleFrontKeep.Info.KeepId)
+                    foreach (var keep in status.KeepList)
                     {
-                        if (battleFrontKeep.KeepStatus == KeepStatus.KEEPSTATUS_SAFE || battleFrontKeep.KeepStatus == KeepStatus.KEEPSTATUS_LOCKED)
+                        if (keep.KeepId == battleFrontKeep.Info.KeepId)
                         {
-                            // Add Keep VPP
-                            if (battleFrontKeep.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                            if (battleFrontKeep.KeepStatus == KeepStatus.KEEPSTATUS_SAFE || battleFrontKeep.KeepStatus == KeepStatus.KEEPSTATUS_LOCKED)
                             {
-                                DestructionVictoryPoints += 300;
-                                DestructionVictoryDominationCount++;
-                            }
-                            if (battleFrontKeep.Realm == Realms.REALMS_REALM_ORDER)
-                            {
-                                OrderVictoryPoints += 300;
-                                OrderVictoryDominationCount++;
+                                // Add Keep VPP
+                                if (battleFrontKeep.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
+                                {
+                                    DestructionVictoryPoints += 300;
+                                    DestructionVictoryDominationCount++;
+                                }
+                                if (battleFrontKeep.Realm == SetRealms.REALMS_REALM_ORDER)
+                                {
+                                    OrderVictoryPoints += 300;
+                                    OrderVictoryDominationCount++;
+                                }
                             }
                         }
                     }
@@ -245,21 +248,24 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
             foreach (var campaignObjective in campaign.Objectives)
             {
-                foreach (var bo in campaign.ActiveBattleFrontStatus.BattlefieldObjectives)
+                foreach (BattleFrontStatus status in campaign.ApocBattleFrontStatuses)
                 {
-                    if (campaignObjective.State == StateFlags.Secure || campaignObjective.State == StateFlags.Locked)
+                    foreach (var bo in status.BattlefieldObjectives)
                     {
-                        if (bo.Entry == campaignObjective.Id)
+                        if (campaignObjective.State == StateFlags.Secure || campaignObjective.State == StateFlags.Locked)
                         {
-                            if (campaignObjective.OwningRealm == Realms.REALMS_REALM_DESTRUCTION)
+                            if (bo.Entry == campaignObjective.Id)
                             {
-                                DestructionVictoryPoints += 50;
-                                DestructionVictoryDominationCount++;
-                            }
-                            if (campaignObjective.OwningRealm == Realms.REALMS_REALM_ORDER)
-                            {
-                                OrderVictoryPoints += 50;
-                                OrderVictoryDominationCount++;
+                                if (campaignObjective.OwningRealm == SetRealms.REALMS_REALM_DESTRUCTION)
+                                {
+                                    DestructionVictoryPoints += 50;
+                                    DestructionVictoryDominationCount++;
+                                }
+                                if (campaignObjective.OwningRealm == SetRealms.REALMS_REALM_ORDER)
+                                {
+                                    OrderVictoryPoints += 50;
+                                    OrderVictoryDominationCount++;
+                                }
                             }
                         }
                     }
@@ -282,13 +288,13 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             }
         }
 
-        public int GetDominationCount(Realms realm)
+        public int GetDominationCount(SetRealms realm)
         {
-            if (realm == Realms.REALMS_REALM_DESTRUCTION)
+            if (realm == SetRealms.REALMS_REALM_DESTRUCTION)
             {
                 return DestructionVictoryDominationCount;
             }
-            if (realm == Realms.REALMS_REALM_ORDER)
+            if (realm == SetRealms.REALMS_REALM_ORDER)
             {
                 return OrderVictoryDominationCount;
             }

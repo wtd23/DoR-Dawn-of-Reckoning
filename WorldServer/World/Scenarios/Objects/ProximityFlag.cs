@@ -14,7 +14,7 @@ namespace WorldServer.World.Scenarios.Objects
     {
         private FlagGuard FlagGrd;
 
-        public GuardCreature(Creature_spawn spawn, FlagGuard FlagGrd) : base(spawn)
+        public GuardCreature(creature_spawns spawn, FlagGuard FlagGrd) : base(spawn)
         {
             this.FlagGrd = FlagGrd;
         }
@@ -72,7 +72,7 @@ namespace WorldServer.World.Scenarios.Objects
                 return;
             }
 
-            Creature_spawn Spawn = new Creature_spawn();
+            creature_spawns Spawn = new creature_spawns();
             Spawn.BuildFromProto(Proto);
             Spawn.WorldO = o;
             Spawn.WorldY = y;
@@ -99,7 +99,7 @@ namespace WorldServer.World.Scenarios.Objects
                 return;
             }
 
-            Creature.Spawn = new Creature_spawn();
+            Creature.Spawn = new creature_spawns();
             Creature.Spawn.BuildFromProto(Proto);
             Creature.Spawn.WorldO = o;
             Creature.Spawn.WorldY = y;
@@ -122,10 +122,10 @@ namespace WorldServer.World.Scenarios.Objects
         public bool Open = true;
         public byte CapturePoints { get; private set; }
         public byte TickPoints { get; private set; }
-        public Scenario_Object ScenarioObject { get; set; }
+        public scenario_objects ScenarioObject { get; set; }
         public List<FlagGuard> Guards = new List<FlagGuard>();
 
-        public ProximityFlag(int objectiveID, string objectiveName, int x, int y, int z, int o, Scenario_Object obj = null)
+        public ProximityFlag(int objectiveID, string objectiveName, int x, int y, int z, int o, scenario_objects obj = null)
         {
             ObjectiveID = objectiveID;
             ObjectiveName = objectiveName;
@@ -139,7 +139,7 @@ namespace WorldServer.World.Scenarios.Objects
             }
         }
 
-        public ProximityFlag(int objectiveID, string objectiveName, int x, int y, int z, int o, byte capturePoints, byte tickPoints, Scenario_Object obj = null)
+        public ProximityFlag(int objectiveID, string objectiveName, int x, int y, int z, int o, byte capturePoints, byte tickPoints, scenario_objects obj = null)
         {
             ObjectiveID = objectiveID;
             ObjectiveName = objectiveName;
@@ -240,13 +240,13 @@ namespace WorldServer.World.Scenarios.Objects
 
             PacketOut Out = new PacketOut((byte)Opcodes.F_PLAY_SOUND);
             Out.WriteByte(0);
-            Out.WriteUInt16(OwningRealm == (byte)Realms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
+            Out.WriteUInt16(OwningRealm == (byte)SetRealms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
             Out.Fill(0, 10);
 
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
 
             sb.Append("The Forces of ");
-            sb.Append(OwningRealm == (byte)Realms.REALMS_REALM_ORDER ? "Order" : "Destruction");
+            sb.Append(OwningRealm == (byte)SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction");
             sb.Append(" have captured ");
             sb.Append(ObjectiveName + "!");
 

@@ -16,12 +16,12 @@ namespace WorldServer.Managers
 {
     public class LootInfo
     {
-        public LootInfo(Item_Info Item)
+        public LootInfo(item_infos Item)
         {
             this.Item = Item;
         }
 
-        public Item_Info Item;
+        public item_infos Item;
     }
 
     public class LootContainer
@@ -178,7 +178,7 @@ namespace WorldServer.Managers
                 return null;
 
             // Initialize lootgroups we'll be searching through
-            List<Loot_Group> lootGroups;
+            List<loot_groups> lootGroups;
 
             Player deadPlayer = corpse as Player;
 
@@ -197,18 +197,18 @@ namespace WorldServer.Managers
                 lootGroups = CreatureService.GetLootGroupsByEvent(deadPlayer.Zone.Info.Type == 1 ? KILL_EVENT_SCENARIO : KILL_EVENT_RVR);
 
                 // This will be our narrowed down list of loot groups that are relevant to the kill in question.
-                List<Loot_Group> candidateLootGroups = new List<Loot_Group>();
+                List<loot_groups> candidateLootGroups = new List<loot_groups>();
 
                 // Whittle down the loot groups into a new candidate list, based on the killed player's career,
                 // and whether the kill occurred in the correct zone (if any) and whether the player has the required quest (if any)
-                foreach (Loot_Group lg in lootGroups)
+                foreach (loot_groups lg in lootGroups)
                 {
                     if (lg == null)
                         continue;
 
                     if (lg.ReqActiveQuest > 0)
                     {
-                        Character_quest quest = player.QtsInterface.GetQuest(lg.ReqActiveQuest);
+                        characters_quests quest = player.QtsInterface.GetQuest(lg.ReqActiveQuest);
                         if (quest == null || quest.IsDone())
                             continue;
                     }
@@ -223,7 +223,7 @@ namespace WorldServer.Managers
                 }
 
                 // Generate items from remaining loot groups
-                foreach (Loot_Group lg in candidateLootGroups)
+                foreach (loot_groups lg in candidateLootGroups)
                 {
                     if (lg == null)
                         continue;
@@ -235,12 +235,12 @@ namespace WorldServer.Managers
                         if (roll <= lg.DropChance)
                         {
                             // Assemble valid drops from the group
-                            List<Loot_Group_Item> candidateItems = new List<Loot_Group_Item>();
+                            List<loot_group_items> candidateItems = new List<loot_group_items>();
 
                             // This whole if is horrible spaghetti, we need to add each new medallion type here
                             if (Constants.DoomsdaySwitch > 0 && lg.Entry == 1 && WorldMgr.WorldSettingsMgr.GetMedallionsSetting() == 1 && looter.GetPlayer().ScnInterface.Scenario == null && deadPlayer.Level > 15)
                             {
-                                foreach (Loot_Group_Item lgi in lg.LootGroupItems)
+                                foreach (loot_group_items lgi in lg.LootGroupItems)
                                 {
                                     if (lgi == null)
                                         continue;
@@ -257,7 +257,7 @@ namespace WorldServer.Managers
                                         if (corpseRenown < lgi.MinRenown || corpseRenown > lgi.MaxRenown)
                                             continue;
 
-                                        Item_Info itemDef = ItemService.GetItem_Info(lgi.ItemID);
+                                        item_infos itemDef = ItemService.GetItem_Info(lgi.ItemID);
 
                                         if (itemDef.Realm != 0 && itemDef.Realm != (byte)player.Realm)
                                             continue;
@@ -268,7 +268,7 @@ namespace WorldServer.Managers
                             }
                             else
                             {
-                                foreach (Loot_Group_Item lgi in lg.LootGroupItems)
+                                foreach (loot_group_items lgi in lg.LootGroupItems)
                                 {
                                     if (lgi == null)
                                         continue;
@@ -279,7 +279,7 @@ namespace WorldServer.Managers
                                     if (corpseRenown < lgi.MinRenown || corpseRenown > lgi.MaxRenown)
                                         continue;
 
-                                    Item_Info itemDef = ItemService.GetItem_Info(lgi.ItemID);
+                                    item_infos itemDef = ItemService.GetItem_Info(lgi.ItemID);
 
                                     if (itemDef.Realm != 0 && itemDef.Realm != (byte)player.Realm)
                                         continue;
@@ -304,7 +304,7 @@ namespace WorldServer.Managers
                                 {
                                     bool valid = false;
 
-                                    Item_Info curItem = ItemService.GetItem_Info(candidateItems[itemIndex].ItemID);
+                                    item_infos curItem = ItemService.GetItem_Info(candidateItems[itemIndex].ItemID);
 
                                     foreach (Player member in members)
                                     {
@@ -327,7 +327,7 @@ namespace WorldServer.Managers
                             // Now roll for an item from the candidate item list, and add it to the loots.
                             if (candidateItems.Count > 0)
                             {
-                                Item_Info winningItem = ItemService.GetItem_Info(candidateItems[StaticRandom.Instance.Next(0, candidateItems.Count)].ItemID);
+                                item_infos winningItem = ItemService.GetItem_Info(candidateItems[StaticRandom.Instance.Next(0, candidateItems.Count)].ItemID);
                                 lootList.Add(new LootInfo(winningItem));
                             }
                         }
@@ -357,11 +357,11 @@ namespace WorldServer.Managers
                 lootGroups = CreatureService.GetLootGroupsByEvent(KILL_EVENT_PVE);
 
                 // This will be our narrowed down list of loot groups that are relevant to the kill in question.
-                List<Loot_Group> candidateLootGroups = new List<Loot_Group>();
+                List<loot_groups> candidateLootGroups = new List<loot_groups>();
 
                 // Whittle down the loot groups into a new candidate list, based on the killed creature's ID,
                 // or the CreatureSubType if the loot group's CreatureID is 0.
-                foreach (Loot_Group lg in lootGroups)
+                foreach (loot_groups lg in lootGroups)
                 {
                     if (lg == null)
                         continue;
@@ -384,7 +384,7 @@ namespace WorldServer.Managers
                 }
 
                 // Generate items from remaining loot groups
-                foreach (Loot_Group lg in candidateLootGroups)
+                foreach (loot_groups lg in candidateLootGroups)
                 {
                     try
                     {
@@ -398,13 +398,13 @@ namespace WorldServer.Managers
                             if (roll <= lg.DropChance)
                             {
                                 // Assemble valid drops from the group
-                                List<Loot_Group_Item> candidateItems = new List<Loot_Group_Item>();
+                                List<loot_group_items> candidateItems = new List<loot_group_items>();
 
                                 int effectiveLevel = Math.Min(Core.Config.RankCap, deadCreature.Level);
 
                                 if (lg.LootGroupItems != null)
                                 {
-                                    foreach (Loot_Group_Item lgi in lg.LootGroupItems)
+                                    foreach (loot_group_items lgi in lg.LootGroupItems)
                                     {
                                         try
                                         {
@@ -414,7 +414,7 @@ namespace WorldServer.Managers
                                             if (effectiveLevel < lgi.MinRank || effectiveLevel > lgi.MaxRank)
                                                 continue;
 
-                                            Item_Info itemDef = ItemService.GetItem_Info(lgi.ItemID);
+                                            item_infos itemDef = ItemService.GetItem_Info(lgi.ItemID);
 
                                             if (itemDef.Realm != 0 && itemDef.Realm != (byte)player.Realm)
                                                 continue;
@@ -443,7 +443,7 @@ namespace WorldServer.Managers
                                     {
                                         bool valid = false;
 
-                                        Item_Info curItem = ItemService.GetItem_Info(candidateItems[itemIndex].ItemID);
+                                        item_infos curItem = ItemService.GetItem_Info(candidateItems[itemIndex].ItemID);
 
                                         foreach (Player member in members)
                                         {
@@ -465,7 +465,7 @@ namespace WorldServer.Managers
                                 // Now roll for an item from the candidate item list, and add it to the loots.
                                 if (candidateItems.Count > 0)
                                 {
-                                    Item_Info winningItem = ItemService.GetItem_Info(candidateItems[StaticRandom.Instance.Next(0, candidateItems.Count)].ItemID);
+                                    item_infos winningItem = ItemService.GetItem_Info(candidateItems[StaticRandom.Instance.Next(0, candidateItems.Count)].ItemID);
                                     Loots.Add(new LootInfo(winningItem));
                                 }
                             }
@@ -499,7 +499,7 @@ namespace WorldServer.Managers
                 // Todo: Currently object loot always is 100%. Make this support non quest related loot.
 
                 GameObject gameObj = corpse.GetGameObject();
-                List<GameObject_loot> gameObjectLoots = GameObjectService.GetGameObjectLoots(gameObj.Spawn.Entry);
+                List<gameobject_loots> gameObjectLoots = GameObjectService.GetGameObjectLoots(gameObj.Spawn.Entry);
                 if (gameObjectLoots.Count <= 0 || gameObj.Looted)
                     return null;
 
@@ -510,9 +510,9 @@ namespace WorldServer.Managers
 
                 List<LootInfo> lootInfo = new List<LootInfo>();
 
-                foreach (GameObject_loot loot in gameObjectLoots)
+                foreach (gameobject_loots loot in gameObjectLoots)
                 {
-                    foreach (KeyValuePair<ushort, Character_quest> kp in Interface.Quests)
+                    foreach (KeyValuePair<ushort, characters_quests> kp in Interface.Quests)
                     {
                         if (kp.Value.Done || kp.Value.IsDone())
                             continue;
@@ -549,21 +549,21 @@ namespace WorldServer.Managers
             // Scenario zones all have a war_world.zone_infos.type value of 1.
             // Note - if "1" refers to "instance" instead of "scenario", there could be problems
             // with players receiving scenario-restricted loot for a PVP kill made in an instance
-            List<Loot_Group> lootGroups = CreatureService.GetLootGroupsByEvent(1);
+            List<loot_groups> lootGroups = CreatureService.GetLootGroupsByEvent(1);
 
             // This will be our narrowed down list of loot groups that are relevant to the kill in question.
-            List<Loot_Group> candidateLootGroups = new List<Loot_Group>();
+            List<loot_groups> candidateLootGroups = new List<loot_groups>();
 
             // Whittle down the loot groups into a new candidate list, based on the killed player's career,
             // and whether the kill occurred in the correct zone (if any) and whether the player has the required quest (if any)
-            foreach (Loot_Group lg in lootGroups)
+            foreach (loot_groups lg in lootGroups)
             {
                 if (lg == null)
                     continue;
 
                 if (lg.ReqActiveQuest > 0)
                 {
-                    Character_quest quest = player.QtsInterface.GetQuest(lg.ReqActiveQuest);
+                    characters_quests quest = player.QtsInterface.GetQuest(lg.ReqActiveQuest);
                     if (quest == null || quest.IsDone())
                         continue;
                 }
@@ -575,7 +575,7 @@ namespace WorldServer.Managers
             }
 
             // Generate items from remaining loot groups
-            foreach (Loot_Group lg in candidateLootGroups)
+            foreach (loot_groups lg in candidateLootGroups)
             {
                 if (lg == null)
                     continue;
@@ -587,9 +587,9 @@ namespace WorldServer.Managers
                     if (roll <= lg.DropChance)
                     {
                         // Assemble valid drops from the group
-                        List<Loot_Group_Item> candidateItems = new List<Loot_Group_Item>();
+                        List<loot_group_items> candidateItems = new List<loot_group_items>();
 
-                        foreach (Loot_Group_Item lgi in lg.LootGroupItems)
+                        foreach (loot_group_items lgi in lg.LootGroupItems)
                         {
                             if (lgi == null)
                                 continue;
@@ -600,7 +600,7 @@ namespace WorldServer.Managers
                             if (corpseRenown < lgi.MinRenown || corpseRenown > lgi.MaxRenown)
                                 continue;
 
-                            Item_Info itemDef = ItemService.GetItem_Info(lgi.ItemID);
+                            item_infos itemDef = ItemService.GetItem_Info(lgi.ItemID);
 
                             if (itemDef.Realm != 0 && itemDef.Realm != (byte)player.Realm)
                                 continue;
@@ -624,7 +624,7 @@ namespace WorldServer.Managers
                             {
                                 bool valid = false;
 
-                                Item_Info curItem = ItemService.GetItem_Info(candidateItems[itemIndex].ItemID);
+                                item_infos curItem = ItemService.GetItem_Info(candidateItems[itemIndex].ItemID);
 
                                 foreach (Player member in members)
                                 {
@@ -647,7 +647,7 @@ namespace WorldServer.Managers
                         // Now roll for an item from the candidate item list, and add it to the loots.
                         if (candidateItems.Count > 0)
                         {
-                            Item_Info winningItem = ItemService.GetItem_Info(candidateItems[StaticRandom.Instance.Next(0, candidateItems.Count)].ItemID);
+                            item_infos winningItem = ItemService.GetItem_Info(candidateItems[StaticRandom.Instance.Next(0, candidateItems.Count)].ItemID);
                             lootList.Add(new LootInfo(winningItem));
                         }
                     }

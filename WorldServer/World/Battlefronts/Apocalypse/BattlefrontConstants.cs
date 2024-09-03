@@ -74,10 +74,10 @@
         #endregion NPCs and misc
 
         #region Battlefront Tiers and Ids
-
+        //Battlefront IDs
         public static int BATTLEFRONT_DWARF_GREENSKIN_TIER1_EKRUND = 11;
-        public static int BATTLEFRONT_DWARF_GREENSKIN_TIER2 = 11;
-        public static int BATTLEFRONT_DWARF_GREENSKIN_TIER3 = 11;
+        public static int BATTLEFRONT_DWARF_GREENSKIN_TIER2 = 19;
+        public static int BATTLEFRONT_DWARF_GREENSKIN_TIER3 = 22;
         public static int BATTLEFRONT_DWARF_GREENSKIN_TIER4_BLACK_CRAG = 4;
         public static int BATTLEFRONT_DWARF_GREENSKIN_TIER4_THUNDER_MOUNTAIN = 5;
         public static int BATTLEFRONT_DWARF_GREENSKIN_TIER4_KADRIN_VALLEY = 6;
@@ -85,8 +85,8 @@
         public static int BATTLEFRONT_DWARF_GREENSKIN_TIER4_BUTCHERS_PASS = 16;
 
         public static int BATTLEFRONT_EMPIRE_CHAOS_TIER1_NORDLAND = 10;
-        public static int BATTLEFRONT_EMPIRE_CHAOS_TIER2 = 11;
-        public static int BATTLEFRONT_EMPIRE_CHAOS_TIER3 = 11;
+        public static int BATTLEFRONT_EMPIRE_CHAOS_TIER2 = 20;
+        public static int BATTLEFRONT_EMPIRE_CHAOS_TIER3 = 23;
         public static int BATTLEFRONT_EMPIRE_CHAOS_TIER4_CHAOS_WASTES = 1;
         public static int BATTLEFRONT_EMPIRE_CHAOS_TIER4_PRAAG = 2;
         public static int BATTLEFRONT_EMPIRE_CHAOS_TIER4_REIKLAND = 3;
@@ -94,8 +94,8 @@
         public static int BATTLEFRONT_EMPIRE_CHAOS_TIER4_THE_MAW = 15;
 
         public static int BATTLEFRONT_ELF_DARKELF_TIER1_CHRACE = 12;
-        public static int BATTLEFRONT_ELF_DARKELF_TIER2 = 11;
-        public static int BATTLEFRONT_ELF_DARKELF_TIER3 = 11;
+        public static int BATTLEFRONT_ELF_DARKELF_TIER2 = 21;
+        public static int BATTLEFRONT_ELF_DARKELF_TIER3 = 24;
         public static int BATTLEFRONT_ELF_DARKELF_TIER4_EATAINE = 7;
         public static int BATTLEFRONT_ELF_DARKELF_TIER4_DRAGONWAKE = 8;
         public static int BATTLEFRONT_ELF_DARKELF_TIER4_CALEDOR = 9;

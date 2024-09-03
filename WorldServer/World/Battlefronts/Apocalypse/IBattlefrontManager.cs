@@ -2,29 +2,38 @@
 using GameData;
 using System.Collections.Generic;
 using WorldServer.World.Battlefronts.Bounty;
+using WorldServer.World.Map;
 
 namespace WorldServer.World.Battlefronts.Apocalypse
 {
     public interface IBattleFrontManager
     {
-        RVRProgression GetActiveBattleFrontFromProgression();
+        byte GetBattleFrontState(int pairing, int tier);
 
-        RVRProgression GetBattleFrontByName(string name);
+        ImpactMatrixManager ImpactMatrixManagerInstance { get; set; }
 
-        RVRProgression GetBattleFrontByBattleFrontId(int id);
+        BountyManager BountyManagerInstance { get; set; }
 
-        string ActiveBattleFrontName { get; set; }
-        RVRProgression ActiveBattleFront { get; set; }
+        List<rvr_progression> BattleFrontProgressions { get; }
+
+        Dictionary<int, rvr_progression> ActiveBattlefronts { get; set; }
+
+        rvr_progression GetActiveBattleFrontFromProgression(int pairingId);
+
+        rvr_progression GetBattleFrontByName(string name);
+
+        rvr_progression GetBattleFrontByBattleFrontId(int id);
+
 
         void AuditBattleFronts(int tier);
 
         void LockBattleFrontsAllRegions(int tier, bool forceDefaultRealm = false);
 
-        RVRProgression AdvanceBattleFront(Realms lockingRealm);
+        rvr_progression AdvanceBattleFront(int pairingId, SetRealms lockingRealm);
 
-        RVRProgression OpenActiveBattlefront();
+        void OpenActiveBattlefront();
 
-        RVRProgression LockActiveBattleFront(Realms realm, int forceNumberOfBags = 0);
+        void LockActiveBattleFront(int pairingId, SetRealms realm, int forceNumberOfBags = 0);
 
         List<BattleFrontStatus> GetBattleFrontStatusList();
 
@@ -32,21 +41,22 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
         BattleFrontStatus GetBattleFrontStatus(int battleFrontId);
 
-        void LockBattleFrontStatus(int battleFrontId, Realms lockingRealm, VictoryPointProgress vpp);
+        BattleFrontStatus GetActiveCampaign(RegionMgr region);
+
+        void LockBattleFrontStatus(int battleFrontId, SetRealms lockingRealm, VictoryPointProgress vpp);
 
         BattleFrontStatus GetRegionBattleFrontStatus(int regionId);
 
-        Campaign GetActiveCampaign();
+        Campaign GetActiveCampaign(int pairingId);
+
+        Campaign GetActiveCampaign(ushort zoneId);
 
         BattleFrontStatus GetActiveBattleFrontStatus(int battleFrontId);
 
         void Update(long tick);
 
-        ImpactMatrixManager ImpactMatrixManagerInstance { get; set; }
-        BountyManager BountyManagerInstance { get; set; }
+        void UpdateRVRPRogression(SetRealms lockingRealm, rvr_progression oldProg, rvr_progression newProg);
 
-        List<RVRProgression> BattleFrontProgressions { get; }
-
-        void UpdateRVRPRogression(Realms lockingRealm, RVRProgression oldProg, RVRProgression newProg);
+        bool IsInContestedZone(ushort zoneId);
     }
 }

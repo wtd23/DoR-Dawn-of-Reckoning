@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.TheSewersofAltdorfWing2Sewers3
     {
         #region Constructors
 
-        public SimpleVermerFangchitter(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleVermerFangchitter(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

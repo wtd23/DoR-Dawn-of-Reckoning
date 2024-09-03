@@ -15,7 +15,7 @@ namespace WorldServer.World.Map
     public class ZoneMgr
     {
         public ushort ZoneId;
-        public Zone_Info Info;
+        public zone_infos Info;
         public ClientZoneInfo ClientInfo;
         public RegionMgr Region;
         public static int LOW_FIGHT = 50;
@@ -33,7 +33,7 @@ namespace WorldServer.World.Map
 
         public List<Player> Players = new List<Player>();
 
-        public ZoneMgr(RegionMgr Region, Zone_Info Info)
+        public ZoneMgr(RegionMgr Region, zone_infos Info)
         {
             this.Region = Region;
             ZoneId = Info.ZoneId;

@@ -23,16 +23,16 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         {
             SiegeTracking = new List<SiegeTracker>
             {
-                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 1, Type = SiegeType.RAM, Realm = Realms.REALMS_REALM_DESTRUCTION},
-                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 1, Type = SiegeType.RAM, Realm = Realms.REALMS_REALM_ORDER},
-                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.OIL, Realm = Realms.REALMS_REALM_DESTRUCTION},
-                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.OIL, Realm = Realms.REALMS_REALM_ORDER},
-                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.DIRECT, Realm = Realms.REALMS_REALM_DESTRUCTION},
-                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.DIRECT, Realm = Realms.REALMS_REALM_ORDER},
-                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.GTAOE, Realm = Realms.REALMS_REALM_DESTRUCTION},
-                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.GTAOE, Realm = Realms.REALMS_REALM_ORDER},
-                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.SNIPER, Realm = Realms.REALMS_REALM_DESTRUCTION},
-                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.SNIPER, Realm = Realms.REALMS_REALM_ORDER}
+                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 1, Type = SiegeType.RAM, Realm = SetRealms.REALMS_REALM_DESTRUCTION},
+                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 1, Type = SiegeType.RAM, Realm = SetRealms.REALMS_REALM_ORDER},
+                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.OIL, Realm = SetRealms.REALMS_REALM_DESTRUCTION},
+                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.OIL, Realm = SetRealms.REALMS_REALM_ORDER},
+                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.DIRECT, Realm = SetRealms.REALMS_REALM_DESTRUCTION},
+                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.DIRECT, Realm = SetRealms.REALMS_REALM_ORDER},
+                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.GTAOE, Realm = SetRealms.REALMS_REALM_DESTRUCTION},
+                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.GTAOE, Realm = SetRealms.REALMS_REALM_ORDER},
+                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.SNIPER, Realm = SetRealms.REALMS_REALM_DESTRUCTION},
+                new SiegeTracker {CurrentNumberSiege = 0, MaxNumberSiege = 2, Type = SiegeType.SNIPER, Realm = SetRealms.REALMS_REALM_ORDER}
             };
 
             DeployedSieges = new List<Siege>();
@@ -49,14 +49,14 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             return s;
         }
 
-        public void Add(Siege siege, Realms realm)
+        public void Add(Siege siege, SetRealms realm)
         {
             DeployedSieges.Add(siege);
             var siegeType = SiegeTracking.SingleOrDefault(x => x.Type == siege.SiegeInterface.Type && x.Realm == realm);
             siegeType?.Increment();
         }
 
-        public void Remove(Siege siege, Realms realm)
+        public void Remove(Siege siege, SetRealms realm)
         {
             DeployedSieges.Remove(siege);
             var siegeType = SiegeTracking.SingleOrDefault(x => x.Type == siege.SiegeInterface.Type && x.Realm == realm);
@@ -98,7 +98,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// </summary>
         /// <param name="typeToDeploy"></param>
         /// <returns></returns>
-        private bool SiegeTypeCanDeploy(SiegeType typeToDeploy, Realms realm)
+        private bool SiegeTypeCanDeploy(SiegeType typeToDeploy, SetRealms realm)
         {
             var okToDeploy = SiegeTracking.SingleOrDefault(x => x.Type == typeToDeploy && x.Realm == realm);
             if (okToDeploy != null)
@@ -109,7 +109,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             }
         }
 
-        public int GetNumberByType(SiegeType siegeType, Realms realm)
+        public int GetNumberByType(SiegeType siegeType, SetRealms realm)
         {
             var tracking = SiegeTracking.SingleOrDefault(x => x.Type == siegeType && x.Realm == realm);
             if (tracking != null)

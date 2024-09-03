@@ -1,5 +1,6 @@
 using Common;
 using FrameWork;
+using GameData;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace WorldServer.World.Objects.Instances
         public List<Creature> AddList = new List<Creature>();
         public int PlayerDeathsCount { get; set; } = 0;
 
-        public InstanceBossSpawn(Creature_spawn spawn, uint bossId, ushort instanceId, Instance instance) : base(spawn)
+        public InstanceBossSpawn(creature_spawns spawn, uint bossId, ushort instanceId, Instance instance) : base(spawn)
         {
             Name = spawn.Proto.Name;
             BossId = bossId;
@@ -47,7 +48,7 @@ namespace WorldServer.World.Objects.Instances
             base.Update(msTick);
         }
 
-        public override void ApplyKnockback(Unit caster, AbilityKnockbackInfo kbInfo)
+        public override void ApplyKnockback(Unit caster, ability_knockback_info kbInfo)
         {
             // no knockdown Mob on bosses ...
         }
@@ -244,7 +245,7 @@ namespace WorldServer.World.Objects.Instances
             {
                 Creature_proto Proto = CreatureService.GetCreatureProto(entry);
 
-                Creature_spawn Spawn = new Creature_spawn
+                creature_spawns Spawn = new creature_spawns
                 {
                     Guid = (uint)CreatureService.GenerateCreatureSpawnGUID()
                 };
@@ -311,7 +312,7 @@ namespace WorldServer.World.Objects.Instances
                         {
                             c.MvtInterface.TurnTo(player);
                             c.MvtInterface.SetBaseSpeed(100);
-                            c.MvtInterface.Follow(player, 5, 10);
+                            c.MvtInterface.Follow(player, Constants.UNITS_TO_FEET_MIN, Constants.UNITS_TO_FEET_MAX);
                             break;
                         }
                     }
@@ -325,7 +326,7 @@ namespace WorldServer.World.Objects.Instances
             {
                 c.MvtInterface.TurnTo(this);
                 c.MvtInterface.SetBaseSpeed(400);
-                c.MvtInterface.Follow(this, 5, 10);
+                c.MvtInterface.Follow(this, Constants.UNITS_TO_FEET_MIN, Constants.UNITS_TO_FEET_MAX);
             }
         }
 

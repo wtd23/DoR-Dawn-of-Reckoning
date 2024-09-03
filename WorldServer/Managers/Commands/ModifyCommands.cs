@@ -85,7 +85,7 @@ namespace WorldServer.Managers.Commands
 
             LogSanction(player.Info.AccountId, plr, "GM issued Name Change", "", $"From {charToRename.Name} to {newName}");
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -221,7 +221,7 @@ namespace WorldServer.Managers.Commands
                     guild.LeaveAlliance();  //sanity in case of packet changes with guild name change on guild inside alliance
                 }
 
-                GMCommandLog log = new GMCommandLog
+                gm_commands_logs log = new gm_commands_logs
                 {
                     PlayerName = plr.Name,
                     AccountId = (uint)plr.Client._Account.AccountId,
@@ -249,7 +249,7 @@ namespace WorldServer.Managers.Commands
             plr = GetTargetOrMe(plr) as Player;
             plr.SetLevel((byte)level);
 
-            GMCommandLog log = new GMCommandLog();
+            gm_commands_logs log = new gm_commands_logs();
             log.PlayerName = plr.Name;
             log.AccountId = (uint)plr.Client._Account.AccountId;
             log.Command = "SET LEVEL TO " + plr.Name + " " + level;
@@ -272,7 +272,7 @@ namespace WorldServer.Managers.Commands
             int renownLevel = GetInt(ref values);
 
             Player target = Player.GetPlayer(playerName);
-            Character chara = CharMgr.GetCharacter(playerName, false);
+            characters chara = CharMgr.GetCharacter(playerName, false);
 
             if (chara == null)
             {
@@ -295,7 +295,7 @@ namespace WorldServer.Managers.Commands
             if (target != plr)
                 plr.SendClientMessage($"MODIFY RENOWN: {playerName}'s renown rank is now {chara.Value.RenownRank}.");
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -323,7 +323,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            Account acct = Core.AcctMgr.GetAccount(username);
+            accounts acct = Core.AcctMgr.GetAccount(username);
 
             if (acct == null)
             {
@@ -399,7 +399,7 @@ namespace WorldServer.Managers.Commands
             plr = GetTargetOrMe(plr) as Player;
             plr.SetInfluence((ushort)chapter, (ushort)value);
 
-            GMCommandLog log = new GMCommandLog();
+            gm_commands_logs log = new gm_commands_logs();
             log.PlayerName = plr.Name;
             log.AccountId = (uint)plr.Client._Account.AccountId;
             log.Command = "SET Influence TO " + plr.Name + " Chapter " + chapter + " Value " + value;
@@ -428,11 +428,11 @@ namespace WorldServer.Managers.Commands
         /// <param name="plr"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        public static bool ModifyContribution(Player plr, ref List<string> values)
+       /* public static bool ModifyContribution(Player plr, ref List<string> values)
         {
             Player target = GetTargetOrMe(plr) as Player;
 
-            var activeCampaign = WorldMgr.UpperTierCampaignManager.GetActiveCampaign();
+            var activeCampaign = WorldMgr.ScalingCampaignManager.GetActiveCampaign();
             var status = activeCampaign?.ActiveBattleFrontStatus;
             if (status != null)
             {
@@ -475,7 +475,7 @@ namespace WorldServer.Managers.Commands
 
             return true;
         }
-
+       */
         public static bool ModifyHonorRank(Player plr, ref List<string> values)
         {
             Player target = GetTargetOrMe(plr) as Player;

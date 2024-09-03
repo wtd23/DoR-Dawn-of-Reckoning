@@ -8,8 +8,8 @@ namespace WorldServer.World.Battlefronts.Apocalypse.Loot
     {
         List<LootBagTypeDefinition> AssignLootToPlayers(int numberOfBagsToAward,
             List<LootBagTypeDefinition> bagDefinitions
-            , List<KeyValuePair<uint, int>> eligiblePlayers, IList<RVRPlayerBagBonus> bagBonuses,
-            Dictionary<uint, int> randomRollBonuses, Dictionary<uint, int> pairingContributionBonuses, WorldConfigs config);
+            , List<KeyValuePair<uint, int>> eligiblePlayers, IList<characters_bag_bonus> bagBonuses,
+            Dictionary<uint, int> randomRollBonuses, Dictionary<uint, int> pairingContributionBonuses, WorldConfig config);
 
         byte DetermineNumberOfAwards(int eligiblePlayers);
 

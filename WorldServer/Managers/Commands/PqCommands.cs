@@ -7,7 +7,7 @@ using Object = WorldServer.World.Objects.Object;
 
 namespace WorldServer.Managers.Commands
 {
-    /// <summary>Public Quest commands under .pq</summary>
+    /// <summary>Public quests commands under .pq</summary>
     internal class PqCommands
     {
         /// <summary>
@@ -24,7 +24,7 @@ namespace WorldServer.Managers.Commands
 
             plr.UpdateWorldPosition();
 
-            PQuest_Spawn spawn = new PQuest_Spawn();
+            pquest_spawns spawn = new pquest_spawns();
             //Added pquest_spawns_ID here as it is required to correctly save it to DB after this field was
             //added in PQuest_spawn.cs
             spawn.pquest_spawns_ID = Guid.NewGuid().ToString();
@@ -63,10 +63,10 @@ namespace WorldServer.Managers.Commands
                         return false;
                     obj.Dispose();
 
-                    Creature_spawn spawn = obj.GetCreature().Spawn;
+                    creature_spawns spawn = obj.GetCreature().Spawn;
                     WorldMgr.Database.DeleteObject(spawn);
 
-                    PQuest_Spawn newSpawn = new PQuest_Spawn();
+                    pquest_spawns newSpawn = new pquest_spawns();
                     //Added pquest_spawns_ID here as it is required to correctly save it to DB after this field was
                     //added in PQuest_spawn.cs
                     newSpawn.pquest_spawns_ID = Guid.NewGuid().ToString();
@@ -89,10 +89,10 @@ namespace WorldServer.Managers.Commands
                         return false;
                     obj.Dispose();
 
-                    GameObject_spawn gospawn = obj.GetGameObject().Spawn;
+                    gameobject_spawns gospawn = obj.GetGameObject().Spawn;
                     WorldMgr.Database.DeleteObject(gospawn);
 
-                    PQuest_Spawn newSpawngo = new PQuest_Spawn();
+                    pquest_spawns newSpawngo = new pquest_spawns();
                     newSpawngo.pquest_spawns_ID = Guid.NewGuid().ToString();
                     newSpawngo.Entry = gospawn.Entry;
                     newSpawngo.Objective = (uint)objective;
@@ -111,9 +111,9 @@ namespace WorldServer.Managers.Commands
                     if (!obj.IsGameObject())
                         return false;
 
-                    GameObject_spawn gointspawn = obj.GetGameObject().Spawn;
+                    gameobject_spawns gointspawn = obj.GetGameObject().Spawn;
 
-                    PQuest_Spawn newSpawnintgo = new PQuest_Spawn();
+                    pquest_spawns newSpawnintgo = new pquest_spawns();
                     newSpawnintgo.pquest_spawns_ID = Guid.NewGuid().ToString();
                     newSpawnintgo.Entry = ((GameObject)obj).Spawn.Guid;
                     newSpawnintgo.Objective = (uint)objective;

@@ -15,12 +15,12 @@ namespace WorldServer.World.Scenarios
     {
         public List<ProximityFlag> Flags = new List<ProximityFlag>();
 
-        public DominationScenario(Scenario_Info info, int tier)
+        public DominationScenario(scenario_infos info, int tier)
             : base(info, tier)
         {
             //flags.Add(new Flag(RKF_1, "The Landing", 360109, 428854, 6433, 1024));
 
-            foreach (Scenario_Object scenarioObject in info.ScenObjects)
+            foreach (scenario_objects scenarioObject in info.ScenObjects)
             {
                 if (scenarioObject.Type == "Flag")
                 {
@@ -58,15 +58,15 @@ namespace WorldServer.World.Scenarios
                         Point3D flagLocation = flag.WorldPosition;
                         if (!plr.IsDead && playerLocation2D.GetDistance(flagLocation) < 20 && Math.Abs(plr.Z - flag.WorldPosition.Z) < 30)
                         {
-                            if (!flag.playersInRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
+                            if (!flag.playersInRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
                             {
-                                flag.playersInRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Add(plr);
+                                flag.playersInRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Add(plr);
                                 flag.SendFlagInfo(plr);
                             }
                         }
-                        else if (flag.playersInRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
+                        else if (flag.playersInRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
                         {
-                            flag.playersInRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Remove(plr);
+                            flag.playersInRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Remove(plr);
                             flag.SendFlagLeft(plr);
                         }
                     }
@@ -165,7 +165,7 @@ namespace WorldServer.World.Scenarios
                             obj.ResetTo(EHeldState.Inactive);
                         else
                         {
-                            obj.SetActive(newOwnership == 2 ? Realms.REALMS_REALM_ORDER : Realms.REALMS_REALM_DESTRUCTION);
+                            obj.SetActive(newOwnership == 2 ? SetRealms.REALMS_REALM_ORDER : SetRealms.REALMS_REALM_DESTRUCTION);
                             for (int i = 0; i < 2; ++i)
                                 foreach (Player plr in Players[i])
                                     plr.SendLocalizeString((newOwnership == 1 ? "Destruction" : "Order") + "'s warball is in play!", ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.CHAT_TAG_DEFAULT);

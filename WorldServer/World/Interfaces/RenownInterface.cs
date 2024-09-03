@@ -74,7 +74,7 @@ namespace WorldServer.World.Interfaces
                         int tree = int.Parse(str.Split(':')[0]);
                         int pos = int.Parse(str.Split(':')[1]);
 
-                        CharacterInfoRenown ren = CharMgr.RenownAbilityInfo[(byte)(tree + 9)][pos];
+                        character_info_renown ren = CharMgr.RenownAbilityInfo[(byte)(tree + 9)][pos];
 
                         _trained[tree][pos] = ren.SpellId;
                         PointsSpent += ren.Renown_Costs;
@@ -503,7 +503,7 @@ namespace WorldServer.World.Interfaces
             }
         }
 
-        public void SendRenownAbility(CharacterInfoRenown ren, byte trained)
+        public void SendRenownAbility(character_info_renown ren, byte trained)
         {
             PacketOut Out = new PacketOut((byte)Opcodes.F_CAREER_PACKAGE_INFO, 64);
             Out.WriteByte(ren.Tree);

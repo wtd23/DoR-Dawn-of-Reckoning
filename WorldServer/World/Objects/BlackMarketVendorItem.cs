@@ -7,17 +7,17 @@ namespace WorldServer.World.Objects
 {
     public class BlackMarketVendorItem
     {
-        public List<Vendor_items> BlackMarketVendorItems = new List<Vendor_items>();
+        public List<creature_vendors> BlackMarketVendorItems = new List<creature_vendors>();
 
         public BlackMarketVendorItem(Player player)
         {
             BlackMarketVendorItems = GetBlackMarketItems(player);
         }
 
-        public List<Vendor_items> GetBlackMarketItems(Player player)
+        public List<creature_vendors> GetBlackMarketItems(Player player)
         {
             var items = ItemService._BlackMarket_Items.Where(x => x.RealmId == (int)player.Realm).ToList();
-            var resultList = new List<Vendor_items>();
+            var resultList = new List<creature_vendors>();
             var playerItems = player.ItmInterface.Items;
 
             foreach (var blackMarketItem in items)
@@ -28,7 +28,7 @@ namespace WorldServer.World.Objects
                     var tradingItem = ItemService.GetItem_Info((uint)1298378521);
                     tradingItem.Description = "Black Market";
 
-                    var item = new Vendor_items
+                    var item = new creature_vendors
                     {
                         Info = tradingItem,
                         ItemId = tradingItem.Entry,

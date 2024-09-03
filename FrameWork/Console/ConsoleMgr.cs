@@ -123,6 +123,8 @@ namespace FrameWork
             }
             catch (Exception ex)
             {
+                Log.Error("ConsoleMgr", ex.ToString());
+
             }
         }
 

@@ -1388,7 +1388,7 @@ namespace WorldServer.Managers
             else
             {
                 Boolean unique = true;
-                foreach (KeyValuePair<uint, Guild_Alliance_info> alli in Alliance.Alliances)
+                foreach (KeyValuePair<uint, guild_alliance_info> alli in Alliance.Alliances)
                 {
                     if (alli.Value.Name == alliname)
                         unique = false;
@@ -1657,7 +1657,7 @@ namespace WorldServer.Managers
             if (petInterface != null && !string.IsNullOrEmpty(text) && text.Length <= 20 && text.All(char.IsLetterOrDigit) && plr.Info.PetName != text)
             {
                 plr.Info.PetName = text;
-                petInterface.myPetName = text;
+                petInterface.MyPetName = text;
                 plr.SaveCharacterInfo();
                 plr.ForceSave();
             }

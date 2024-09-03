@@ -8,17 +8,17 @@ namespace WorldServer.World.Objects.Instances
 {
     public class InstanceObject : GameObject
     {
-        public readonly Instance_Object Info;
+        public readonly instance_objects Info;
         protected readonly Instance Instance;
 
         protected new byte VfxState = 0;
 
-        public InstanceObject(Instance instance, Instance_Object info)
+        public InstanceObject(Instance instance, instance_objects info)
         {
             Info = info;
             Instance = instance;
             Name = info.Name;
-            Zone_Info zone = ZoneService.GetZone_Info(instance.Info.ZoneID);
+            zone_infos zone = ZoneService.GetZone_Info(instance.Info.ZoneID);
             X = (ushort)(info.WorldX - (zone.OffX << 12));
             Y = (ushort)(info.WorldY - (zone.OffY << 12));
             Z = (ushort)info.WorldZ;

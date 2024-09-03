@@ -782,17 +782,6 @@ namespace WorldServer.World.Abilities
                 }
             _playerOwner._Value.MasterySkills = masString;
 
-            /*if (_playerOwner.Info.CareerLine == 19)
-            {
-                Pet playerPet = ((CareerInterface_WhiteLion)_playerOwner.CrrInterface).myPet;
-                if (playerPet != null)
-                    playerPet.Dismiss(null, null);
-            } else if (_playerOwner.Info.CareerLine == 8)
-            {
-                Pet playerPet = ((CareerInterface_SquigHerder)_playerOwner.CrrInterface).myPet;
-                if (playerPet != null)
-                    playerPet.Dismiss(null, null);
-            } */
             if (_playerOwner.Info.CareerLine == 19 || _playerOwner.Info.CareerLine == 8)
             {
                 DespawnPet(_playerOwner.Info.CareerLine);
@@ -848,7 +837,8 @@ namespace WorldServer.World.Abilities
                 Out.WriteByte((byte)(i + 1));
                 Out.Fill(0, 4);
 
-                // RB   4/9/2016    If for whatever reason bonus mastery points push the tree above 15, cap them.
+                // RB   4/9/2016
+                // If for whatever reason bonus mastery points push the tree above 15, cap them.
                 if (_pointsInTree[i] > 15)
                     _pointsInTree[i] = 15;
 

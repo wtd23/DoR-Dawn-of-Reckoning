@@ -26,7 +26,7 @@ namespace WorldServer.World.Abilities.Objects
 
             IsInvulnerable = true;
 
-            Faction = Realm == Realms.REALMS_REALM_ORDER ? (byte)0x41 : (byte)0x81;
+            Faction = Realm == SetRealms.REALMS_REALM_ORDER ? (byte)0x41 : (byte)0x81;
 
             Health = 1;
             MaxHealth = 1;
@@ -86,7 +86,7 @@ namespace WorldServer.World.Abilities.Objects
             PacketOut Out = new PacketOut((byte)Opcodes.F_CAST_PLAYER_EFFECT, 10);
             Out.WriteUInt16(Oid);
             Out.WriteUInt16(Oid);
-            Out.WriteUInt16(Owner.Realm == Realms.REALMS_REALM_ORDER ? (ushort)24680 : (ushort)24681); // 00 00 07 D D
+            Out.WriteUInt16(Owner.Realm == SetRealms.REALMS_REALM_ORDER ? (ushort)24680 : (ushort)24681); // 00 00 07 D D
             Out.WriteByte(1);
             Out.WriteByte(0);
             Out.WriteByte(5);   //7

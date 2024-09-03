@@ -196,7 +196,7 @@ namespace WorldServer.Managers.Commands
                     parameter.Member.DeclaringType.Name, parameter.Member.Name));
                 return false;
             }
-            else if (type != typeof(Zone_Info)
+            else if (type != typeof(zone_infos)
                 && type != typeof(short) && type != typeof(int) && type != typeof(long)
                 && type != typeof(ushort) && type != typeof(uint) && type != typeof(ulong)
                 && type != typeof(string) && type != typeof(bool)

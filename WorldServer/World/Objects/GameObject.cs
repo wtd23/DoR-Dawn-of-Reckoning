@@ -20,7 +20,7 @@ namespace WorldServer.World.Objects
 {
     public class GameObject : Unit
     {
-        public GameObject_spawn Spawn;
+        public gameobject_spawns Spawn;
 
         private long CreatureSpawnCooldown = 0;
         private long SoundCooldown = 0;
@@ -52,7 +52,7 @@ namespace WorldServer.World.Objects
         {
         }
 
-        public GameObject(GameObject_spawn spawn)
+        public GameObject(gameobject_spawns spawn)
             : this()
         {
             Spawn = spawn;
@@ -75,11 +75,11 @@ namespace WorldServer.World.Objects
 
             // Setting realm...?
             if (Faction > 63 && Faction < 118)
-                Realm = Realms.REALMS_REALM_ORDER;
+                Realm = SetRealms.REALMS_REALM_ORDER;
             else if (Faction > 127 && FactionId < 181)
-                Realm = Realms.REALMS_REALM_DESTRUCTION;
+                Realm = SetRealms.REALMS_REALM_DESTRUCTION;
             else if (Faction == 1)
-                Realm = Realms.REALMS_REALM_HOSTILE;
+                Realm = SetRealms.REALMS_REALM_HOSTILE;
 
             Level = Spawn.Proto.Level;
             MaxHealth = Spawn.Proto.HealthPoints;
@@ -146,7 +146,7 @@ namespace WorldServer.World.Objects
             Out.WriteByte((byte)(Spawn.GetUnk(0) >> 8));
 
             // Get the database if the value hasnt been changed (currently only used for keep doors)
-            if (Realm == GameData.Realms.REALMS_REALM_NEUTRAL)
+            if (Realm == GameData.SetRealms.REALMS_REALM_NEUTRAL)
                 Out.WriteByte((byte)(Spawn.GetUnk(0) & 0xFF));
             else
                 Out.WriteByte((byte)Realm);
@@ -157,7 +157,7 @@ namespace WorldServer.World.Objects
 
             int flags = Spawn.GetUnk(3);
 
-            if (Realm != GameData.Realms.REALMS_REALM_NEUTRAL && !IsInvulnerable)
+            if (Realm != GameData.SetRealms.REALMS_REALM_NEUTRAL && !IsInvulnerable)
                 flags |= 8; // Attackable (stops invalid target errors)
 
             LootContainer lootsContainer = LootsMgr.GenerateLoot(this, plr, 1);
@@ -293,7 +293,7 @@ namespace WorldServer.World.Objects
 
                     case 3100418: //rift of time
                         ZoneJump(player, 161);
-                        Zone_Info info = ZoneService.GetZone_Info(161);
+                        zone_infos info = ZoneService.GetZone_Info(161);
                         Point3D pos = ZoneService.GetWorldPosition(info, 30612, 42142, 17057);
                         player.Teleport(161, (uint)pos.X, (uint)pos.Y, (ushort)pos.Z, 4092);
                         return;
@@ -444,7 +444,7 @@ namespace WorldServer.World.Objects
                 Creature_proto Proto = CreatureService.GetCreatureProto(this.Spawn.Proto.CreatureSpawnId);
                 for (int i = 0; i < this.Spawn.Proto.CreatureSpawnCount; i++) // CreatureCount - how many creatures are spawned
                 {
-                    Creature_spawn CreSpawn = new Creature_spawn
+                    creature_spawns CreSpawn = new creature_spawns
                     {
                         Guid = (uint)CreatureService.GenerateCreatureSpawnGUID()
                     };
@@ -641,7 +641,7 @@ namespace WorldServer.World.Objects
             Log.Info("Jump", "Jump to :" + Spawn.Guid);
 #endif
 
-            Zone_jump jump = ZoneService.GetZoneJump(Spawn.Guid);
+            zone_jumps jump = ZoneService.GetZoneJump(Spawn.Guid);
 
             if (jump == null)
                 return;

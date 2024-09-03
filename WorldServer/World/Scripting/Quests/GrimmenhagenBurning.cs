@@ -65,7 +65,7 @@ namespace WorldServer.World.Scripting.Quests
             if (Proto == null)
                 return;
 
-            Creature_spawn Spawn = new Creature_spawn
+            creature_spawns Spawn = new creature_spawns
             {
                 Guid = (uint)CreatureService.GenerateCreatureSpawnGUID()
             };

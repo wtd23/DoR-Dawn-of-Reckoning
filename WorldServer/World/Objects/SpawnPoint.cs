@@ -16,7 +16,7 @@ namespace WorldServer.World.Objects
             Z = z;
         }
 
-        public SpawnPoint(Zone_Respawn respawn)
+        public SpawnPoint(zone_respawns respawn)
         {
             Point3D world;
 

@@ -10,7 +10,7 @@ namespace WorldServer.World.Objects.Instances.The_Lost_Vale
     {
         #region Constructors
 
-        public SimpleHorgulul(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleHorgulul(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
         }
 

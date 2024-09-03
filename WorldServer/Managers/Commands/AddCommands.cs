@@ -36,7 +36,7 @@ namespace WorldServer.Managers.Commands
             plr = GetTargetOrMe(plr) as Player;
             plr.AddXp((uint)xp, false, false);
 
-            GMCommandLog log = new GMCommandLog();
+            gm_commands_logs log = new gm_commands_logs();
             log.PlayerName = plr.Name;
             log.AccountId = (uint)plr.Client._Account.AccountId;
             log.Command = "ADD XP TO " + plr.Name + " " + xp;
@@ -62,7 +62,7 @@ namespace WorldServer.Managers.Commands
             Player targetPlr = GetTargetOrMe(plr) as Player;
             if (targetPlr.ItmInterface.CreateItem((uint)itemId, (ushort)count) == ItemResult.RESULT_OK)
             {
-                GMCommandLog log = new GMCommandLog();
+                gm_commands_logs log = new gm_commands_logs();
                 log.PlayerName = plr.Name;
                 log.AccountId = (uint)plr.Client._Account.AccountId;
                 log.Command = "ADDED " + count + " OF " + ItemService.GetItem_Info((uint)itemId).Name + " TO " + targetPlr.Name;
@@ -87,7 +87,7 @@ namespace WorldServer.Managers.Commands
             plr = GetTargetOrMe(plr) as Player;
             plr.AddMoney((uint)money);
 
-            GMCommandLog log = new GMCommandLog();
+            gm_commands_logs log = new gm_commands_logs();
             log.PlayerName = plr.Name;
             log.AccountId = (uint)plr.Client._Account.AccountId;
             log.Command = "ADDED MONEY TO " + plr.Name + " " + money;
@@ -107,14 +107,14 @@ namespace WorldServer.Managers.Commands
         {
             int tokEntry = GetInt(ref values);
 
-            Tok_Info info = TokService.GetTok((ushort)tokEntry);
+            tok_infos info = TokService.GetTok((ushort)tokEntry);
             if (info == null)
                 return false;
 
             plr = GetTargetOrMe(plr) as Player;
             plr.TokInterface.AddTok(info.Entry);
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -138,7 +138,7 @@ namespace WorldServer.Managers.Commands
             plr = GetTargetOrMe(plr) as Player;
             plr.AddRenown((uint)value, false);
 
-            GMCommandLog log = new GMCommandLog();
+            gm_commands_logs log = new gm_commands_logs();
             log.PlayerName = plr.Name;
             log.AccountId = (uint)plr.Client._Account.AccountId;
             log.Command = "ADD RENOWN TO " + plr.Name + " " + value;
@@ -162,7 +162,7 @@ namespace WorldServer.Managers.Commands
             plr = GetTargetOrMe(plr) as Player;
             plr.AddInfluence((byte)chapter, (ushort)inf);
 
-            GMCommandLog log = new GMCommandLog();
+            gm_commands_logs log = new gm_commands_logs();
             log.PlayerName = plr.Name;
             log.AccountId = (uint)plr.Client._Account.AccountId;
             log.Command = "ADD Infl TO " + plr.Name + " Chapter " + chapter + " Value " + inf;
@@ -172,10 +172,10 @@ namespace WorldServer.Managers.Commands
             return true;
         }
 
-        public static bool AddRewardEligibility(Player plr, ref List<string> values)
+      /*  public static bool AddRewardEligibility(Player plr, ref List<string> values)
         {
-            var activeBattleFrontId = WorldMgr.UpperTierCampaignManager.ActiveBattleFront.BattleFrontId;
-            var activeBattleFrontStatus = WorldMgr.UpperTierCampaignManager.GetBattleFrontStatus(activeBattleFrontId);
+            var activeBattleFrontId = WorldMgr.ScalingCampaignManager.ActiveBattleFront.BattleFrontId;
+            var activeBattleFrontStatus = WorldMgr.ScalingCampaignManager.GetBattleFrontStatus(activeBattleFrontId);
 
             plr = GetTargetOrMe(plr) as Player;
 
@@ -184,7 +184,7 @@ namespace WorldServer.Managers.Commands
             plr.SendClientMessage(plr.Name + " added to Eligibility");
 
             return true;
-        }
+        }*/
 
         public static bool AddZoneLockBags(Player plr, ref List<string> values)
         {
@@ -217,10 +217,10 @@ namespace WorldServer.Managers.Commands
 
                 var eligPlayer = new List<KeyValuePair<uint, int>>();
                 eligPlayer.Add(new KeyValuePair<uint, int>(plr.CharacterId, 10));
-                var bonuses = new List<RVRPlayerBagBonus>();
+                var bonuses = new List<characters_bag_bonus>();
                 var randomRolls = new Dictionary<uint, int>();
                 var pairingContributions = new Dictionary<uint, int>();
-                var rewardAssignments = rewardAssigner.AssignLootToPlayers(numberBags, new List<LootBagTypeDefinition> { lootBagTypeDefinition }, eligPlayer, bonuses, randomRolls, pairingContributions, new WorldConfigs { AllowBagBonusContribution = "Y", AllowPairingContribution = "Y", AllowRandomContribution = "Y" });
+                var rewardAssignments = rewardAssigner.AssignLootToPlayers(numberBags, new List<LootBagTypeDefinition> { lootBagTypeDefinition }, eligPlayer, bonuses, randomRolls, pairingContributions, new WorldConfig { AllowBagBonusContribution = "Y", AllowPairingContribution = "Y", AllowRandomContribution = "Y" });
 
                 var bagContentSelector = new BagContentSelector(RVRZoneRewardService.RVRRewardKeepItems, StaticRandom.Instance);
 
@@ -240,9 +240,9 @@ namespace WorldServer.Managers.Commands
                             // Only distribute if loot is valid
                             var generatedLootBag = new LootBagBuilder().BuildChestLootBag(lootDefinition, plr);
 
-                            if (plr.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                            if (plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                                 destructionLootChest.Add(plr.CharacterId, generatedLootBag);
-                            if (plr.Realm == Realms.REALMS_REALM_ORDER)
+                            if (plr.Realm == SetRealms.REALMS_REALM_ORDER)
                                 orderLootChest.Add(plr.CharacterId, generatedLootBag);
                         }
                         else

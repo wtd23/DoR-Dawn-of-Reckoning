@@ -7,19 +7,19 @@ namespace WorldServer.Services.World
     [Service]
     public class DyeService : ServiceBase
     {
-        public static List<Dye_Info> _Dyes = new List<Dye_Info>();
+        public static List<dye_infos> _Dyes = new List<dye_infos>();
 
         [LoadingFunction(true)]
         public static void LoadDyes()
         {
-            _Dyes = new List<Dye_Info>();
+            _Dyes = new List<dye_infos>();
 
             Log.Debug("WorldMgr", "Loading Dye_Info...");
 
-            IList<Dye_Info> Dyes = Database.SelectAllObjects<Dye_Info>();
+            IList<dye_infos> Dyes = Database.SelectAllObjects<dye_infos>();
 
             int Count = 0;
-            foreach (Dye_Info Dye in Dyes)
+            foreach (dye_infos Dye in Dyes)
             {
                 if (!_Dyes.Contains(Dye))
                     _Dyes.Add(Dye);
@@ -35,7 +35,7 @@ namespace WorldServer.Services.World
         /// Gets the existing dyes sorted by price.
         /// </summary>
         /// <returns>List of dyes sorted by price, never null</returns>
-        public static List<Dye_Info> GetDyes()
+        public static List<dye_infos> GetDyes()
         {
             return _Dyes;
         }

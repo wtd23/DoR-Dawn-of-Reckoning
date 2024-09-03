@@ -1273,7 +1273,7 @@ namespace WorldServer.World.Abilities
             var Y = plr.WorldPosition.Y;
             var Z = plr.WorldPosition.Z;
 
-            Creature_spawn spawn = new Creature_spawn { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
+            creature_spawns spawn = new creature_spawns { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
             spawn.BuildFromProto(CreatureService.GetCreatureProto(1000155));
 
             spawn.WorldO = facing;
@@ -1285,18 +1285,17 @@ namespace WorldServer.World.Abilities
 
             Creature c = plr.Region.CreateCreature(spawn);
             c.PlayersInRange = plr.PlayersInRange;
-            
+
             return true;
         }
 
         private bool MovePet(AbilityCommandInfo cmd, byte level, Unit target)
         {
-            Player plr = _caster as Player;
-            if (plr == null || plr.CrrInterface == null)
+            if (!(_caster is Player plr) || plr.CrrInterface == null)
                 return false;
 
             if (plr.CrrInterface.GetTargetOfInterest() != null)
-                plr.CrrInterface.GetTargetOfInterest().MvtInterface.Teleport(_caster.WorldPosition);
+                plr.CrrInterface.GetTargetOfInterest().MvtInterface.TeleportPet(_caster.WorldPosition);
 
             return true;
         }
@@ -1389,7 +1388,7 @@ namespace WorldServer.World.Abilities
 
                 for (int i = 0; i < cmd.SecondaryValue; i++)
                 {
-                    var spawn = new Creature_spawn { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
+                    var spawn = new creature_spawns { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
                     var proto = CreatureService.GetCreatureProto((uint)cmd.PrimaryValue);
                     spawn.BuildFromProto(proto);
 
@@ -1544,7 +1543,7 @@ namespace WorldServer.World.Abilities
         {
             Player plr = _caster as Player;
 
-            RallyPoint rallyPoint = RallyPointService.GetRallyPoint(plr._Value.RallyPoint);
+            rally_points rallyPoint = RallyPointService.GetRallyPoint(plr._Value.RallyPoint);
 
             if (rallyPoint != null)
                 plr.Teleport(rallyPoint.ZoneID, rallyPoint.WorldX, rallyPoint.WorldY, rallyPoint.WorldZ, rallyPoint.WorldO);
@@ -1556,7 +1555,7 @@ namespace WorldServer.World.Abilities
         {
             Player plr = (Player)_caster;
 
-            Zone_jump zoneJump = ZoneService.GetZoneJump((uint)cmd.PrimaryValue);
+            zone_jumps zoneJump = ZoneService.GetZoneJump((uint)cmd.PrimaryValue);
 
             if (zoneJump != null)
                 plr.Teleport(zoneJump.ZoneID, zoneJump.WorldX, zoneJump.WorldY, zoneJump.WorldZ, zoneJump.WorldO);
@@ -1567,9 +1566,9 @@ namespace WorldServer.World.Abilities
         private bool WarpToDungeon(AbilityCommandInfo cmd, byte level, Unit target)
         {
             Player plr = (Player)_caster;
-            Zone_jump zoneJump = null;
+            zone_jumps zoneJump = null;
 
-            if (plr.Realm == Realms.REALMS_REALM_ORDER)
+            if (plr.Realm == SetRealms.REALMS_REALM_ORDER)
             {
                 zoneJump = ZoneService.GetZoneJump((uint)cmd.PrimaryValue);
             }
@@ -1644,7 +1643,7 @@ namespace WorldServer.World.Abilities
 
         private void CreateLandMine(AbilityCommandInfo cmd, byte level, Point3D position)
         {
-            LandMine l = new LandMine((Player)_caster, position, CreatureService.GetCreatureProto(_caster.Realm == Realms.REALMS_REALM_ORDER ? 5623 : (uint)33036));
+            LandMine l = new LandMine((Player)_caster, position, CreatureService.GetCreatureProto(_caster.Realm == SetRealms.REALMS_REALM_ORDER ? 5623 : (uint)33036));
             _caster.Region.AddObject(l, _caster.Zone.ZoneId);
             l.BuffInterface.QueueBuff(new BuffQueueInfo(_caster, _caster.AbtInterface.GetMasteryLevelFor(3), AbilityMgr.GetBuffInfo(cmd.Entry, _caster, l)));
         }

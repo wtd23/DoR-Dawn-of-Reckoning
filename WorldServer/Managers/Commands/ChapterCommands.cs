@@ -19,7 +19,7 @@ namespace WorldServer.Managers.Commands
         {
             int entry = GetInt(ref values);
 
-            Chapter_Info info = ChapterService.GetChapter((ushort)entry);
+            chapter_infos info = ChapterService.GetChapter((ushort)entry);
             if (info == null)
                 return false;
 
@@ -45,8 +45,8 @@ namespace WorldServer.Managers.Commands
             int entry = GetInt(ref values);
             int tokExplore = GetInt(ref values);
 
-            Chapter_Info chapter = ChapterService.GetChapter((ushort)entry);
-            Tok_Info tok = TokService.GetTok((ushort)entry);
+            chapter_infos chapter = ChapterService.GetChapter((ushort)entry);
+            tok_infos tok = TokService.GetTok((ushort)entry);
 
             if (tok == null || chapter == null)
                 return false;
@@ -69,8 +69,8 @@ namespace WorldServer.Managers.Commands
             int entry = GetInt(ref values);
             int tokEntry = GetInt(ref values);
 
-            Chapter_Info chapter = ChapterService.GetChapter((ushort)entry);
-            Tok_Info tok = TokService.GetTok((ushort)entry);
+            chapter_infos chapter = ChapterService.GetChapter((ushort)entry);
+            tok_infos tok = TokService.GetTok((ushort)entry);
 
             if (tok == null || chapter == null)
                 return false;

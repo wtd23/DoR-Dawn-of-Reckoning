@@ -66,9 +66,9 @@ namespace WorldServer.World.Scripting.Events.BrightWizardCollegeReopen
                     {
                         if (player.QtsInterface.GetQuest(Quest) != null)
                         {
-                            Character_quest quest = player.QtsInterface.GetQuest(Quest);
+                            characters_quests quest = player.QtsInterface.GetQuest(Quest);
 
-                            foreach (KeyValuePair<ushort, Character_quest> questKp in player.QtsInterface.Quests)
+                            foreach (KeyValuePair<ushort, characters_quests> questKp in player.QtsInterface.Quests)
                             {
                                 if (questKp.Value == quest)
                                 {

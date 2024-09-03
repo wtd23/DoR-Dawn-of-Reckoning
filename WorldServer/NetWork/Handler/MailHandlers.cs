@@ -58,7 +58,7 @@ namespace WorldServer.NetWork.Handler
 
         public static void SendCOD(string receiverName, Player sender, uint amount)
         {
-            Character receiver = CharMgr.GetCharacter(receiverName, false);
+            characters receiver = CharMgr.GetCharacter(receiverName, false);
 
             // Sender may have deleted character, oh well. No one gets the money.
             if (receiver == null)

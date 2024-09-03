@@ -20,7 +20,7 @@ namespace WorldServer.World.Battlefronts.Keeps
         public const int INNER_DOOR_RP = 400;
         public const int INNER_DOOR_XP = 1500;
 
-        public static void OuterDoorReward(KeepDoor door, Realms attackingRealm, string description, ContributionManager contributionManagerInstance)
+        public static void OuterDoorReward(KeepDoor door, SetRealms attackingRealm, string description, ContributionManager contributionManagerInstance)
         {
             var attackingPlayers = door.GameObject.PlayersInRange.Where(x => x.Realm == attackingRealm);
 
@@ -46,7 +46,7 @@ namespace WorldServer.World.Battlefronts.Keeps
             }
         }
 
-        public static void InnerDoorReward(KeepDoor door, Realms attackingRealm, string description, ContributionManager contributionManagerInstance)
+        public static void InnerDoorReward(KeepDoor door, SetRealms attackingRealm, string description, ContributionManager contributionManagerInstance)
         {
             var attackingPlayers = door.GameObject.PlayersInRange.Where(x => x.Realm == attackingRealm);
 
@@ -78,7 +78,7 @@ namespace WorldServer.World.Battlefronts.Keeps
             {
                 if (keep.Realm == plr.Realm && plr.ValidInTier(keep.Tier, true))
                 {
-                    var influenceId = plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? plr.CurrentArea.DestroInfluenceId : plr.CurrentArea.OrderInfluenceId;
+                    var influenceId = plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? plr.CurrentArea.DestroInfluenceId : plr.CurrentArea.OrderInfluenceId;
                     var random = StaticRandom.Instance.Next(80, 120);
                     var totalXp = 2000 * keep.Tier * random / 100;
                     var totalRenown = 300 * keep.Tier * random / 100;
@@ -196,7 +196,7 @@ namespace WorldServer.World.Battlefronts.Keeps
 
                         if ((influenceId == 0) && player.CurrentArea != null)
                         {
-                            influenceId = player.Realm == Realms.REALMS_REALM_DESTRUCTION
+                            influenceId = player.Realm == SetRealms.REALMS_REALM_DESTRUCTION
                                 ? player.CurrentArea.DestroInfluenceId
                                 : player.CurrentArea.OrderInfluenceId;
                             player.AddInfluence((ushort)influenceId, (ushort)totalInfluence);

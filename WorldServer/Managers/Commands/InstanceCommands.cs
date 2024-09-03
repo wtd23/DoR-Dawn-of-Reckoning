@@ -23,7 +23,7 @@ namespace WorldServer.Managers.Commands
 
             plr.UpdateWorldPosition();
 
-            Instance_Spawn spawn = new Instance_Spawn();
+            instance_creature_spawns spawn = new instance_creature_spawns();
             // "Spawn a Instance NPC <object id> <BossId> <spawngroup> <realm>"
             spawn.Instance_spawns_ID = Guid.NewGuid().ToString();
             spawn.Entry = (uint)entry;
@@ -59,7 +59,7 @@ namespace WorldServer.Managers.Commands
 
             plr.UpdateWorldPosition();
 
-            Instance_Boss_Spawn spawn = new Instance_Boss_Spawn();
+            instance_boss_spawns spawn = new instance_boss_spawns();
             // "Spawn a Instance NPC <object id> <BossId> <spawngroup> <realm>"
             spawn.Instance_spawns_ID = Guid.NewGuid().ToString();
             spawn.Entry = (uint)entry;
@@ -97,10 +97,10 @@ namespace WorldServer.Managers.Commands
                 return false;
             obj.Dispose();
 
-            Creature_spawn spawn = obj.GetCreature().Spawn;
+            creature_spawns spawn = obj.GetCreature().Spawn;
             WorldMgr.Database.DeleteObject(spawn);
 
-            Instance_Spawn newSpawn = new Instance_Spawn();
+            instance_creature_spawns newSpawn = new instance_creature_spawns();
 
             newSpawn.Instance_spawns_ID = Guid.NewGuid().ToString();
             newSpawn.Entry = spawn.Entry;
@@ -134,10 +134,10 @@ namespace WorldServer.Managers.Commands
                 return false;
             obj.Dispose();
 
-            Creature_spawn spawn = obj.GetCreature().Spawn;
+            creature_spawns spawn = obj.GetCreature().Spawn;
             WorldMgr.Database.DeleteObject(spawn);
 
-            Instance_Boss_Spawn newSpawn = new Instance_Boss_Spawn();
+            instance_boss_spawns newSpawn = new instance_boss_spawns();
 
             newSpawn.Instance_spawns_ID = Guid.NewGuid().ToString();
             newSpawn.Entry = spawn.Entry;

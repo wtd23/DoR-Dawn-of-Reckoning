@@ -1,7 +1,12 @@
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\LauncherServer.exe.config
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\LauncherServer.exe
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\LauncherServer\obj\x64\Release\LauncherServer.csproj.AssemblyReference.cache
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\LauncherServer\obj\x64\Release\LauncherServer.csproj.SuggestedBindingRedirects.cache
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\LauncherServer\obj\x64\Release\LauncherServer.csproj.CoreCompileInputs.cache
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\LauncherServer\obj\x64\Release\LauncherServer.csproj.CopyComplete
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\LauncherServer\obj\x64\Release\LauncherServer.exe
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\LauncherServer.exe.config
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\LauncherServer.exe
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\LauncherServer\obj\x64\Release\LauncherServer.csproj.AssemblyReference.cache
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\LauncherServer\obj\x64\Release\LauncherServer.csproj.CoreCompileInputs.cache
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\LauncherServer\obj\x64\Release\Launcher.BE5181E6.Up2Date
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\LauncherServer\obj\x64\Release\LauncherServer.exe
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\LauncherServer.exe.config
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\LauncherServer.exe
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\LauncherServer\obj\x64\Release\LauncherServer.csproj.AssemblyReference.cache
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\LauncherServer\obj\x64\Release\LauncherServer.csproj.CoreCompileInputs.cache
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\LauncherServer\obj\x64\Release\Launcher.BE5181E6.Up2Date
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\LauncherServer\obj\x64\Release\LauncherServer.exe

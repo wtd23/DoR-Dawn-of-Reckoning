@@ -7,7 +7,7 @@ namespace WorldServer.World.Objects.Instances.The_Lost_Vale
     {
         #region Constructors
 
-        public SimpleTheDeamonicBeast(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleTheDeamonicBeast(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(ChargeRandomNonTankPlayer, 15000, 0);
         }

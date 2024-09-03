@@ -8,14 +8,14 @@ namespace WorldServer.World.Objects
 {
     public class HonorVendorItem
     {
-        public List<Vendor_items> items = new List<Vendor_items>();
+        public List<creature_vendors> items = new List<creature_vendors>();
 
         public HonorVendorItem(Player player)
         {
             items = GetHonorRankItems(player, player.Info.HonorRank);
         }
 
-        private List<Vendor_items> GetHonorRankItems(Player player, int rank)
+        private List<creature_vendors> GetHonorRankItems(Player player, int rank)
         {
             var rankItems = HonorService.HonorRewards.Where(x => x.HonorRank <= rank);
 
@@ -23,7 +23,7 @@ namespace WorldServer.World.Objects
             {
                 if (IsValidItemForPlayer(player, honorReward))
                 {
-                    var item = new Vendor_items
+                    var item = new creature_vendors
                     {
                         Info = ItemService.GetItem_Info((uint)honorReward.ItemId),
                         ItemId = (uint)honorReward.ItemId,
@@ -36,7 +36,7 @@ namespace WorldServer.World.Objects
             return items;
         }
 
-        public bool IsValidItemForPlayer(Player player, HonorReward honorReward)
+        public bool IsValidItemForPlayer(Player player, honor_rewards honorReward)
         {
             if (honorReward.Realm == 0 || honorReward.Realm == (int)player.Realm)
             {

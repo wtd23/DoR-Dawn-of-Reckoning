@@ -17,7 +17,7 @@ namespace WorldServer.World.Objects
                 return ZoneAreas;
             }
 
-            foreach (var rvrAreaPolygon in RVRProgressionService._RVRAreaPolygons)
+            foreach (var rvrAreaPolygon in RVRProgressionService.RVRAreaPolygons)
             {
                 ZoneAreas.Add(rvrAreaPolygon.ZoneId, rvrAreaPolygon.PolygonPlanarCoordinates.Split(',').Select(ushort.Parse).ToList());
             }

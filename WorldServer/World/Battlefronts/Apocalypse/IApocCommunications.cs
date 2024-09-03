@@ -9,14 +9,14 @@ namespace WorldServer.World.Battlefronts.Apocalypse
     {
         void SendFlagLeft(Player plr, int id);
 
-        void BuildCaptureStatus(PacketOut Out, RegionMgr region, Realms realm);
+        void BuildCaptureStatus(PacketOut Out, RegionMgr region, SetRealms realm);
 
         void BuildBattleFrontStatus(PacketOut Out, RegionMgr region);
 
-        void SendCampaignStatus(Player plr, VictoryPointProgress vpp, Realms realm);
+        void SendCampaignStatus(Player plr, VictoryPointProgress vpp, SetRealms realm);
 
         void Broadcast(string message, int tier);
 
-        void Broadcast(string message, Realms realm, RegionMgr region, int tier);
+        void Broadcast(string message, SetRealms realm, RegionMgr region, int tier);
     }
 }

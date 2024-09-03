@@ -74,15 +74,15 @@ namespace WorldServer.Managers.Commands
             int zoneID;
             if (int.TryParse(zoneName, out zoneID))
             {
-                Zone_Info info = ZoneService.GetZone_Info((ushort)zoneID);
+                zone_infos info = ZoneService.GetZone_Info((ushort)zoneID);
                 if (info != null)
                     return zoneID;
                 player.SendMessage("Could not find zone for id " + zoneID, ChatLogFilters.CHATLOGFILTERS_USER_ERROR);
                 return -1;
             }
 
-            List<Zone_Info> results = new List<Zone_Info>();
-            foreach (Zone_Info zone in ZoneService._Zone_Info)
+            List<zone_infos> results = new List<zone_infos>();
+            foreach (zone_infos zone in ZoneService._Zone_Info)
             {
                 if (zone.Name.ToLower().Contains(zoneName.ToLower()))
                     results.Add(zone);
@@ -224,7 +224,7 @@ namespace WorldServer.Managers.Commands
         public static void LogSanction(int accountId, Player issuedBy, string actionType, string actionDuration, string actionReason)
         {
             Core.AcctMgr.AddSanction(
-                new AccountSanctionInfo
+                new accounts_sanction_logs
                 {
                     AccountId = accountId,
                     IssuedBy = issuedBy.Client._Account.Username,

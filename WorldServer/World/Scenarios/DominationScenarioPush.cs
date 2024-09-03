@@ -18,7 +18,7 @@ namespace WorldServer.World.Scenarios
         private int _orderLevel = 0;
         private int _destroLevel = 2;
 
-        public DominationScenarioPush(Scenario_Info info, int tier)
+        public DominationScenarioPush(scenario_infos info, int tier)
             : base(info, tier)
         {
             //flags.Add(new Flag(RKF_1, "The Landing", 360109, 428854, 6433, 1024));
@@ -27,7 +27,7 @@ namespace WorldServer.World.Scenarios
             FlagLevel[1] = new List<ProximityFlag>();
             FlagLevel[2] = new List<ProximityFlag>();
 
-            foreach (Scenario_Object scenarioObject in info.ScenObjects)
+            foreach (scenario_objects scenarioObject in info.ScenObjects)
             {
                 Log.Info("DominationScenarioPush", "Adding flag " + scenarioObject.ObjectiveName + " realm:" + scenarioObject.Realm);
                 if (scenarioObject.Type == "Flag")
@@ -57,13 +57,13 @@ namespace WorldServer.World.Scenarios
             EvtInterface.AddEvent(GeneratePoints, 6000, 0);
 
             foreach (var orderFlag in FlagLevel[0])
-                BroadcastFlagUnlock(orderFlag, Realms.REALMS_REALM_ORDER);
+                BroadcastFlagUnlock(orderFlag, SetRealms.REALMS_REALM_ORDER);
 
             foreach (var destroFlag in FlagLevel[2])
-                BroadcastFlagUnlock(destroFlag, Realms.REALMS_REALM_DESTRUCTION);
+                BroadcastFlagUnlock(destroFlag, SetRealms.REALMS_REALM_DESTRUCTION);
         }
 
-        private void BroadcastFlagUnlock(ProximityFlag flag, Realms? realm = null)
+        private void BroadcastFlagUnlock(ProximityFlag flag, SetRealms? realm = null)
         {
             for (int i = 0; i < 2; i++)
             {
@@ -75,7 +75,7 @@ namespace WorldServer.World.Scenarios
             }
         }
 
-        private bool IsLevelCaptured(int level, Realms realm)
+        private bool IsLevelCaptured(int level, SetRealms realm)
         {
             if (!FlagLevel.ContainsKey(level))
                 return false;
@@ -118,22 +118,22 @@ namespace WorldServer.World.Scenarios
                         {
                             var level = GetFlagLevel(flag);
                             //check if player is allowed to capture this flag (must capture flags closer to base first)
-                            if (plr.Realm == Realms.REALMS_REALM_ORDER && level > _orderLevel && flag.OwningRealm == 0)
+                            if (plr.Realm == SetRealms.REALMS_REALM_ORDER && level > _orderLevel && flag.OwningRealm == 0)
                                 continue;
-                            if (plr.Realm == Realms.REALMS_REALM_DESTRUCTION && level < _destroLevel && flag.OwningRealm == 0)
+                            if (plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION && level < _destroLevel && flag.OwningRealm == 0)
                                 continue;
 
-                            if (!flag.playersInRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
+                            if (!flag.playersInRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
                             {
-                                flag.playersInRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Add(plr);
+                                flag.playersInRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Add(plr);
                                 flag.SendFlagInfo(plr);
                             }
                         }
-                        else if (flag.playersInRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
+                        else if (flag.playersInRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
                         {
                             //cannot capture center flag until base is captured
 
-                            flag.playersInRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Remove(plr);
+                            flag.playersInRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Remove(plr);
                             flag.SendFlagLeft(plr);
                         }
                     }
@@ -184,14 +184,14 @@ namespace WorldServer.World.Scenarios
                     {
                         //update levels
 
-                        if (IsLevelCaptured(0, Realms.REALMS_REALM_ORDER))
+                        if (IsLevelCaptured(0, SetRealms.REALMS_REALM_ORDER))
                             _orderLevel = 1;
-                        if (IsLevelCaptured(1, Realms.REALMS_REALM_ORDER))
+                        if (IsLevelCaptured(1, SetRealms.REALMS_REALM_ORDER))
                             _orderLevel = 2;
 
-                        if (IsLevelCaptured(2, Realms.REALMS_REALM_DESTRUCTION))
+                        if (IsLevelCaptured(2, SetRealms.REALMS_REALM_DESTRUCTION))
                             _destroLevel = 1;
-                        if (IsLevelCaptured(1, Realms.REALMS_REALM_DESTRUCTION))
+                        if (IsLevelCaptured(1, SetRealms.REALMS_REALM_DESTRUCTION))
                             _destroLevel = 0;
 
                         string packetString =
@@ -213,13 +213,13 @@ namespace WorldServer.World.Scenarios
                         {
                             SendObjectiveStates(plr);
 
-                            if (_orderLevel != currentOrderLevel && plr.Realm == Realms.REALMS_REALM_ORDER)
+                            if (_orderLevel != currentOrderLevel && plr.Realm == SetRealms.REALMS_REALM_ORDER)
                             {
                                 foreach (var f in FlagLevel[_orderLevel])
                                     plr.SendLocalizeString(f.ObjectiveName + " is open for capture!", ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.CHAT_TAG_DEFAULT);
                             }
 
-                            if (_destroLevel != currentDestroLevel && plr.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                            if (_destroLevel != currentDestroLevel && plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                             {
                                 foreach (var f in FlagLevel[_destroLevel])
                                     plr.SendLocalizeString(f.ObjectiveName + " is open for capture!", ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.CHAT_TAG_DEFAULT);

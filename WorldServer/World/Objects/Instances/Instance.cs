@@ -43,7 +43,7 @@ namespace WorldServer.World.Objects.Instances
     public class Instance
     {
         public ushort ID { get; set; }
-        public Instance_Info Info;
+        public instance_infos Info;
         public RegionMgr Region;
         public List<Player> Players = new List<Player>();
         private List<GameObject> _Objects = new List<GameObject>();
@@ -55,7 +55,7 @@ namespace WorldServer.World.Objects.Instances
         private bool _running;
         public ushort ZoneID;
         private readonly byte Realm;
-        public Instance_Lockouts Lockout = null;
+        public instance_lockouts Lockout = null;
         private int closetime;
         public byte state;
         public byte updatestate;
@@ -63,7 +63,7 @@ namespace WorldServer.World.Objects.Instances
 
         public uint CurrentBossId { get; set; } = 0;
 
-        public Instance(ushort zoneid, ushort id, byte realm, Instance_Lockouts lockouts)
+        public Instance(ushort zoneid, ushort id, byte realm, instance_lockouts lockouts)
         {
             Lockout = lockouts;
             ID = id;
@@ -215,7 +215,7 @@ namespace WorldServer.World.Objects.Instances
             return _BossSpawns.Count;
         }
 
-        public void AddPlayer(Player player, Zone_jump jump)
+        public void AddPlayer(Player player, zone_jumps jump)
         {
             lock (Players)
             {
@@ -278,7 +278,7 @@ namespace WorldServer.World.Objects.Instances
         {
             if (Lockout == null) // instance hasn't got any lockouts
             {
-                Lockout = new Instance_Lockouts
+                Lockout = new instance_lockouts
                 {
                     InstanceID = "~" + ZoneID + ":" + (TCPManager.GetTimeStamp() + Info.LockoutTimer * 60),
                     Bosseskilled = CurrentBossId.ToString()
@@ -319,7 +319,7 @@ namespace WorldServer.World.Objects.Instances
                     deadbossIds.Add(uint.Parse(Lockout.Bosseskilled.Split(':')[i]));
                 }
 
-            InstanceService._InstanceBossSpawns.TryGetValue(Info.Entry, out List<Instance_Boss_Spawn> Obj);
+            InstanceService._InstanceBossSpawns.TryGetValue(Info.Entry, out List<instance_boss_spawns> Obj);
 
             if (Obj == null)
                 return;
@@ -334,7 +334,7 @@ namespace WorldServer.World.Objects.Instances
                     if (obj.ZoneID != ZoneID)
                         continue;
 
-                    Creature_spawn spawn = new Creature_spawn
+                    creature_spawns spawn = new creature_spawns
                     {
                         Guid = (uint)CreatureService.GenerateCreatureSpawnGUID()
                     };
@@ -681,7 +681,7 @@ namespace WorldServer.World.Objects.Instances
 
         private void LoadSpawns()
         {
-            InstanceService._InstanceSpawns.TryGetValue(ZoneID, out List<Instance_Spawn> Obj);
+            InstanceService._InstanceSpawns.TryGetValue(ZoneID, out List<instance_creature_spawns> Obj);
 
             List<uint> deadbossIds = new List<uint>();
             if (Lockout != null)
@@ -700,7 +700,7 @@ namespace WorldServer.World.Objects.Instances
 
                 if (obj.Realm == 0 || obj.Realm == Realm)
                 {
-                    Creature_spawn spawn = new Creature_spawn
+                    creature_spawns spawn = new creature_spawns
                     {
                         Guid = (uint)CreatureService.GenerateCreatureSpawnGUID()
                     };

@@ -45,7 +45,7 @@ namespace WorldServer.NetWork.Handler
                         packet.Skip(2);
                         string Name = packet.GetString(NameSize - 1);
 
-                        Bug_report report = new Bug_report();
+                        bugs_reports report = new bugs_reports();
                         report.Time = (uint)TCPManager.GetTimeStamp();
                         report.AccountId = (uint)Plr.Client._Account.AccountId;
                         report.CharacterId = Plr.CharacterId;
@@ -78,7 +78,7 @@ namespace WorldServer.NetWork.Handler
                         report.Fields.Add(new KeyValuePair<uint, string>(0, Name.Replace("|", "").Replace(":", "")));
 
                         //lets not allow players to report server automated mails
-                        if (Message.Contains("[Mail Subject]: Public Quest Loot [Mail Message Body]: You won a Public Quest Loot Bag") || Message.Contains("[Mail Subject]: Medallion Reward [Mail Message Body]: You've received a medallion reward for your realm's victory in a recent battle in which you were a participant.") || Message.Contains(" [Mail Message Body]: Your mail expired and has been returned to you."))
+                        if (Message.Contains("[Mail Subject]: Public quests Loot [Mail Message Body]: You won a Public quests Loot Bag") || Message.Contains("[Mail Subject]: Medallion Reward [Mail Message Body]: You've received a medallion reward for your realm's victory in a recent battle in which you were a participant.") || Message.Contains(" [Mail Message Body]: Your mail expired and has been returned to you."))
                         {
                             Plr.SendClientMessage("This is a server generated mail, this ticket will be discarded.", ChatLogFilters.CHATLOGFILTERS_USER_ERROR);
                             break;
@@ -109,7 +109,7 @@ namespace WorldServer.NetWork.Handler
                         packet.Skip(1);
                         byte FieldsCount = packet.GetUint8();
 
-                        Bug_report report = new Bug_report();
+                        bugs_reports report = new bugs_reports();
                         report.Time = (uint)TCPManager.GetTimeStamp();
                         report.AccountId = (uint)Plr.Client._Account.AccountId;
                         report.CharacterId = Plr.CharacterId;
@@ -161,7 +161,7 @@ namespace WorldServer.NetWork.Handler
                         if (MessageSize > 0)
                             Message = packet.GetString(MessageSize - 1);
 
-                        Bug_report report = new Bug_report();
+                        bugs_reports report = new bugs_reports();
                         report.Time = (uint)TCPManager.GetTimeStamp();
                         report.AccountId = (uint)Plr.Client._Account.AccountId;
                         report.CharacterId = Plr.CharacterId;

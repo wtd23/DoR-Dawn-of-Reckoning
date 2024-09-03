@@ -250,8 +250,7 @@ namespace WorldServer.Managers.Commands
         /// <returns></returns>
         public static bool GetAbilityList(Player plr, ref List<string> values)
         {
-            Creature obj = GetObjectTarget(plr) as Creature;
-            if (obj == null)
+            if (!(GetObjectTarget(plr) is Creature obj))
                 return false;
 
             plr.SendClientMessage("All loaded abilities of target <Entry, Name>:");

@@ -160,6 +160,12 @@ namespace WorldServer.World.Interfaces
                 Scripts[i].OnCastAbility(Ability);
         }
 
+        public void OnCastAbilityCreature(Object Creature, AbilityInfo Ability)
+        {
+            for (int i = 0; i < Scripts.Count; ++i)
+                Scripts[i].OnCastAbilityCreature(Creature, Ability);
+        }
+
         #endregion Local
 
         #region World

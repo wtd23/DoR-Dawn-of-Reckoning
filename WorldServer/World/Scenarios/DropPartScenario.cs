@@ -23,10 +23,10 @@ namespace WorldServer.World.Scenarios
         private bool _salvageMoved = true;
         private Point3D _salvageSpawn = new Point3D();
 
-        public DropPartScenario(Scenario_Info info, int tier)
+        public DropPartScenario(scenario_infos info, int tier)
             : base(info, tier)
         {
-            foreach (Scenario_Object scBall in info.ScenObjects)
+            foreach (scenario_objects scBall in info.ScenObjects)
             {
                 if (scBall.ObjectiveName == "Salvage")
                 {
@@ -57,7 +57,7 @@ namespace WorldServer.World.Scenarios
 
             GameObject_proto glowProto = GameObjectService.GetGameObjectProto(100598);
 
-            GameObject_spawn spawn = new GameObject_spawn
+            gameobject_spawns spawn = new gameobject_spawns
             {
                 Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                 WorldO = 0,
@@ -123,7 +123,7 @@ namespace WorldServer.World.Scenarios
                     Out.Write(bytes, 0, bytes.Length);
 
                     Out.Fill(0, 5);
-                    if (plr.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                    if (plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                         Out.WriteByte(0x9C);
                     else
                         Out.WriteByte(0x9B);
@@ -177,7 +177,7 @@ namespace WorldServer.World.Scenarios
                     Out.Write(bytes, 0, bytes.Length);
 
                     Out.Fill(0, 5);
-                    if (plr.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                    if (plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                         Out.WriteByte(0x9C);
                     else
                         Out.WriteByte(0x9B);
@@ -196,10 +196,10 @@ namespace WorldServer.World.Scenarios
                     SendObjectiveStates(player);
                 }
             ResetPart();
-            GivePoints((plr.Realm == Realms.REALMS_REALM_ORDER ? 1 : 2), 75);
+            GivePoints((plr.Realm == SetRealms.REALMS_REALM_ORDER ? 1 : 2), 75);
             //rewarding the player turning in the salvage so it gets more focused on objectives
             plr.AddRenown(70, true);
-            if (plr.Realm == Realms.REALMS_REALM_ORDER)
+            if (plr.Realm == SetRealms.REALMS_REALM_ORDER)
                 _orderCart.PlayEffect(1136, new Point3D(_orderCart.Spawn.WorldX, _orderCart.Spawn.WorldY, _orderCart.Spawn.WorldZ + 50));
             else
                 _destroCart.PlayEffect(1136, new Point3D(_destroCart.Spawn.WorldX, _destroCart.Spawn.WorldY, _destroCart.Spawn.WorldZ + 50));
@@ -216,7 +216,7 @@ namespace WorldServer.World.Scenarios
         {
             GameObject_proto glowProto = GameObjectService.GetGameObjectProto(entry);
 
-            GameObject_spawn spawn = new GameObject_spawn
+            gameobject_spawns spawn = new gameobject_spawns
             {
                 Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                 WorldO = o,
@@ -237,8 +237,8 @@ namespace WorldServer.World.Scenarios
         {
             base.Interact(obj, plr, menu);
 
-            if ((obj == _orderCart && plr.Realm == Realms.REALMS_REALM_ORDER && plr == _carrier)
-                || (obj == _destroCart && plr.Realm == Realms.REALMS_REALM_DESTRUCTION && plr == _carrier))
+            if ((obj == _orderCart && plr.Realm == SetRealms.REALMS_REALM_ORDER && plr == _carrier)
+                || (obj == _destroCart && plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION && plr == _carrier))
                 PutPartInCart(plr, obj);
             else if (_carrier == null && obj == _salvage)
             {

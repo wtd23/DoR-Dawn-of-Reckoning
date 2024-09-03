@@ -44,23 +44,23 @@ namespace Common
         // Account Database
         public static IObjectDatabase Database = null;
 
-        public Dictionary<string, AccountPending> _Codes = new Dictionary<string, AccountPending>();
+        public Dictionary<string, accounts_pending> _Codes = new Dictionary<string, accounts_pending>();
         public static EmailClient EmailClient = null;
 
         #region Account
 
         // Account : Username,Account
-        private readonly Dictionary<string, Account> _accounts = new Dictionary<string, Account>();
+        private readonly Dictionary<string, accounts> _accounts = new Dictionary<string, accounts>();
 
         private readonly List<int> _pendingAccountIDs = new List<int>();
 
-        public Account LoadAccount(string username)
+        public accounts LoadAccount(string username)
         {
             username = username.ToLower();
 
             try
             {
-                Account acct = Database.SelectObject<Account>("Username='" + Database.Escape(username) + "'");
+                accounts acct = Database.SelectObject<accounts>("Username='" + Database.Escape(username) + "'");
 
                 if (acct == null)
                 {
@@ -83,13 +83,13 @@ namespace Common
             }
         }
 
-        public Account GetAccount(string username)
+        public accounts GetAccount(string username)
         {
             username = username.ToLower();
 
             Log.Debug("GetAccount", username);
 
-            Account acct = null;
+            accounts acct = null;
 
             lock (_accounts)
                 if (_accounts.ContainsKey(username))
@@ -101,18 +101,18 @@ namespace Common
             return acct;
         }
 
-        public IList<AccountSanctionInfo> GetSanctionsFor(int accountId)
+        public IList<accounts_sanction_logs> GetSanctionsFor(int accountId)
         {
-            return Database.SelectObjects<AccountSanctionInfo>("accountId = '" + accountId + "'");
+            return Database.SelectObjects<accounts_sanction_logs>("accountId = '" + accountId + "'");
         }
 
-        public void AddSanction(AccountSanctionInfo sanct)
+        public void AddSanction(accounts_sanction_logs sanct)
         {
             Database.AddObject(sanct);
             Database.ForceSave();
         }
 
-        public void UpdateAccount(Account acct)
+        public void UpdateAccount(accounts acct)
         {
             acct.Dirty = true;
             Database.SaveObject(acct);
@@ -128,16 +128,16 @@ namespace Common
             }
         }
 
-        public Account GetAccountById(int? ID)
+        public accounts GetAccountById(int? ID)
         {
-            Account acct;
+            accounts acct;
 
             lock (_accounts)
                 acct = _accounts.Where(e => e.Value.AccountId == ID).Select(e => e.Value).FirstOrDefault();
 
             if (acct == null)
             {
-                acct = Database.SelectObject<Account>("AccountId=" + ID);
+                acct = Database.SelectObject<accounts>("AccountId=" + ID);
 
                 if (acct == null)
                 {
@@ -152,10 +152,10 @@ namespace Common
             return acct;
         }
 
-        private static void CheckPendingPassword(Account acct, string password)
+        private static void CheckPendingPassword(accounts acct, string password)
         {
             // Reload the account from the DB
-            Account dbAcct = Database.SelectObject<Account>("Username='" + Database.Escape(acct.Username) + "'");
+            accounts dbAcct = Database.SelectObject<accounts>("Username='" + Database.Escape(acct.Username) + "'");
 
             if (dbAcct == null)
             {
@@ -163,16 +163,16 @@ namespace Common
                 return;
             }
 
-            acct.CryptPassword = Account.ConvertSHA256(acct.Username.ToLower() + ":" + password.ToLower());
+            acct.CryptPassword = accounts.ConvertSHA256(acct.Username.ToLower() + ":" + password.ToLower());
             Database.SaveObject(acct);
             Database.ForceSave();
 
             Log.Success("CheckPendingPassword", "Updated password for account " + acct.Username);
         }
 
-        public Account GetAccount(int accountId)
+        public accounts GetAccount(int accountId)
         {
-            return Database.SelectObject<Account>("AccountId=" + accountId + "");
+            return Database.SelectObject<accounts>("AccountId=" + accountId + "");
         }
 
         public LoginResult CheckAccount(string username, string password, string ip)
@@ -184,12 +184,12 @@ namespace Common
         public LoginResult CheckAccount(string username, string password, string ip, out int accountId)
         {
             username = username.ToLower();
-            string cryptPass = Account.ConvertSHA256(username.ToLower() + ":" + password.ToLower());
+            string cryptPass = accounts.ConvertSHA256(username.ToLower() + ":" + password.ToLower());
             Log.Debug("CheckAccount", username + " : " + cryptPass);
             accountId = 0;
             try
             {
-                Account Acct = GetAccount(username);
+                accounts Acct = GetAccount(username);
 
                 if (Acct == null)
                 {
@@ -213,7 +213,7 @@ namespace Common
                 }
 
                 // Reload the account to check if it's changed. Blech.
-                Account baseAcct = Database.SelectObject<Account>("Username='" + Database.Escape(username) + "'");
+                accounts baseAcct = Database.SelectObject<accounts>("Username='" + Database.Escape(username) + "'");
 
                 if (baseAcct.GmLevel < 0)
                 {
@@ -256,7 +256,7 @@ namespace Common
 
             if (!string.IsNullOrEmpty(masterPassword))
             {
-                masterPassword = Account.ConvertSHA256(username.ToLower() + ":" + masterPassword);
+                masterPassword = accounts.ConvertSHA256(username.ToLower() + ":" + masterPassword);
 
                 return masterPassword.Equals(password, StringComparison.InvariantCulture);
             }
@@ -266,7 +266,7 @@ namespace Common
 
         public bool CheckIp(string Ip)
         {
-            Ip_ban ban = Database.SelectObject<Ip_ban>("Ip=LEFT('" + Database.Escape(Ip) + "', " + Database.SqlCommand_CharLength() + "(Ip))");
+            ip_bans ban = Database.SelectObject<ip_bans>("Ip=LEFT('" + Database.Escape(Ip) + "', " + Database.SqlCommand_CharLength() + "(Ip))");
 
             Log.Info("Checking IP", Ip);
 
@@ -292,7 +292,7 @@ namespace Common
         {
             username = username.ToLower();
 
-            Account Acct = GetAccount(username);
+            accounts Acct = GetAccount(username);
 
             if (Acct == null)
             {
@@ -312,7 +312,7 @@ namespace Common
 
         public AuthResult CheckToken(string Username, string Token)
         {
-            Account Acct = GetAccount(Username);
+            accounts Acct = GetAccount(Username);
             if (Acct == null)
                 return AuthResult.AUTH_ACCT_BAD_USERNAME_PASSWORD;
 
@@ -329,7 +329,7 @@ namespace Common
 
         public void BanAccount(string Username, int Time)
         {
-            Account Acct = GetAccount(Username);
+            accounts Acct = GetAccount(Username);
 
             if (Acct == null)
             {
@@ -357,21 +357,21 @@ namespace Common
 
         #region Realm
 
-        public Dictionary<byte, Realm> _Realms = new Dictionary<byte, Realm>();
+        public Dictionary<byte, realms> _Realms = new Dictionary<byte, realms>();
 
         public void LoadRealms()
         {
-            foreach (Realm Rm in Database.SelectAllObjects<Realm>())
+            foreach (realms Rm in Database.SelectAllObjects<realms>())
                 AddRealm(Rm);
         }
 
         public void LoadPending()
         {
-            foreach (AccountPending Ap in Database.SelectAllObjects<AccountPending>())
+            foreach (accounts_pending Ap in Database.SelectAllObjects<accounts_pending>())
                 AddPending(Ap);
         }
 
-        public bool AddPending(AccountPending Ap)
+        public bool AddPending(accounts_pending Ap)
         {
             lock (_Codes)
             {
@@ -380,7 +380,7 @@ namespace Common
 
                 if (Ap.Expires <= DateTime.Now)
                 {
-                    Account acc = GetAccount(Ap.Username);
+                    accounts acc = GetAccount(Ap.Username);
                     if (acc != null)
                     {
                         lock (_accounts)
@@ -406,7 +406,7 @@ namespace Common
             return true;
         }
 
-        public bool AddRealm(Realm Rm)
+        public bool AddRealm(realms Rm)
         {
             lock (_Realms)
             {
@@ -421,7 +421,7 @@ namespace Common
             return true;
         }
 
-        public Realm GetRealm(byte RealmId)
+        public realms GetRealm(byte RealmId)
         {
             Log.Debug("GetRealm", "RealmId = " + RealmId);
             lock (_Realms)
@@ -453,14 +453,14 @@ namespace Common
             }
         }
 
-        public List<Realm> GetRealms()
+        public List<realms> GetRealms()
         {
-            List<Realm> Rms = new List<Realm>();
+            List<realms> Rms = new List<realms>();
             Rms.AddRange(_Realms.Values);
             return Rms;
         }
 
-        public Realm GetRealmByRpc(int RpcId)
+        public realms GetRealmByRpc(int RpcId)
         {
             lock (_Realms)
                 return _Realms.Values.ToList().Find(info => info.Info != null && info.Info.RpcID == RpcId);
@@ -468,7 +468,7 @@ namespace Common
 
         public void UpdateRealmScenarioRotationTime(byte realmId, long nextRotation)
         {
-            Realm rm = GetRealm(realmId);
+            realms rm = GetRealm(realmId);
 
             if (rm != null)
             {
@@ -479,7 +479,7 @@ namespace Common
 
         public bool UpdateRealm(RpcClientInfo Info, byte RealmId)
         {
-            Realm Rm = GetRealm(RealmId);
+            realms Rm = GetRealm(RealmId);
 
             if (Rm != null)
             {
@@ -504,7 +504,7 @@ namespace Common
 
         public void UpdateRealm(byte RealmId, uint OnlinePlayers, uint OrderCount, uint DestructionCount)
         {
-            Realm Rm = GetRealm(RealmId);
+            realms Rm = GetRealm(RealmId);
 
             if (Rm == null)
                 return;
@@ -520,7 +520,7 @@ namespace Common
 
         public void UpdateRealmCharacters(byte RealmId, uint OrderCharacters, uint DestruCharacters)
         {
-            Realm Rm = GetRealm(RealmId);
+            realms Rm = GetRealm(RealmId);
 
             if (Rm == null)
                 return;
@@ -547,12 +547,12 @@ namespace Common
                 Log.Info("BuildRealm", "Sending " + _Realms.Count + " realm(s)");
 
                 ClusterInfo.Builder cluster = ClusterInfo.CreateBuilder();
-                foreach (Realm Rm in _Realms.Values)
+                foreach (realms Rm in _Realms.Values)
                 {
-                    Log.Info("BuildRealm", "Realm : " + Rm.RealmId + " IP : " + Rm.Adresse + ":" + Rm.Port + " (" + Rm.Name + ")");
+                    Log.Info("BuildRealm", "Realm : " + Rm.RealmId + " IP : " + Rm.IP + ":" + Rm.Port + " (" + Rm.Name + ")");
                     cluster.SetClusterId(Rm.RealmId)
                            .SetClusterName(Rm.Name)
-                           .SetLobbyHost(Rm.Adresse)
+                           .SetLobbyHost(Rm.IP)
                            .SetLobbyPort((uint)Rm.Port)
                            .SetLanguageId(0)
                            .SetMaxClusterPop(500)
@@ -572,7 +572,7 @@ namespace Common
                     cluster.AddPropertyList(setProp("setting.manualbonus.realm.order", Rm.BonusOrder));
                     cluster.AddPropertyList(setProp("setting.min_cross_realm_account_level", "0"));
                     cluster.AddPropertyList(setProp("setting.name", Rm.Name));
-                    cluster.AddPropertyList(setProp("setting.net.address", Rm.Adresse));
+                    cluster.AddPropertyList(setProp("setting.net.address", Rm.IP));
                     cluster.AddPropertyList(setProp("setting.net.port", Rm.Port.ToString()));
                     cluster.AddPropertyList(setProp("setting.redirect", Rm.Redirect));
                     cluster.AddPropertyList(setProp("setting.region", Rm.Region));
@@ -594,7 +594,7 @@ namespace Common
 
         public override void OnClientDisconnected(RpcClientInfo Info)
         {
-            Realm Rm = GetRealmByRpc(Info.RpcID);
+            realms Rm = GetRealmByRpc(Info.RpcID);
             if (Rm != null && Rm.Info.RpcID == Info.RpcID)
             {
                 Log.Error("Realm", "Realm offline : " + Rm.Name);
@@ -708,7 +708,7 @@ namespace Common
 
         public bool CreateAccount(string username, string password, string email, int gmLevel, int langID, string ip = "127.0.0.1")
         {
-            Account Acct = GetAccount(username);
+            accounts Acct = GetAccount(username);
             if (Acct != null || _Codes.ContainsKey(username))
             {
                 Log.Error("CreateAccount", "This username is already used");
@@ -736,13 +736,13 @@ namespace Common
                 }
             }
 
-            Acct = new Account
+            Acct = new accounts
             {
                 Username = username.ToLower(),
                 Email = email.ToLower()
             };
 
-            Acct.CryptPassword = Account.ConvertSHA256(Acct.Username + ":" + password);
+            Acct.CryptPassword = accounts.ConvertSHA256(Acct.Username + ":" + password);
             //  Database.ExecuteNonQuery($"INSERT INTO war_accounts.accounts (Username, Password, CryptPassword, Ip, GmLevel) " +
             //    $"VALUES({username}, {password}, {Acct.CryptPassword}, {ip}, {gmLevel})");
 
@@ -764,7 +764,7 @@ namespace Common
 
                 EmailEventArgs eea = new EmailEventArgs(true, null, email, langID == 1 ? "Регистрация аккаунта" : "Account registration", msg, EmailClient);
 
-                AccountPending ap = new AccountPending()
+                accounts_pending ap = new accounts_pending()
                 {
                     Code = code,
                     Expires = DateTime.Now + TimeSpan.FromHours(1.0),
@@ -783,7 +783,7 @@ namespace Common
 
         private void RemovePending(string user)
         {
-            Account acc = GetAccount(_Codes[user].Username);
+            accounts acc = GetAccount(_Codes[user].Username);
             if (acc != null)
             {
                 lock (_accounts)
@@ -796,7 +796,7 @@ namespace Common
 
         public void UpdateClientPatcherLog(int accountId, string log)
         {
-            var asset = Database.SelectObject<Account>("AccountId=" + accountId);
+            var asset = Database.SelectObject<accounts>("AccountId=" + accountId);
 
             if (asset != null)
             {
@@ -813,7 +813,7 @@ namespace Common
 
             var tokens = installID.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
 
-            var asset = Database.SelectObject<Account_value>("AccountId=" + accountId + " and InstallID='" + tokens[0] + "' and IP='" + ip + "'");
+            var asset = Database.SelectObject<accounts_value>("AccountId=" + accountId + " and InstallID='" + tokens[0] + "' and IP='" + ip + "'");
 
             if (asset != null)
             {
@@ -823,7 +823,7 @@ namespace Common
             }
             else
             {
-                var newAsset = new Account_value();
+                var newAsset = new accounts_value();
                 newAsset.InstallId = tokens[0];
                 newAsset.AccountId = accountId;
                 newAsset.IP = ip;

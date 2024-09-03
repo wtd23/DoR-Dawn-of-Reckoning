@@ -1,16 +1,21 @@
 ﻿using Common;
 using WorldServer.World.Abilities.Buffs;
 using WorldServer.World.Objects;
+using WorldServer.World.Positions;
 
 namespace WorldServer.World.Abilities.CareerInterfaces
 {
     internal class CareerInterface_SquigHerder : CareerInterface, IPetCareerInterface
     {
         private Pet _myPet;
-        public Pet myPet { get { return _myPet; } set { _myPet = value; } }
+
+        public Pet myPet
+        { get { return _myPet; } set { _myPet = value; } }
 
         private byte _AIMode = 5;
-        public byte AIMode { get { return _AIMode; } set { _AIMode = value; } }
+
+        public byte AIMode
+        { get { return _AIMode; } set { _AIMode = value; } }
 
         private ushort _currentPetID;
 
@@ -64,19 +69,13 @@ namespace WorldServer.World.Abilities.CareerInterfaces
                     case 1841:
                         Proto.Name = myPlayer.Name + "'s Squig";
                         Proto.Model1 = 136;
-                        Proto.Ranged = 0;
+                        Proto.Ranged = 10;
                         break;
 
                     case 1842:
                         Proto.Name = myPlayer.Name + "'s Horned Squig";
                         Proto.Model1 = 137;
-                        Proto.Ranged = 0;
-                        break;
-
-                    case 1843:
-                        Proto.Name = myPlayer.Name + "'s Gas Squig";
-                        Proto.Model1 = 139;
-                        Proto.Ranged = 100;
+                        Proto.Ranged = 10;
                         break;
 
                     case 1844:
@@ -85,16 +84,22 @@ namespace WorldServer.World.Abilities.CareerInterfaces
                         Proto.Ranged = 100;
                         break;
 
+                    case 1843:
+                        Proto.Name = myPlayer.Name + "'s Gas Squig";
+                        Proto.Model1 = 139;
+                        Proto.Ranged = 100;
+                        break;
+
                     case 1845:
                         Proto.Name = myPlayer.Name + "'s Battle Squig";
                         Proto.Model1 = 140;
-                        Proto.Ranged = 0;
+                        Proto.Ranged = 10;
                         break;
 
                     case 2828:
                         Proto.Name = myPlayer.Name + "'s Horned Squig";
                         Proto.Model1 = 137;
-                        Proto.Ranged = 0;
+                        Proto.Ranged = 10;
                         break;
 
                     case 2829:
@@ -104,15 +109,16 @@ namespace WorldServer.World.Abilities.CareerInterfaces
                         break;
                 }
 
-                Creature_spawn Spawn = new Creature_spawn();
+                creature_spawns Spawn = new creature_spawns();
 
                 Proto.MinScale = 50;
                 Proto.MaxScale = 50;
                 Spawn.BuildFromProto(Proto);
                 Spawn.WorldO = myPlayer._Value.WorldO;
-                Spawn.WorldY = myPlayer._Value.WorldY;
+                Point3D offset = WorldUtils.GetForward(myPlayer, 75);
+                Spawn.WorldX = myPlayer._Value.WorldX + offset.X;
+                Spawn.WorldY = myPlayer._Value.WorldY + offset.Y;
                 Spawn.WorldZ = myPlayer._Value.WorldZ;
-                Spawn.WorldX = myPlayer._Value.WorldX;
                 Spawn.ZoneId = myPlayer.Zone.ZoneId;
                 Spawn.Icone = 18;
                 Spawn.WaypointType = 0;

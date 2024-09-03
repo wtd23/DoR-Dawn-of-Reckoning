@@ -8,7 +8,7 @@ namespace WorldServer.Services.World
     [Service]
     public class ItemService : ServiceBase
     {
-        public static Dictionary<uint, Item_Info> _Item_Info;
+        public static Dictionary<uint, item_infos> _Item_Info;
 
         [LoadingFunction(true)]
         public static void LoadItem_Info()
@@ -17,9 +17,9 @@ namespace WorldServer.Services.World
 
             int i;
 
-            _Item_Info = Database.MapAllObjects<uint, Item_Info>("Entry", "Name != ''", 100000);
+            _Item_Info = Database.MapAllObjects<uint, item_infos>("Entry", "Name != ''", 100000);
 
-            foreach (Item_Info Info in _Item_Info.Values)
+            foreach (item_infos Info in _Item_Info.Values)
             {
                 foreach (KeyValuePair<byte, ushort> Kp in Info._Stats)
                 {
@@ -70,57 +70,57 @@ namespace WorldServer.Services.World
 
             Log.Success("LoadItem_Info", "Loaded " + _Item_Info.Count + " Item_Info");
 
-            foreach (Item_Info Info in _Item_Info.Values)
+            foreach (item_infos Info in _Item_Info.Values)
             {
-                Info.RequiredItems = new List<KeyValuePair<Item_Info, ushort>>(Info._SellRequiredItems.Count);
+                Info.RequiredItems = new List<KeyValuePair<item_infos, ushort>>(Info._SellRequiredItems.Count);
                 foreach (KeyValuePair<uint, ushort> Kp in Info._SellRequiredItems)
                 {
-                    Info.RequiredItems.Add(new KeyValuePair<Item_Info, ushort>(GetItem_Info(Kp.Key), Kp.Value));
+                    Info.RequiredItems.Add(new KeyValuePair<item_infos, ushort>(GetItem_Info(Kp.Key), Kp.Value));
                 }
             }
         }
 
-        public static Item_Info GetItem_Info(uint Entry)
+        public static item_infos GetItem_Info(uint Entry)
         {
-            Item_Info info;
+            item_infos info;
             _Item_Info.TryGetValue(Entry, out info);
             return info;
         }
 
-        public static Dictionary<uint, Item_Set> _Item_Sets;
+        public static Dictionary<uint, item_sets> _Item_Sets;
 
         [LoadingFunction(true)]
         public static void LoadItem_Set()
         {
             Log.Debug("WorldMgr", "Loading Item_Set...");
 
-            _Item_Sets = new Dictionary<uint, Item_Set>();
+            _Item_Sets = new Dictionary<uint, item_sets>();
 
-            IList<Item_Set> Infos = Database.SelectAllObjects<Item_Set>();
+            IList<item_sets> Infos = Database.SelectAllObjects<item_sets>();
 
-            foreach (Item_Set Info in Infos)
+            foreach (item_sets Info in Infos)
                 _Item_Sets.Add(Info.Entry, Info);
 
             Log.Success("LoadItem_Set", "Loaded " + _Item_Sets.Count + " Item_Set");
         }
 
-        public static Item_Set GetItem_Set(uint Entry)
+        public static item_sets GetItem_Set(uint Entry)
         {
             if (_Item_Sets.ContainsKey(Entry))
                 return _Item_Sets[Entry];
             return null;
         }
 
-        public static List<BlackMarketItem> _BlackMarket_Items;
+        public static List<black_market_vendor_items> _BlackMarket_Items;
 
         [LoadingFunction(true)]
         public static void LoadBlackMarketItems()
         {
             Log.Debug("WorldMgr", "LoadBlackMarketItems...");
 
-            _BlackMarket_Items = new List<BlackMarketItem>();
+            _BlackMarket_Items = new List<black_market_vendor_items>();
 
-            IList<BlackMarketItem> items = Database.SelectAllObjects<BlackMarketItem>();
+            IList<black_market_vendor_items> items = Database.SelectAllObjects<black_market_vendor_items>();
 
             foreach (var blackMarketItem in items)
             {

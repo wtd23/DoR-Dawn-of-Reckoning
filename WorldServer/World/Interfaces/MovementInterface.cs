@@ -5,6 +5,7 @@ using WorldServer.Managers;
 using WorldServer.World.Abilities.Objects;
 using WorldServer.World.Objects;
 using WorldServer.World.Positions;
+using WorldServer.World.Scripting.Mounts;
 using Object = WorldServer.World.Objects.Object;
 using Opcodes = WorldServer.NetWork.Opcodes;
 
@@ -34,7 +35,6 @@ namespace WorldServer.World.Interfaces
         }
 
         public EMoveState MoveState { get; private set; }
-        
 
         private Unit _unit;
 
@@ -249,7 +249,8 @@ namespace WorldServer.World.Interfaces
         {
             return Math.Min(1f, deltaMs / _moveDuration);
         }
-        internal void Move(Point3D point3D, Zone_Info zone)
+
+        internal void Move(Point3D point3D, zone_infos zone)
         {
             throw new NotImplementedException();
         }
@@ -282,7 +283,7 @@ namespace WorldServer.World.Interfaces
             _startWorldPos.SetCoordsFrom(_unit.WorldPosition);
             _destWorldPos.SetCoordsFrom(destWorldPos);
 
-            Zone_Info destZone = _unit.Region.GetZone((ushort)(destWorldPos.X >> 12), (ushort)(destWorldPos.Y >> 12));
+            zone_infos destZone = _unit.Region.GetZone((ushort)(destWorldPos.X >> 12), (ushort)(destWorldPos.Y >> 12));
 
             if (destZone == null)
                 return;
@@ -315,7 +316,7 @@ namespace WorldServer.World.Interfaces
             uint newWorldPosX = (uint)Point2D.Lerp(_startWorldPos.X, _destWorldPos.X, GetMoveFactor(deltaMs));
             uint newWorldPosY = (uint)Point2D.Lerp(_startWorldPos.Y, _destWorldPos.Y, GetMoveFactor(deltaMs));
 
-            Zone_Info destZone = _unit.Region.GetZone((ushort)(newWorldPosX >> 12), (ushort)(newWorldPosY >> 12));
+            zone_infos destZone = _unit.Region.GetZone((ushort)(newWorldPosX >> 12), (ushort)(newWorldPosY >> 12));
 
             if (destZone == null)
                 return;
@@ -361,7 +362,6 @@ namespace WorldServer.World.Interfaces
 
         public delegate void dgEventRaiser();
 
-
         #endregion Move
 
         #region Follow
@@ -371,6 +371,8 @@ namespace WorldServer.World.Interfaces
         private int _minWithdrawlTolerance, _maxWithdrawlTolerance;
 
         public Unit FollowTarget { get; private set; }
+        public Mount CurrentMount { get; internal set; }
+
         private long _nextFollowUpdate;
         private int _minFollowTolerance, _maxFollowTolerance;
 
@@ -560,7 +562,7 @@ namespace WorldServer.World.Interfaces
             uint newWorldPosX = (uint)Point2D.Lerp(_unit.WorldPosition.X, FollowTarget.WorldPosition.X, GetMoveFactor(deltaMs));
             uint newWorldPosY = (uint)Point2D.Lerp(_unit.WorldPosition.Y, FollowTarget.WorldPosition.Y, GetMoveFactor(deltaMs));
 
-            Zone_Info destZone = _unit.Region.GetZone((ushort)(newWorldPosX >> 12), (ushort)(newWorldPosY >> 12));
+            zone_infos destZone = _unit.Region.GetZone((ushort)(newWorldPosX >> 12), (ushort)(newWorldPosY >> 12));
 
             if (destZone == null)
                 return;
@@ -579,13 +581,35 @@ namespace WorldServer.World.Interfaces
 
         public void Teleport(Point3D destWorldPos)
         {
-            Zone_Info destZone = _unit.Region.GetZone((ushort)(destWorldPos.X >> 12), (ushort)(destWorldPos.Y >> 12));
+            zone_infos destZone = _unit.Region.GetZone((ushort)(destWorldPos.X >> 12), (ushort)(destWorldPos.Y >> 12));
 
             if (destZone == null)
                 return;
 
             ushort pinX = _unit.Zone.CalculPin((uint)destWorldPos.X, true);
             ushort pinY = _unit.Zone.CalculPin((uint)destWorldPos.Y, false);
+            ushort pinZ = (ushort)destWorldPos.Z;
+
+            _destWorldPos.SetCoordsFrom(destWorldPos);
+
+            _forcePositionUpdate = true;
+
+            _unit.SetPosition(pinX, pinY, pinZ, _unit.Heading, destZone.ZoneId);
+
+            UpdateMovementState(null);
+
+            _forcePositionUpdate = false;
+        }
+
+        public void TeleportPet(Point3D destWorldPos)
+        {
+            zone_infos destZone = _unit.Region.GetZone((ushort)(destWorldPos.X >> 12), (ushort)(destWorldPos.Y >> 12));
+
+            if (destZone == null)
+                return;
+
+            ushort pinX = _unit.Zone.CalculPin((uint)destWorldPos.X, true);
+            ushort pinY = _unit.Zone.CalculPin((uint)destWorldPos.Y + 100, false);
             ushort pinZ = (ushort)destWorldPos.Z;
 
             _destWorldPos.SetCoordsFrom(destWorldPos);

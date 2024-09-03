@@ -48,7 +48,7 @@ namespace WorldServer.World.Abilities.Buffs
 
         private delegate void ResourceEventCommandDelegate(NewBuff hostBuff, BuffCommandInfo cmd, byte oldVal, ref byte change);
 
-        private delegate void ItemEventCommandDelegate(NewBuff hostBuff, BuffCommandInfo cmd, Item_Info itemInfo);
+        private delegate void ItemEventCommandDelegate(NewBuff hostBuff, BuffCommandInfo cmd, item_infos itemInfo);
 
         private static readonly Dictionary<string, BuffEventCheckDelegate> _eventChecks = new Dictionary<string, BuffEventCheckDelegate>();
 
@@ -524,7 +524,7 @@ namespace WorldServer.World.Abilities.Buffs
             } while (cmd != null);
         }
 
-        public static void InvokeItemCommand(NewBuff hostBuff, BuffCommandInfo cmd, Item_Info itmInfo)
+        public static void InvokeItemCommand(NewBuff hostBuff, BuffCommandInfo cmd, item_infos itmInfo)
         {
             uint iterations = 0;
             do
@@ -2840,7 +2840,7 @@ namespace WorldServer.World.Abilities.Buffs
             switch (hostBuff.BuffState)
             {
                 case BUFF_START:
-                    if (hostBuff.Caster.Realm == Realms.REALMS_REALM_ORDER)
+                    if (hostBuff.Caster.Realm == SetRealms.REALMS_REALM_ORDER)
                         target.OSInterface.AddEffect((byte)GameData.ObjectEffectState.OBJECTEFFECTSTATE_ORDER_CHICKEN);
                     else target.OSInterface.AddEffect((byte)GameData.ObjectEffectState.OBJECTEFFECTSTATE_CHAOS_CHICKEN);
                     ((Player)hostBuff.Target).IsPolymorphed = true;
@@ -2865,7 +2865,7 @@ namespace WorldServer.World.Abilities.Buffs
                     break;
 
                 case BUFF_END:
-                    if (hostBuff.Caster.Realm == Realms.REALMS_REALM_ORDER)
+                    if (hostBuff.Caster.Realm == SetRealms.REALMS_REALM_ORDER)
                         target.OSInterface.RemoveEffect((byte)GameData.ObjectEffectState.OBJECTEFFECTSTATE_ORDER_CHICKEN);
                     else target.OSInterface.RemoveEffect((byte)GameData.ObjectEffectState.OBJECTEFFECTSTATE_CHAOS_CHICKEN);
                     ((Player)hostBuff.Target).IsPolymorphed = false;
@@ -3323,7 +3323,7 @@ namespace WorldServer.World.Abilities.Buffs
                 if (cmd.CommandResult > 0)
                 {
                     player.SendClientMessage("You are carrying a resource out of the RvR area. Holding a resource outside of the RvR area too long will cause it to reset.", ChatLogFilters.CHATLOGFILTERS_RVR);
-                    player.SendClientMessage("Must return to the RvR area when carrying a resource!", player.Realm == Realms.REALMS_REALM_ORDER ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE);
+                    player.SendClientMessage("Must return to the RvR area when carrying a resource!", player.Realm == SetRealms.REALMS_REALM_ORDER ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE);
                 }
                 else
                 {
@@ -3398,7 +3398,7 @@ namespace WorldServer.World.Abilities.Buffs
                     {
                         Creature_proto Proto = CreatureService.GetCreatureProto((uint)cmd.PrimaryValue);
 
-                        Creature_spawn Spawn = new Creature_spawn();
+                        creature_spawns Spawn = new creature_spawns();
                         Spawn.Guid = (uint)CreatureService.GenerateCreatureSpawnGUID();
                         Spawn.BuildFromProto(Proto);
                         Spawn.WorldO = target.Heading;
@@ -3450,7 +3450,7 @@ namespace WorldServer.World.Abilities.Buffs
                     if (!myPlayer.CbtInterface.IsPvp)
                     {
                         Creature_proto proto = CreatureService.GetCreatureProto((uint)cmd.PrimaryValue);
-                        Creature_spawn spawn = new Creature_spawn();
+                        creature_spawns spawn = new creature_spawns();
 
                         if (proto == null)
                         {
@@ -3929,7 +3929,7 @@ namespace WorldServer.World.Abilities.Buffs
         #region ItemEventCommands
 
         // Yeah I'm lazy.
-        private static void EventGreatweaponMastery(NewBuff hostBuff, BuffCommandInfo cmd, Item_Info itemInfo)
+        private static void EventGreatweaponMastery(NewBuff hostBuff, BuffCommandInfo cmd, item_infos itemInfo)
         {
             if (itemInfo.TwoHanded ^ cmd.CommandResult == 0)
                 return;
@@ -3948,7 +3948,7 @@ namespace WorldServer.World.Abilities.Buffs
             }
         }
 
-        private static void EventOppressingBlows(NewBuff hostBuff, BuffCommandInfo cmd, Item_Info itemInfo)
+        private static void EventOppressingBlows(NewBuff hostBuff, BuffCommandInfo cmd, item_infos itemInfo)
         {
             if (itemInfo.TwoHanded ^ cmd.CommandResult == 0)
                 return;
@@ -3965,7 +3965,7 @@ namespace WorldServer.World.Abilities.Buffs
             }
         }
 
-        private static void EventModifyStatIfHasShield(NewBuff hostBuff, BuffCommandInfo cmd, Item_Info itemInfo)
+        private static void EventModifyStatIfHasShield(NewBuff hostBuff, BuffCommandInfo cmd, item_infos itemInfo)
         {
             if ((itemInfo?.Type == 5) ^ cmd.CommandResult == 0)
                 return;
@@ -3991,7 +3991,7 @@ namespace WorldServer.World.Abilities.Buffs
             }
         }
 
-        private static void EventModifyPercentageStatIfHasShield(NewBuff hostBuff, BuffCommandInfo cmd, Item_Info itemInfo)
+        private static void EventModifyPercentageStatIfHasShield(NewBuff hostBuff, BuffCommandInfo cmd, item_infos itemInfo)
         {
             if ((itemInfo?.Type == 5) ^ cmd.CommandResult == 0)
                 return;
@@ -4436,10 +4436,10 @@ namespace WorldServer.World.Abilities.Buffs
         private static bool ResourceHandler(NewBuff hostBuff, BuffCommandInfo cmd, AbilityDamageInfo damageInfo, Unit target, Unit eventInstigator)
         {
             Player player = (Player)hostBuff.Caster;
-            player.SendClientMessage("You have dropped the supplies!", player.Realm == Realms.REALMS_REALM_DESTRUCTION ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE);
+            player.SendClientMessage("You have dropped the supplies!", player.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE);
             lock (player.PlayersInRange)
                 foreach (Player plr in player.PlayersInRange)
-                    plr.SendClientMessage($"{player.Name} has dropped supplies!", player.Realm == Realms.REALMS_REALM_DESTRUCTION ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE);
+                    plr.SendClientMessage($"{player.Name} has dropped supplies!", player.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE);
 
             hostBuff.BuffHasExpired = true;
 

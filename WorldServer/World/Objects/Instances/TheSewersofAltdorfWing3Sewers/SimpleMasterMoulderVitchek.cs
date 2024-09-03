@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.TheSewersofAltdorfWing3Sewers
     {
         #region Constructors
 
-        public SimpleMasterMoulderVitchek(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleMasterMoulderVitchek(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

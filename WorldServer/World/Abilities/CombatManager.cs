@@ -1780,14 +1780,14 @@ namespace WorldServer.World.Abilities
 
                     Out.WriteByte((byte)("Guard damage".Length + 1));
                     Out.WriteHexStringBytes("6504");
-                    Out.WriteByte(receiver.Realm == Realms.REALMS_REALM_ORDER ? (byte)2 : (byte)1); // faction
+                    Out.WriteByte(receiver.Realm == SetRealms.REALMS_REALM_ORDER ? (byte)2 : (byte)1); // faction
                     Out.WriteByte(0);
                     Out.WriteStringBytes("Guard damage");
                     Out.WriteByte(0);
 
                     Out.WriteByte((byte)(receiver.Name.Length + 1)); // len for weapon name
                     Out.WriteHexStringBytes("4207");
-                    Out.WriteByte(receiver.Realm == Realms.REALMS_REALM_ORDER ? (byte)2 : (byte)1); // faction
+                    Out.WriteByte(receiver.Realm == SetRealms.REALMS_REALM_ORDER ? (byte)2 : (byte)1); // faction
                     Out.WriteByte(1);
                     Out.WriteStringBytes(receiver.Name);
                     Out.WriteByte(0);
@@ -2051,7 +2051,7 @@ namespace WorldServer.World.Abilities
         {
             Out.WriteByte((byte)(killer.Info.Name.Length + 1));
             Out.WriteHexStringBytes("6504");
-            Out.WriteByte(killer.Info.Realm == (byte)Realms.REALMS_REALM_ORDER ? (byte)1 : (byte)2); // faction
+            Out.WriteByte(killer.Info.Realm == (byte)SetRealms.REALMS_REALM_ORDER ? (byte)1 : (byte)2); // faction
             Out.WriteByte(0);
             Out.WriteStringBytes(killer.Info.Name);
             Out.WriteByte(0);
@@ -2061,7 +2061,7 @@ namespace WorldServer.World.Abilities
         {
             Out.WriteByte((byte)(victim.Info.Name.Length + 1));
             Out.WriteHexStringBytes("4207");
-            Out.WriteByte(victim.Info.Realm == (byte)Realms.REALMS_REALM_ORDER ? (byte)2 : (byte)1); // faction
+            Out.WriteByte(victim.Info.Realm == (byte)SetRealms.REALMS_REALM_ORDER ? (byte)2 : (byte)1); // faction
             Out.WriteByte(1);
             Out.WriteStringBytes(victim.Info.Name);
             Out.WriteByte(0);
@@ -2069,7 +2069,7 @@ namespace WorldServer.World.Abilities
 
         private static void WriteWeaponDeathSpamInfo(PacketOut Out, Player plrCaster, EquipSlot slot)
         {
-            Item_Info wepInfo = plrCaster.ItmInterface.GetItemInSlot((ushort)slot).Info;
+            item_infos wepInfo = plrCaster.ItmInterface.GetItemInSlot((ushort)slot).Info;
 
             string areaName = plrCaster.GetAreaName();
 

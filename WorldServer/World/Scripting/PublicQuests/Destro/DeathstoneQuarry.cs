@@ -63,7 +63,7 @@ namespace WorldServer.World.Scripting.PublicQuests.Destro
 
             Creature_proto Proto = CreatureService.GetCreatureProto(14872);
 
-            Creature_spawn Spawn = new Creature_spawn();
+            creature_spawns Spawn = new creature_spawns();
             Spawn.Guid = (uint)CreatureService.GenerateCreatureSpawnGUID();
             Spawn.BuildFromProto(Proto);
             Spawn.WorldO = (int)O;

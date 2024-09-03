@@ -11,28 +11,28 @@ namespace WorldServer.Services.World
     [Service(typeof(CreatureService), typeof(GameObjectService), typeof(ItemService))]
     public class InstanceService : ServiceBase
     {
-        public static Dictionary<uint, List<Instance_Spawn>> _InstanceSpawns;
-        public static Dictionary<uint, List<Instance_Boss_Spawn>> _InstanceBossSpawns;
-        public static Dictionary<uint, Instance_Info> _InstanceInfo;
-        public static Dictionary<uint, List<Instance_Encounter>> _InstanceEncounter;
-        public static Dictionary<string, Instance_Lockouts> _InstanceLockouts;
-        public static Dictionary<string, Instances_Statistics> _InstanceStatistics;
+        public static Dictionary<uint, List<instance_creature_spawns>> _InstanceSpawns;
+        public static Dictionary<uint, List<instance_boss_spawns>> _InstanceBossSpawns;
+        public static Dictionary<uint, instance_infos> _InstanceInfo;
+        public static Dictionary<uint, List<instance_encounters>> _InstanceEncounter;
+        public static Dictionary<string, instance_lockouts> _InstanceLockouts;
+        public static Dictionary<string, instance_statistics> _InstanceStatistics;
 
         #region loading methods
 
         [LoadingFunction(true)]
         public static void LoadInstance_Creatures()
         {
-            _InstanceSpawns = new Dictionary<uint, List<Instance_Spawn>>();
+            _InstanceSpawns = new Dictionary<uint, List<instance_creature_spawns>>();
 
-            IList<Instance_Spawn> InstanceSpawns = Database.SelectAllObjects<Instance_Spawn>();
+            IList<instance_creature_spawns> InstanceSpawns = Database.SelectAllObjects<instance_creature_spawns>();
 
-            foreach (Instance_Spawn Obj in InstanceSpawns)
+            foreach (instance_creature_spawns Obj in InstanceSpawns)
             {
-                List<Instance_Spawn> Objs;
+                List<instance_creature_spawns> Objs;
                 if (!_InstanceSpawns.TryGetValue(Obj.ZoneID, out Objs))
                 {
-                    Objs = new List<Instance_Spawn>();
+                    Objs = new List<instance_creature_spawns>();
                     _InstanceSpawns.Add(Obj.ZoneID, Objs);
                 }
 
@@ -44,16 +44,16 @@ namespace WorldServer.Services.World
         [LoadingFunction(true)]
         public static void LoadInstance_Boss_Creatures()
         {
-            _InstanceBossSpawns = new Dictionary<uint, List<Instance_Boss_Spawn>>();
+            _InstanceBossSpawns = new Dictionary<uint, List<instance_boss_spawns>>();
 
-            IList<Instance_Boss_Spawn> InstanceSpawns = Database.SelectAllObjects<Instance_Boss_Spawn>();
+            IList<instance_boss_spawns> InstanceSpawns = Database.SelectAllObjects<instance_boss_spawns>();
 
-            foreach (Instance_Boss_Spawn Obj in InstanceSpawns)
+            foreach (instance_boss_spawns Obj in InstanceSpawns)
             {
-                List<Instance_Boss_Spawn> Objs;
+                List<instance_boss_spawns> Objs;
                 if (!_InstanceBossSpawns.TryGetValue(Obj.InstanceID, out Objs))
                 {
-                    Objs = new List<Instance_Boss_Spawn>();
+                    Objs = new List<instance_boss_spawns>();
                     _InstanceBossSpawns.Add(Obj.InstanceID, Objs);
                 }
 
@@ -65,11 +65,11 @@ namespace WorldServer.Services.World
         [LoadingFunction(true)]
         public static void LoadInstance_Info()
         {
-            _InstanceInfo = new Dictionary<uint, Instance_Info>();
+            _InstanceInfo = new Dictionary<uint, instance_infos>();
 
-            IList<Instance_Info> InstanceInfo = Database.SelectAllObjects<Instance_Info>();
+            IList<instance_infos> InstanceInfo = Database.SelectAllObjects<instance_infos>();
 
-            foreach (Instance_Info II in InstanceInfo)
+            foreach (instance_infos II in InstanceInfo)
             {
                 _InstanceInfo.Add(II.ZoneID, II);
             }
@@ -79,11 +79,11 @@ namespace WorldServer.Services.World
         [LoadingFunction(true)]
         public static void LoadInstance_Lockouts()
         {
-            _InstanceLockouts = new Dictionary<string, Instance_Lockouts>();
+            _InstanceLockouts = new Dictionary<string, instance_lockouts>();
 
-            IList<Instance_Lockouts> InstanceLockouts = Database.SelectAllObjects<Instance_Lockouts>();
+            IList<instance_lockouts> InstanceLockouts = Database.SelectAllObjects<instance_lockouts>();
 
-            foreach (Instance_Lockouts Obj in InstanceLockouts)
+            foreach (instance_lockouts Obj in InstanceLockouts)
             {
                 _InstanceLockouts.Add(Obj.InstanceID, Obj);
             }
@@ -94,16 +94,16 @@ namespace WorldServer.Services.World
         [LoadingFunction(true)]
         public static void LoadInstance_Encounter()
         {
-            _InstanceEncounter = new Dictionary<uint, List<Instance_Encounter>>();
+            _InstanceEncounter = new Dictionary<uint, List<instance_encounters>>();
 
-            IList<Instance_Encounter> InstanceEncounter = Database.SelectAllObjects<Instance_Encounter>();
+            IList<instance_encounters> InstanceEncounter = Database.SelectAllObjects<instance_encounters>();
 
-            foreach (Instance_Encounter Obj in InstanceEncounter)
+            foreach (instance_encounters Obj in InstanceEncounter)
             {
-                List<Instance_Encounter> Objs;
+                List<instance_encounters> Objs;
                 if (!_InstanceEncounter.TryGetValue(Obj.InstanceID, out Objs))
                 {
-                    Objs = new List<Instance_Encounter>();
+                    Objs = new List<instance_encounters>();
                     _InstanceEncounter.Add(Obj.InstanceID, Objs);
                 }
 
@@ -115,11 +115,11 @@ namespace WorldServer.Services.World
         [LoadingFunction(true)]
         public static void LoadInstances_Statistics()
         {
-            _InstanceStatistics = new Dictionary<string, Instances_Statistics>();
+            _InstanceStatistics = new Dictionary<string, instance_statistics>();
 
-            IList<Instances_Statistics> InstanceStatistics = Database.SelectAllObjects<Instances_Statistics>();
+            IList<instance_statistics> InstanceStatistics = Database.SelectAllObjects<instance_statistics>();
 
-            foreach (Instances_Statistics Obj in InstanceStatistics)
+            foreach (instance_statistics Obj in InstanceStatistics)
             {
                 //_InstanceStatistics.Add(Obj.InstanceID, Obj);
                 Obj.Dirty = true;
@@ -134,9 +134,9 @@ namespace WorldServer.Services.World
 
         #region access methods
 
-        private static Instances_Statistics AddNewInstanceStatisticsEntry(string instanceID)
+        private static instance_statistics AddNewInstanceStatisticsEntry(string instanceID)
         {
-            Instances_Statistics stat = new Instances_Statistics()
+            instance_statistics stat = new instance_statistics()
             {
                 InstanceID = instanceID,
                 lockouts_InstanceID = string.Empty,
@@ -152,14 +152,14 @@ namespace WorldServer.Services.World
             return stat;
         }
 
-        public static void SaveLockoutInstanceID(string instanceID, Instance_Lockouts lockout)
+        public static void SaveLockoutInstanceID(string instanceID, instance_lockouts lockout)
         {
             if (lockout == null)
                 return;
 
             // instanceID:      260:123456;
 
-            if (!_InstanceStatistics.TryGetValue(instanceID, out Instances_Statistics stat))
+            if (!_InstanceStatistics.TryGetValue(instanceID, out instance_statistics stat))
                 stat = AddNewInstanceStatisticsEntry(instanceID);
 
             stat.lockouts_InstanceID = lockout.InstanceID;
@@ -177,7 +177,7 @@ namespace WorldServer.Services.World
             // instanceID:      260:123456;
             // playerIDs:       123;456;
 
-            if (!_InstanceStatistics.TryGetValue(instanceID, out Instances_Statistics stat))
+            if (!_InstanceStatistics.TryGetValue(instanceID, out instance_statistics stat))
                 stat = AddNewInstanceStatisticsEntry(instanceID);
 
             string newStr = string.Empty;
@@ -200,7 +200,7 @@ namespace WorldServer.Services.World
             // instanceID:      260:123456;
             // ttkPerBoss:      330:123;331:456;
 
-            if (!_InstanceStatistics.TryGetValue(instanceID, out Instances_Statistics stat))
+            if (!_InstanceStatistics.TryGetValue(instanceID, out instance_statistics stat))
                 stat = AddNewInstanceStatisticsEntry(instanceID);
 
             string[] split = stat.ttkPerBoss.Split(';');
@@ -246,7 +246,7 @@ namespace WorldServer.Services.World
             // instanceID:      260:123456;
             // deathCountPerBoss: 330:2;331:1;
 
-            if (!_InstanceStatistics.TryGetValue(instanceID, out Instances_Statistics stat))
+            if (!_InstanceStatistics.TryGetValue(instanceID, out instance_statistics stat))
                 stat = AddNewInstanceStatisticsEntry(instanceID);
 
             string[] split = stat.deathCountPerBoss.Split(';');
@@ -292,7 +292,7 @@ namespace WorldServer.Services.World
             // instanceID:      260:123456;
             // attemptsPerBoss: 330:2;331:1;
 
-            if (!_InstanceStatistics.TryGetValue(instanceID, out Instances_Statistics stat))
+            if (!_InstanceStatistics.TryGetValue(instanceID, out instance_statistics stat))
                 stat = AddNewInstanceStatisticsEntry(instanceID);
 
             string[] split = stat.attemptsPerBoss.Split(';');
@@ -330,10 +330,10 @@ namespace WorldServer.Services.World
             Database.ForceSave();
         }
 
-        public static Instance_Encounter GetInstanceEncounter(uint instanceID, uint bossId)
+        public static instance_encounters GetInstanceEncounter(uint instanceID, uint bossId)
         {
-            _InstanceEncounter.TryGetValue(instanceID, out List<Instance_Encounter> bosses);
-            foreach (Instance_Encounter IE in bosses)
+            _InstanceEncounter.TryGetValue(instanceID, out List<instance_encounters> bosses);
+            foreach (instance_encounters IE in bosses)
             {
                 if (bossId == IE.bossId)
                     return IE;
@@ -346,7 +346,7 @@ namespace WorldServer.Services.World
             if (plr._Value.GetAllLockouts().Count == 0 || plr.Zone == null)
                 return;
 
-            _InstanceInfo.TryGetValue(plr.Zone.ZoneId, out Instance_Info Info);
+            _InstanceInfo.TryGetValue(plr.Zone.ZoneId, out instance_infos Info);
 
             if (Info == null)
                 return;

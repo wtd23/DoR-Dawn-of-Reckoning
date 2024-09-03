@@ -16,12 +16,12 @@ namespace WorldServer.World.Scenarios
     {
         private readonly List<CapturePoint> _capturePoints = new List<CapturePoint>();
 
-        public DoubleDominationScenario(Scenario_Info info, int tier)
+        public DoubleDominationScenario(scenario_infos info, int tier)
             : base(info, tier)
         {
             //flags.Add(new Flag(RKF_1, "The Landing", 360109, 428854, 6433, 1024));
 
-            foreach (Scenario_Object scenarioObject in info.ScenObjects)
+            foreach (scenario_objects scenarioObject in info.ScenObjects)
             {
                 if (scenarioObject.Type == "Capture Point")
                 {
@@ -48,10 +48,10 @@ namespace WorldServer.World.Scenarios
                         Point3D flagLocation = cPoint.WorldPosition;
                         if (!plr.IsDead && plr.Get2DDistanceToWorldPoint(flagLocation) < 50)
                         {
-                            if (!cPoint.PlayersInCloseRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
+                            if (!cPoint.PlayersInCloseRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
                                 cPoint.AddInCloseRange(plr);
                         }
-                        else if (cPoint.PlayersInCloseRange[plr.Realm == Realms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
+                        else if (cPoint.PlayersInCloseRange[plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION ? 1 : 0].Contains(plr))
                             cPoint.RemoveInCloseRange(plr);
                     }
                 }
@@ -64,12 +64,12 @@ namespace WorldServer.World.Scenarios
 
         public void OnCapture(CapturePoint captured)
         {
-            if (_capturePoints[0].OwningRealm == _capturePoints[1].OwningRealm && _capturePoints[0].OwningRealm != Realms.REALMS_REALM_NEUTRAL)
+            if (_capturePoints[0].OwningRealm == _capturePoints[1].OwningRealm && _capturePoints[0].OwningRealm != SetRealms.REALMS_REALM_NEUTRAL)
             {
                 foreach (Object obj in Region.Objects)
                 {
                     Player plr = obj as Player;
-                    plr?.SendLocalizeString((_capturePoints[0].OwningRealm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " will lock down both control points in 15 seconds!", ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.CHAT_TAG_DEFAULT);
+                    plr?.SendLocalizeString((_capturePoints[0].OwningRealm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " will lock down both control points in 15 seconds!", ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.CHAT_TAG_DEFAULT);
                 }
 
                 _capturePoints[0].CountdownTimerEnd = TCPManager.GetTimeStamp() + 15;
@@ -110,7 +110,7 @@ namespace WorldServer.World.Scenarios
 
             PacketOut Out = new PacketOut((byte)Opcodes.F_PLAY_SOUND);
             Out.WriteByte(0);
-            Out.WriteUInt16(_capturePoints[0].OwningRealm == Realms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
+            Out.WriteUInt16(_capturePoints[0].OwningRealm == SetRealms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
             Out.Fill(0, 10);
 
             foreach (Object obj in Region.Objects)
@@ -118,7 +118,7 @@ namespace WorldServer.World.Scenarios
                 Player plr = obj as Player;
                 if (plr != null)
                 {
-                    plr.SendLocalizeString((_capturePoints[0].OwningRealm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " has locked down " + _capturePoints[0].ObjectiveName + " and " + _capturePoints[1].ObjectiveName + "!", ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.CHAT_TAG_DEFAULT);
+                    plr.SendLocalizeString((_capturePoints[0].OwningRealm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " has locked down " + _capturePoints[0].ObjectiveName + " and " + _capturePoints[1].ObjectiveName + "!", ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.CHAT_TAG_DEFAULT);
                     plr.SendPacket(Out);
 
                     // 25% damage buff for 30 seconds

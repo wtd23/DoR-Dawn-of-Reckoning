@@ -25,21 +25,21 @@ namespace WorldServer.World.AI
         public BossBrain(Unit myOwner)
             : base(myOwner)
         {
-            AbilityTracker = new Dictionary<BossSpawnAbilities, long>();
+            AbilityTracker = new Dictionary<boss_spawn_abilities, long>();
             SpawnList = new List<Creature>();
             CurrentPhase = 0;
             ConditionManager = new Conditions(_unit, Combat);
             ExecutionManager = new Executions(_unit, Combat, this);
         }
 
-        public List<BossSpawnAbilities> Abilities { get; set; }
+        public List<boss_spawn_abilities> Abilities { get; set; }
 
-        public Dictionary<BossSpawnAbilities, long> AbilityTracker { get; set; }
+        public Dictionary<boss_spawn_abilities, long> AbilityTracker { get; set; }
 
         // List of Adds that the boss has spawned, and their states.
         public List<Creature> SpawnList { get; set; }
 
-        public List<BossSpawnPhase> Phases { get; set; }
+        public List<boss_spawn_phases> Phases { get; set; }
         public int CurrentPhase { get; set; }
 
         public override void Think(long tick)
@@ -80,7 +80,7 @@ namespace WorldServer.World.AI
             }
         }
 
-        private void FilterAbilities(long tick, List<BossSpawnAbilities> phaseAbilities)
+        private void FilterAbilities(long tick, List<boss_spawn_abilities> phaseAbilities)
         {
             foreach (var ability in phaseAbilities)
             {
@@ -115,7 +115,7 @@ namespace WorldServer.World.AI
             }
         }
 
-        private void ExecuteNextAbilityFromList(long tick, List<KeyValuePair<BossSpawnAbilities, long>> myList)
+        private void ExecuteNextAbilityFromList(long tick, List<KeyValuePair<boss_spawn_abilities, long>> myList)
         {
             // This contains the list of abilities that can possibly be executed.
             var rand = StaticRandom.Instance.Next(1, 100);
@@ -167,22 +167,22 @@ namespace WorldServer.World.AI
             }
         }
 
-        public void PerformSound(BossSpawnAbilities key)
+        public void PerformSound(boss_spawn_abilities key)
         {
             if (!string.IsNullOrEmpty(key.Sound))
                 foreach (var plr in GetClosePlayers(300))
                     plr.PlaySound(Convert.ToUInt16(key.Sound));
         }
 
-        public void PerformSpeech(BossSpawnAbilities key)
+        public void PerformSpeech(boss_spawn_abilities key)
         {
             if (!string.IsNullOrEmpty(key.Speech))
                 _unit.Say(key.Speech, ChatLogFilters.CHATLOGFILTERS_SHOUT);
         }
 
-        public List<BossSpawnAbilities> GetStartCombatAbilities()
+        public List<boss_spawn_abilities> GetStartCombatAbilities()
         {
-            var result = new List<BossSpawnAbilities>();
+            var result = new List<boss_spawn_abilities>();
             foreach (var ability in Abilities)
             {
                 if (ability.Phase == "!")
@@ -194,9 +194,9 @@ namespace WorldServer.World.AI
             return result;
         }
 
-        private List<BossSpawnAbilities> GetPhaseAbilities()
+        private List<boss_spawn_abilities> GetPhaseAbilities()
         {
-            var result = new List<BossSpawnAbilities>();
+            var result = new List<boss_spawn_abilities>();
             foreach (var ability in Abilities)
             {
                 // Any phase ability

@@ -1,7 +1,12 @@
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\LobbyServer.exe.config
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\LobbyServer.exe
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\LobbyServer\obj\x64\Release\LobbyServer.csproj.AssemblyReference.cache
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\LobbyServer\obj\x64\Release\LobbyServer.csproj.SuggestedBindingRedirects.cache
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\LobbyServer\obj\x64\Release\LobbyServer.csproj.CoreCompileInputs.cache
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\LobbyServer\obj\x64\Release\LobbyServer.csproj.CopyComplete
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\LobbyServer\obj\x64\Release\LobbyServer.exe
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\LobbyServer.exe.config
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\LobbyServer.exe
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\LobbyServer\obj\x64\Release\LobbyServer.csproj.AssemblyReference.cache
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\LobbyServer\obj\x64\Release\LobbyServer.csproj.CoreCompileInputs.cache
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\LobbyServer\obj\x64\Release\LobbySer.D107D153.Up2Date
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\LobbyServer\obj\x64\Release\LobbyServer.exe
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\LobbyServer.exe.config
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\LobbyServer.exe
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\LobbyServer\obj\x64\Release\LobbyServer.csproj.AssemblyReference.cache
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\LobbyServer\obj\x64\Release\LobbyServer.csproj.CoreCompileInputs.cache
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\LobbyServer\obj\x64\Release\LobbySer.D107D153.Up2Date
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\LobbyServer\obj\x64\Release\LobbyServer.exe

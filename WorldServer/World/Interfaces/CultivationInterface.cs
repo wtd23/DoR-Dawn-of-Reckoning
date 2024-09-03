@@ -100,7 +100,7 @@ namespace WorldServer.World.Interfaces
 
         #region Component Add
 
-        public bool AddSeed(Item_Info seedInfo)
+        public bool AddSeed(item_infos seedInfo)
         {
             if (_stage != STAGE_EMPTY)
             {
@@ -126,7 +126,7 @@ namespace WorldServer.World.Interfaces
             return true;
         }
 
-        public bool AddSoil(Item_Info soilInfo)
+        public bool AddSoil(item_infos soilInfo)
         {
             if (_soilItemID != 0 || _stage != STAGE_GERMINATION || _seedItemID == 0)
             {
@@ -140,7 +140,7 @@ namespace WorldServer.World.Interfaces
             return true;
         }
 
-        public bool AddWater(Item_Info waterInfo)
+        public bool AddWater(item_infos waterInfo)
         {
             if (_waterItemID != 0 || _stage != STAGE_SEEDLING || _seedItemID == 0)
             {
@@ -154,7 +154,7 @@ namespace WorldServer.World.Interfaces
             return true;
         }
 
-        public bool AddNutrients(Item_Info nutrientInfo)
+        public bool AddNutrients(item_infos nutrientInfo)
         {
             if (_nutrientItemID != 0 || _stage != STAGE_FLOWERING || _seedItemID == 0)
             {
@@ -265,8 +265,8 @@ namespace WorldServer.World.Interfaces
             if (ItemService.GetItem_Info(_seedItemID).Rarity == 3)
                 harvester.ItmInterface.CreateItem(_seedItemID, 1, true);
 
-            Item_Info mainItem = ItemService.GetItem_Info(uint.Parse(ItemService.GetItem_Info(_seedItemID).Craftresult.Split(';')[0]));
-            Item_Info subItem = ItemService.GetItem_Info(uint.Parse(ItemService.GetItem_Info(_seedItemID).Craftresult.Split(';')[1]));
+            item_infos mainItem = ItemService.GetItem_Info(uint.Parse(ItemService.GetItem_Info(_seedItemID).Craftresult.Split(';')[0]));
+            item_infos subItem = ItemService.GetItem_Info(uint.Parse(ItemService.GetItem_Info(_seedItemID).Craftresult.Split(';')[1]));
 
             if (harvester.ItmInterface.GetTotalFreeInventorySlot(mainItem) < 4)
             {

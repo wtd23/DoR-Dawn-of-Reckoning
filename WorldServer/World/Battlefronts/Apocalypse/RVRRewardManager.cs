@@ -45,7 +45,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 #endif
             DelayedRewards.TryGetValue(killer.CharacterId, out xprEntry);
 
-            // Character has no record of XP/RR gain.
+            // characters has no record of XP/RR gain.
             if (xprEntry == null)
             {
                 xprEntry = new XpRenown(xpShare, renownReward, 0, 0, TCPManager.GetTimeStamp());
@@ -67,16 +67,16 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// <param name="nearOrderCount"></param>
         /// <param name="nearDestroCount"></param>
         /// <returns></returns>
-        public float CalculateObjectiveRewardScale(Realms owningRealm, short nearOrderCount, short nearDestroCount)
+        public float CalculateObjectiveRewardScale(SetRealms owningRealm, short nearOrderCount, short nearDestroCount)
         {
             float scale = 0.0f;
-            if (owningRealm == Realms.REALMS_REALM_DESTRUCTION)
+            if (owningRealm == SetRealms.REALMS_REALM_DESTRUCTION)
             {
                 scale = (float)Math.Abs(Math.Log(nearOrderCount / 10.0f + 1.0f));
             }
             else
             {
-                if (owningRealm == Realms.REALMS_REALM_ORDER)
+                if (owningRealm == SetRealms.REALMS_REALM_ORDER)
                 {
                     scale = (float)Math.Abs(Math.Log(nearDestroCount / 10.0f + 1.0f));
                 }
@@ -90,7 +90,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         ///     Grants a small reward to all players in close range for defending.
         /// </summary>
         /// <remarks>Invoked in short periods of time</remarks>
-        public VictoryPoint RewardCaptureTick(ISet<Player> playersWithinRange, Realms owningRealm, int tier, string objectiveName, float rewardScaleMultiplier, BORewardType boRewardType)
+        public VictoryPoint RewardCaptureTick(ISet<Player> playersWithinRange, SetRealms owningRealm, int tier, string objectiveName, float rewardScaleMultiplier, BORewardType boRewardType)
         {
             ushort influenceId;
 
@@ -125,7 +125,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             foreach (var player in playersWithinRange)
             {
                 // if the BattlefieldObjective is Neutral, allow rewards.
-                if (owningRealm != Realms.REALMS_REALM_NEUTRAL)
+                if (owningRealm != SetRealms.REALMS_REALM_NEUTRAL)
                 {
                     if (player.Realm != owningRealm || player.IsAFK || player.IsAutoAFK)
                         continue;
@@ -133,7 +133,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
                 if (player.CurrentArea != null)
                 {
-                    if (player.Realm == Realms.REALMS_REALM_ORDER)
+                    if (player.Realm == SetRealms.REALMS_REALM_ORDER)
                         influenceId = (ushort)player.CurrentArea.OrderInfluenceId;
                     else
                         influenceId = (ushort)player.CurrentArea.DestroInfluenceId;
@@ -156,19 +156,19 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             switch (boRewardType)
             {
                 case BORewardType.CAPTURING: // small tick
-                    if (owningRealm == Realms.REALMS_REALM_ORDER)
+                    if (owningRealm == SetRealms.REALMS_REALM_ORDER)
                         VP.OrderVictoryPoints += 0;
-                    else if (owningRealm == Realms.REALMS_REALM_DESTRUCTION)
+                    else if (owningRealm == SetRealms.REALMS_REALM_DESTRUCTION)
                         VP.DestructionVictoryPoints += 0;
                     break;
 
                 case BORewardType.CAPTURED: // big tick
-                    if (owningRealm == Realms.REALMS_REALM_ORDER)
+                    if (owningRealm == SetRealms.REALMS_REALM_ORDER)
                     {
                         VP.OrderVictoryPoints += 50;
                         VP.DestructionVictoryPoints -= 50;
                     }
-                    else if (owningRealm == Realms.REALMS_REALM_DESTRUCTION)
+                    else if (owningRealm == SetRealms.REALMS_REALM_DESTRUCTION)
                     {
                         VP.DestructionVictoryPoints += 50;
                         VP.OrderVictoryPoints -= 50;
@@ -177,9 +177,9 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                     break;
 
                 case BORewardType.GUARDED: // small tick
-                    if (owningRealm == Realms.REALMS_REALM_ORDER)
+                    if (owningRealm == SetRealms.REALMS_REALM_ORDER)
                         VP.OrderVictoryPoints += 0;
-                    else if (owningRealm == Realms.REALMS_REALM_DESTRUCTION)
+                    else if (owningRealm == SetRealms.REALMS_REALM_DESTRUCTION)
                         VP.DestructionVictoryPoints += 0;
                     break;
 

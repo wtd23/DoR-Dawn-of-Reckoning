@@ -24,9 +24,9 @@ namespace WorldServer.World.Abilities
             if (msTick <= _rezTime)
                 return;
 
-            _slayerChoppa.RezUnit(_slayerChoppa.Realm == Realms.REALMS_REALM_ORDER ? (ushort)1489 : (ushort)1795, 25, true);
+            _slayerChoppa.RezUnit(_slayerChoppa.Realm == SetRealms.REALMS_REALM_ORDER ? (ushort)1489 : (ushort)1795, 25, true);
 
-            AbilityDamageInfo damageThisPass = AbilityMgr.GetExtraDamageFor(_slayerChoppa.Realm == Realms.REALMS_REALM_ORDER ? (ushort)1489 : (ushort)1795, 0, 0);
+            AbilityDamageInfo damageThisPass = AbilityMgr.GetExtraDamageFor(_slayerChoppa.Realm == SetRealms.REALMS_REALM_ORDER ? (ushort)1489 : (ushort)1795, 0, 0);
 
             List<Object> objects;
 

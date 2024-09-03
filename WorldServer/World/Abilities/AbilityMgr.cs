@@ -32,7 +32,7 @@ namespace WorldServer.World.Abilities
         public static Dictionary<ushort, List<BuffCommandInfo>> BuffCommandInfos = new Dictionary<ushort, List<BuffCommandInfo>>();
 
         // Knockback
-        public static Dictionary<ushort, List<AbilityKnockbackInfo>> KnockbackInfos = new Dictionary<ushort, List<AbilityKnockbackInfo>>();
+        public static Dictionary<ushort, List<ability_knockback_info>> KnockbackInfos = new Dictionary<ushort, List<ability_knockback_info>>();
 
         // Extra Damage Info (type-2 damage)
         public static Dictionary<ushort, List<List<AbilityDamageInfo>>> ExtraDamage = new Dictionary<ushort, List<List<AbilityDamageInfo>>>();
@@ -71,20 +71,20 @@ namespace WorldServer.World.Abilities
 
             #region Database
 
-            List<DBAbilityInfo> dbAbilities = (List<DBAbilityInfo>)db.SelectAllObjects<DBAbilityInfo>();
+            List<abilities> dbAbilities = (List<abilities>)db.SelectAllObjects<abilities>();
 
             List<AbilityInfo> abVolatiles = AbilityInfo.Convert(dbAbilities);
             Dictionary<ushort, AbilityConstants> abConstants = AbilityConstants.Convert(dbAbilities).ToDictionary(key => key.Entry);
-            List<AbilityDamageInfo> abDmgHeals = AbilityDamageInfo.Convert(db.SelectAllObjects<DBAbilityDamageInfo>().OrderBy(dmg => dmg.ParentCommandID).ThenBy(dmg => dmg.ParentCommandSequence).ToList());
-            List<AbilityCommandInfo> abCommands = AbilityCommandInfo.Convert(db.SelectAllObjects<DBAbilityCommandInfo>().OrderBy(cmd => cmd.CommandID).ToList());
+            List<AbilityDamageInfo> abDmgHeals = AbilityDamageInfo.Convert(db.SelectAllObjects<ability_damage_heals>().OrderBy(dmg => dmg.ParentCommandID).ThenBy(dmg => dmg.ParentCommandSequence).ToList());
+            List<AbilityCommandInfo> abCommands = AbilityCommandInfo.Convert(db.SelectAllObjects<ability_commands>().OrderBy(cmd => cmd.CommandID).ToList());
 
-            IList<AbilityModifierCheck> abChecks = db.SelectAllObjects<AbilityModifierCheck>().OrderBy(check => check.ID).ToList();
-            IList<AbilityModifierEffect> abMods = db.SelectAllObjects<AbilityModifierEffect>().OrderBy(mod => mod.Sequence).ToList();
+            IList<ability_modifier_checks> abChecks = db.SelectAllObjects<ability_modifier_checks>().OrderBy(check => check.ID).ToList();
+            IList<ability_modifiers> abMods = db.SelectAllObjects<ability_modifiers>().OrderBy(mod => mod.Sequence).ToList();
 
-            List<BuffInfo> buffInfos = BuffInfo.Convert((List<DBBuffInfo>)db.SelectAllObjects<DBBuffInfo>());
-            List<BuffCommandInfo> buffCommands = BuffCommandInfo.Convert(db.SelectAllObjects<DBBuffCommandInfo>().OrderBy(buffcmd => buffcmd.CommandID).ToList());
+            List<BuffInfo> buffInfos = BuffInfo.Convert((List<buff_infos>)db.SelectAllObjects<buff_infos>());
+            List<BuffCommandInfo> buffCommands = BuffCommandInfo.Convert(db.SelectAllObjects<buff_commands>().OrderBy(buffcmd => buffcmd.CommandID).ToList());
 
-            IList<AbilityKnockbackInfo> knockbackInfos = db.SelectAllObjects<AbilityKnockbackInfo>().OrderBy(kbinfo => kbinfo.Id).ToList();
+            IList<ability_knockback_info> knockbackInfos = db.SelectAllObjects<ability_knockback_info>().OrderBy(kbinfo => kbinfo.Id).ToList();
 
             List<AbilityCommandInfo> slaveCommands = new List<AbilityCommandInfo>();
             List<BuffCommandInfo> slaveBuffCommands = new List<BuffCommandInfo>();
@@ -98,7 +98,7 @@ namespace WorldServer.World.Abilities
 
             #region AbilityChecks
 
-            foreach (AbilityModifierCheck check in abChecks)
+            foreach (ability_modifier_checks check in abChecks)
             {
                 switch (check.PreOrPost)
                 {
@@ -177,7 +177,7 @@ namespace WorldServer.World.Abilities
 
             #region AbilityModifiers
 
-            foreach (AbilityModifierEffect effect in abMods)
+            foreach (ability_modifiers effect in abMods)
             {
                 switch (effect.PreOrPost)
                 {
@@ -355,7 +355,7 @@ namespace WorldServer.World.Abilities
             foreach (var kbInfo in knockbackInfos)
             {
                 if (!KnockbackInfos.ContainsKey(kbInfo.Entry))
-                    KnockbackInfos.Add(kbInfo.Entry, new List<AbilityKnockbackInfo>());
+                    KnockbackInfos.Add(kbInfo.Entry, new List<ability_knockback_info>());
                 KnockbackInfos[kbInfo.Entry].Add(kbInfo);
             }
 
@@ -445,7 +445,7 @@ namespace WorldServer.World.Abilities
         {
             CreatureAbilities.Clear();
 
-            IList<Creature_abilities> creaAbs = WorldMgr.Database.SelectAllObjects<Creature_abilities>();
+            IList<creature_abilities> creaAbs = WorldMgr.Database.SelectAllObjects<creature_abilities>();
 
             Dictionary<uint, List<NPCAbility>> temp = new Dictionary<uint, List<NPCAbility>>();
 
@@ -591,7 +591,7 @@ namespace WorldServer.World.Abilities
             return NewAbilityVolatiles[entry].SpecialCost > 0;
         }
 
-        public static AbilityKnockbackInfo GetKnockbackInfo(ushort entry, int id)
+        public static ability_knockback_info GetKnockbackInfo(ushort entry, int id)
         {
             return KnockbackInfos[entry][id];
         }

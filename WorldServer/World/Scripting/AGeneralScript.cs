@@ -2,6 +2,7 @@
 using WorldServer.World.Abilities.Components;
 using WorldServer.World.Map;
 using WorldServer.World.Objects;
+using WorldServer.World.Scripting.Mounts;
 using Object = WorldServer.World.Objects.Object;
 
 namespace WorldServer.World.Scripting
@@ -11,6 +12,10 @@ namespace WorldServer.World.Scripting
         public string ScriptName;
 
         public virtual void OnCastAbility(AbilityInfo Ab)
+        {
+        }
+
+        public virtual void OnCastAbilityCreature(Object Obj, AbilityInfo Ab)
         {
         }
 

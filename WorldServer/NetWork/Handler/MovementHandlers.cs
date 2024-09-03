@@ -114,17 +114,17 @@ namespace WorldServer.NetWork.Handler
                 return;
             }
 
-            Zone_jump Jump = null;
+            zone_jumps Jump = null;
 
             // ZARU: zone jump out hackaround for LV leave
             if (destinationId == 272804328)
             {
-                Instance_Info II;
+                instance_infos II;
                 InstanceService._InstanceInfo.TryGetValue(260, out II);
 
-                if (cclient.Plr.Realm == Realms.REALMS_REALM_ORDER)
+                if (cclient.Plr.Realm == SetRealms.REALMS_REALM_ORDER)
                     Jump = ZoneService.GetZoneJump(II.OrderExitZoneJumpID);
-                else if (cclient.Plr.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                else if (cclient.Plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                     Jump = ZoneService.GetZoneJump(II.DestrExitZoneJumpID);
 
                 if (Jump == null)
@@ -297,9 +297,9 @@ namespace WorldServer.NetWork.Handler
 
                 if (zoneID == 111 && player.Client.IsPlaying())
                 {
-                    if (player.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                    if (player.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                         player.Teleport(202, 1411789, 1454421, 3516, 0);
-                    else if (player.Realm == Realms.REALMS_REALM_ORDER)
+                    else if (player.Realm == SetRealms.REALMS_REALM_ORDER)
                         player.Teleport(202, 1449783, 1459746, 3549, 0);
                 }
 
@@ -309,9 +309,9 @@ namespace WorldServer.NetWork.Handler
                 if ((zoneID == 0 && player.ZoneId.HasValue) && player.Client.IsPlaying())
                 {
                     player.SendClientMessage("You managed to go outside of the worlds boundries, as such you have been forcefully moved to your capital", ChatLogFilters.CHATLOGFILTERS_CSR_TELL_RECEIVE);
-                    if (player.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                    if (player.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                         player.Teleport(161, 439815, 134493, 16865, 0);
-                    else if (player.Realm == Realms.REALMS_REALM_ORDER)
+                    else if (player.Realm == SetRealms.REALMS_REALM_ORDER)
                         player.Teleport(162, 124084, 130213, 12572, 0);
                 }
 
@@ -529,9 +529,9 @@ namespace WorldServer.NetWork.Handler
                 if ((zoneID == 0 && player.ZoneId.HasValue) && player.Client.IsPlaying())
                 {
                     player.SendClientMessage("You managed to go outside of the worlds boundries, as such you have been forcefully moved to your capital", ChatLogFilters.CHATLOGFILTERS_CSR_TELL_RECEIVE);
-                    if (player.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                    if (player.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                         player.Teleport(161, 439815, 134493, 16865, 0);
-                    else if (player.Realm == Realms.REALMS_REALM_ORDER)
+                    else if (player.Realm == SetRealms.REALMS_REALM_ORDER)
                         player.Teleport(162, 124084, 130213, 12572, 0);
                 }
 
@@ -752,7 +752,7 @@ namespace WorldServer.NetWork.Handler
                 ushort zoneId = Plr.Info.Value.ZoneId;
                 ushort regionId = (ushort)Plr.Info.Value.RegionId;
 
-                Zone_Info info = ZoneService.GetZone_Info(zoneId);
+                zone_infos info = ZoneService.GetZone_Info(zoneId);
                 if (info?.Type == 0)
                 {
                     RegionMgr region = WorldMgr.GetRegion(regionId, true);
@@ -761,12 +761,12 @@ namespace WorldServer.NetWork.Handler
                 }
                 else if (info?.Type == 4 || info?.Type == 5 || info?.Type == 6)  // login into a instance results in teleport outside
                 {
-                    if (InstanceService._InstanceInfo.TryGetValue(zoneId, out Instance_Info II))
+                    if (InstanceService._InstanceInfo.TryGetValue(zoneId, out instance_infos II))
                     {
-                        Zone_jump ExitJump = null;
-                        if (Plr.Realm == Realms.REALMS_REALM_ORDER)
+                        zone_jumps ExitJump = null;
+                        if (Plr.Realm == SetRealms.REALMS_REALM_ORDER)
                             ExitJump = ZoneService.GetZoneJump(II.OrderExitZoneJumpID);
-                        else if (Plr.Realm == Realms.REALMS_REALM_DESTRUCTION)
+                        else if (Plr.Realm == SetRealms.REALMS_REALM_DESTRUCTION)
                             ExitJump = ZoneService.GetZoneJump(II.DestrExitZoneJumpID);
 
                         if (ExitJump == null)
@@ -778,13 +778,13 @@ namespace WorldServer.NetWork.Handler
                 }
 
                 // Warp a player to their bind point if they attempt to load into a scenario map.
-                RallyPoint rallyPoint = RallyPointService.GetRallyPoint(Plr.Info.Value.RallyPoint);
+                rally_points rallyPoint = RallyPointService.GetRallyPoint(Plr.Info.Value.RallyPoint);
 
                 if (rallyPoint != null)
                     Plr.Teleport(rallyPoint.ZoneID, rallyPoint.WorldX, rallyPoint.WorldY, rallyPoint.WorldZ, rallyPoint.WorldO);
                 else
                 {
-                    CharacterInfo cInfo = CharMgr.GetCharacterInfo(Plr.Info.Career);
+                    character_info cInfo = CharMgr.GetCharacterInfo(Plr.Info.Career);
                     Plr.Teleport(cInfo.ZoneId, (uint)cInfo.WorldX, (uint)cInfo.WorldY, (ushort)cInfo.WorldZ,
                         (ushort)cInfo.WorldO);
                 }
@@ -923,12 +923,12 @@ namespace WorldServer.NetWork.Handler
 
                 ushort destId = packet.GetUint16();
 
-                List<Zone_Taxi> destinations = WorldMgr.GetTaxis(cclient.Plr);
+                List<zone_taxis> destinations = WorldMgr.GetTaxis(cclient.Plr);
 
                 if (destinations.Count <= destId - 1)
                     return;
 
-                Zone_Taxi destination = destinations[destId - 1];
+                zone_taxis destination = destinations[destId - 1];
 
                 if (!cclient.Plr.RemoveMoney(destination.Info.Price))
                 {

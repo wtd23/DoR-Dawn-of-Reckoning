@@ -68,9 +68,14 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
         public uint AccumulatedKills;
 
+        public int PairingId { get; set; }
+
         public ApocCommunications CommsEngine { get; set; }
 
         public Campaign BattleFront { get; set; }
+
+        public int BattleFrontId { get; set; }
+
         public BattleFrontStatus battleFrontStatus { get; set; }
 
         public new string Name { get; set; }
@@ -78,9 +83,9 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         public StateFlags State { get; set; }
 
         /// <summary>Gets the currently owning realm, may be neutral.</summary>
-        public Realms OwningRealm { get; set; }
+        public SetRealms OwningRealm { get; set; }
 
-        private Realms AssaultingRealm { get; set; }
+        private SetRealms AssaultingRealm { get; set; }
 
         public int BuffId { get; set; }
 
@@ -139,7 +144,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// </summary>
         /// <param name="objective"></param>
         /// <param name="tier"></param>
-        public BattlefieldObjective(RegionMgr region, BattleFront_Objective objective)
+        public BattlefieldObjective(RegionMgr region, battlefront_objectives objective)
         {
             Id = objective.Entry;
             Name = objective.Name;
@@ -166,7 +171,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             fsm.Initialize(CampaignObjectiveStateMachine.ProcessState.Neutral);
             if (objective.Guards != null)
             {
-                foreach (BattleFront_Guard Guard in objective.Guards)
+                foreach (battlefront_guards Guard in objective.Guards)
                 {
                     Guards.Add(new FlagGuard(this, region, objective.ZoneId, Guard.OrderId, Guard.DestroId, Guard.X, Guard.Y, Guard.Z, Guard.O));
                 }
@@ -223,9 +228,9 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             fsm.Fire(CampaignObjectiveStateMachine.Command.OnCaptureTimerEnd);
         }
 
-        private bool SpawnAllGuards(Realms owner)
+        private bool SpawnAllGuards(SetRealms owner)
         {
-            if (owner == Realms.REALMS_REALM_DESTRUCTION || owner == Realms.REALMS_REALM_ORDER)
+            if (owner == SetRealms.REALMS_REALM_DESTRUCTION || owner == SetRealms.REALMS_REALM_ORDER)
             {
                 if (Guards != null)
                     foreach (FlagGuard guard in Guards)
@@ -254,7 +259,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
         public override void SendInteract(Player player, InteractMenu menu)
         {
-            if (OwningRealm == player.Realm && AssaultingRealm == Realms.REALMS_REALM_NEUTRAL)
+            if (OwningRealm == player.Realm && AssaultingRealm == SetRealms.REALMS_REALM_NEUTRAL)
             {
                 player.SendClientMessage("Your realm already owns this flag.", ChatLogFilters.CHATLOGFILTERS_USER_ERROR);
                 return;
@@ -481,7 +486,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// </summary>
         /// <param name="realm">Realm of the player that will get the state</param>
         /// <returns>String constance representation</returns>
-        private string GetStateText(Realms realm)
+        private string GetStateText(SetRealms realm)
         {
             switch (State)
             {
@@ -530,15 +535,15 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
             switch (OwningRealm)
             {
-                case Realms.REALMS_REALM_NEUTRAL:
+                case SetRealms.REALMS_REALM_NEUTRAL:
                     displayId = 3442;
                     break;
 
-                case Realms.REALMS_REALM_ORDER:
+                case SetRealms.REALMS_REALM_ORDER:
                     displayId = 3443;
                     break;
 
-                case Realms.REALMS_REALM_DESTRUCTION:
+                case SetRealms.REALMS_REALM_DESTRUCTION:
                     displayId = 3438;
                     break;
 
@@ -607,7 +612,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                 return;
 
             var frnt = BattleFront;
-            if (frnt != null && frnt.IsBattleFrontLocked())
+            if (frnt != null && frnt.IsBattleFrontLocked(ZoneId))
                 return;
         }
 
@@ -667,7 +672,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             }
 
             string message = null;
-            var largeFilter = OwningRealm == Realms.REALMS_REALM_ORDER
+            var largeFilter = OwningRealm == SetRealms.REALMS_REALM_ORDER
                 ? ChatLogFilters.CHATLOGFILTERS_C_ORDER_RVR_MESSAGE
                 : ChatLogFilters.CHATLOGFILTERS_C_DESTRUCTION_RVR_MESSAGE;
             foreach (var player in Region.Players)
@@ -693,7 +698,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                             Name, "!");
                         snd = new PacketOut((byte)Opcodes.F_PLAY_SOUND);
                         snd.WriteByte(0);
-                        snd.WriteUInt16(OwningRealm == Realms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
+                        snd.WriteUInt16(OwningRealm == SetRealms.REALMS_REALM_ORDER ? (ushort)0x0C : (ushort)0x332);
                         snd.Fill(0, 10);
                         break;
                     }
@@ -739,9 +744,9 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// <summary>Computes a string for a realm.</summary>
         /// <param name="realm">To compute string for, should not be neutral</param>
         /// <returns>"Order" / "Destruction"</returns>
-        private static string GetRealmString(Realms realm)
+        private static string GetRealmString(SetRealms realm)
         {
-            return realm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction";
+            return realm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction";
         }
 
         /// <summary>
@@ -753,7 +758,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         {
             player.SendClientMessage($"[{Name}]", ChatLogFilters.CHATLOGFILTERS_CSR_TELL_RECEIVE);
             player.SendClientMessage(
-                $"{Enum.GetName(typeof(StateFlags), State)} and held by {(OwningRealm == Realms.REALMS_REALM_NEUTRAL ? "no realm" : (OwningRealm == Realms.REALMS_REALM_ORDER ? "Order" : "Destruction"))}");
+                $"{Enum.GetName(typeof(StateFlags), State)} and held by {(OwningRealm == SetRealms.REALMS_REALM_NEUTRAL ? "no realm" : (OwningRealm == SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction"))}");
 
             player.SendClientMessage($"Control progress: {_captureProgress}");
             player.SendClientMessage($"Secure progress: {_secureProgress}");
@@ -764,15 +769,15 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// Grants rewards for taking this battlefield objective from the enemy.
         /// </summary>
         /// <param name="capturingRealm"></param>
-        public void GrantCaptureRewards(Realms capturingRealm)
+        public void GrantCaptureRewards(SetRealms capturingRealm)
         {
             if (State == StateFlags.ZoneLocked)
                 return;
 
             var closePlayers = GetClosePlayers(capturingRealm);
 
-            var contributionDefinition = new ContributionDefinition();
-            var activeBattleFrontStatus = BattleFront.GetActiveBattleFrontStatus();
+            var contributionDefinition = new bounty_contribution_definition();
+            var activeBattleFrontStatus = BattleFront.GetActiveBattleFrontStatus(ZoneId);
 
             VictoryPoint VP = new VictoryPoint(0, 0);
 
@@ -805,9 +810,10 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
                 case StateFlags.Secure: // big tick
                     VP = RewardManager.RewardCaptureTick(closePlayers, capturingRealm, Tier, Name, 1f, BORewardType.CAPTURED);
-
-                    WorldMgr.UpperTierCampaignManager.GetActiveCampaign().VictoryPointProgress.UpdateStatus(WorldMgr.UpperTierCampaignManager.GetActiveCampaign());
-
+                    foreach (pairing_infos pairing in RVRProgressionService.RVRPairings)
+                    {
+                        WorldMgr.ScalingCampaignManager.GetActiveCampaign(pairing.PairingId).VictoryPointProgress.UpdateStatus(WorldMgr.ScalingCampaignManager.GetActiveCampaign(pairing.PairingId));
+                    }
                     lock (closePlayers)
                     {
                         foreach (var closePlayer in closePlayers)
@@ -855,7 +861,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// </summary>
         /// <param name="capturingRealm"></param>
         /// <returns></returns>
-        private ISet<Player> GetClosePlayers(Realms capturingRealm)
+        private ISet<Player> GetClosePlayers(SetRealms capturingRealm)
         {
             var applicablePlayerList = PlayersInRange.Where(x => x.Realm == capturingRealm).ToList();
 
@@ -930,7 +936,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
             // state change and send state
             State = StateFlags.Unsecure;
-            OwningRealm = Realms.REALMS_REALM_NEUTRAL;
+            OwningRealm = SetRealms.REALMS_REALM_NEUTRAL;
             // Make sure we remove the Buff Id.
             BuffId = 0;
             BroadcastFlagInfo(true);
@@ -982,13 +988,13 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             AddGlow(AssaultingRealm);
         }
 
-        private void AddGlow(Realms assaultingRealm)
+        private void AddGlow(SetRealms assaultingRealm)
         {
             GameObject_proto glowProto = GameObjectService.GetGameObjectProto(99858); //99858
 
             if (glowProto != null)
             {
-                GameObject_spawn spawn = new GameObject_spawn
+                gameobject_spawns spawn = new gameobject_spawns
                 {
                     Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                     WorldO = Heading,
@@ -1000,7 +1006,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                 spawn.BuildFromProto(glowProto);
 
                 var siegeRangeFlag = new GameObject(spawn);
-                if (assaultingRealm == Realms.REALMS_REALM_DESTRUCTION)
+                if (assaultingRealm == SetRealms.REALMS_REALM_DESTRUCTION)
                     siegeRangeFlag.VfxState = 2; //1 blue, 2 red, 3 white, 4 - white;
                 else
                 {
@@ -1017,7 +1023,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             OwningRealm = AssaultingRealm;
 
             // Add buffs to Assaulting Realm
-            var campaignObjectiveBuff = RVRProgressionService._CampaignObjectiveBuffs.SingleOrDefault(x => x.ObjectiveId == Id);
+            var campaignObjectiveBuff = RVRProgressionService.CampaignObjectiveBuffs.SingleOrDefault(x => x.ObjectiveId == Id);
             if (campaignObjectiveBuff != null)
             {
                 BuffId = campaignObjectiveBuff.BuffId;

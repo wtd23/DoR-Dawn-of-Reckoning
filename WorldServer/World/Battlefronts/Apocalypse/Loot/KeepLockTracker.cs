@@ -14,7 +14,7 @@
 
         public override string ToString()
         {
-            return $"Character {CharacterId}, Base {ZoneContribution} Random {RandomBonus} Pairing {PairingBonus} Bag Bonus : {GoldBagBonus}/{PurpleBagBonus}/{BlueBagBonus}/{GreenBagBonus}/{WhiteBagBonus}";
+            return $"characters {CharacterId}, Base {ZoneContribution} Random {RandomBonus} Pairing {PairingBonus} Bag Bonus : {GoldBagBonus}/{PurpleBagBonus}/{BlueBagBonus}/{GreenBagBonus}/{WhiteBagBonus}";
         }
     }
 }

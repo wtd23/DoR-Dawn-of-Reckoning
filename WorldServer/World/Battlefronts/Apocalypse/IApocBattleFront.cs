@@ -37,7 +37,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// Locks a pairing, preventing any interaction with objectives within.
         /// </summary>
         /// <param name="realm">Realm that locked the Campaign</param>
-        void LockPairing(Realm realm);
+        void LockPairing(Common.realms realm);
 
         /// <summary>
         /// Returns the pairing to its open state, allowing interaction with objectives.
@@ -68,7 +68,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// </summary>
         /// <param name="realm">Recipent player's realm</param>
         /// <param name="Out">TCP output</param>
-        void WriteVictoryPoints(Realms realm, PacketOut Out);
+        void WriteVictoryPoints(GameData.SetRealms realm, PacketOut Out);
 
         /// <summary>
         /// Writes battle front advancement status (t4 only, otherwise throws a notimplemented exception).
@@ -87,7 +87,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// </summary>
         /// <param name="message">Message text to send</param>
         /// <param name="realm">Realm filter</param>
-        void Broadcast(string message, Realms realm);
+        void Broadcast(string message, GameData.SetRealms realm);
 
         /// <summary>
         /// Sends campain diagnostic information to player (gm only).

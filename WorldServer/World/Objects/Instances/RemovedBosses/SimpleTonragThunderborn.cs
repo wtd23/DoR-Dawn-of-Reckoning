@@ -10,7 +10,7 @@ namespace WorldServer.World.Objects.Instances.RemovedBosses
     {
         #region Constructors
 
-        public SimpleTonragThunderborn(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleTonragThunderborn(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             EvtInterface.AddEvent(CheckDistanceAndUpdateAbilitiyDmgHeal, 500, 0);
         }

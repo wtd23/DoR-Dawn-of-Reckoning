@@ -8,7 +8,7 @@ namespace WorldServer.World.Objects.PublicQuests
     public class PQuestObjective
     {
         public PublicQuest Quest;
-        public PQuest_Objective Objective;
+        public pquest_objectives Objective;
         public List<PQuestCreature> ActiveCreatures = new List<PQuestCreature>();
         public List<PQuestGameObject> ActiveGameObjects = new List<PQuestGameObject>();
         public List<uint> ActiveInteractableGameObjects = new List<uint>();
@@ -49,7 +49,7 @@ namespace WorldServer.World.Objects.PublicQuests
                 return;
             }
 
-            foreach (PQuest_Spawn spawn in Objective.Spawns)
+            foreach (pquest_spawns spawn in Objective.Spawns)
             {
                 if (spawn.Type == 1)
                 {
@@ -66,7 +66,7 @@ namespace WorldServer.World.Objects.PublicQuests
                         continue;
                     }
 
-                    Creature_spawn S = new Creature_spawn
+                    creature_spawns S = new creature_spawns
                     {
                         Guid = (uint)CreatureService.GenerateCreatureSpawnGUID(),
                         WorldO = spawn.WorldO,
@@ -103,7 +103,7 @@ namespace WorldServer.World.Objects.PublicQuests
                         return;
                     }
 
-                    GameObject_spawn S = new GameObject_spawn();
+                    gameobject_spawns S = new gameobject_spawns();
                     S.Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID();
                     S.BuildFromProto(Proto);
                     S.WorldO = spawn.WorldO;

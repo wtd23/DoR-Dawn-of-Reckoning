@@ -1,4 +1,5 @@
 ﻿using FrameWork;
+using GameData;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -107,7 +108,7 @@ namespace WorldServer.World.Scripting
             Unit target = (Unit)Params[0];
             uint Entry = (uint)Params[1];*/
 
-            Common.Mount_Info info = new Common.Mount_Info();
+            Common.mount_infos info = new Common.mount_infos();
 
             info.Entry = entry;
             target.Mount((ushort)info.Entry);
@@ -116,7 +117,7 @@ namespace WorldServer.World.Scripting
         public void DismountNPC()
         {
             Creature c = Obj as Creature;
-            Common.Mount_Info info = new Common.Mount_Info();
+            Common.mount_infos info = new Common.mount_infos();
 
             info.Entry = 0;
             c.Mount((ushort)info.Entry);
@@ -255,8 +256,7 @@ namespace WorldServer.World.Scripting
             Creature c = null;
             foreach (Object o in Obj.ObjectsInRange.ToList())
             {
-                Creature crea = o as Creature;
-                if (crea != null && crea.Entry == entry)
+                if (o is Creature crea && crea.Entry == entry)
                 {
                     c = crea;
                     break;
@@ -277,9 +277,8 @@ namespace WorldServer.World.Scripting
                         player = obj as Player;
                         if (player != null && !player.IsDead && !player.IsInvulnerable)
                         {
-                            haveTarget = true;
                             c.MvtInterface.TurnTo(player);
-                            c.MvtInterface.Follow(player, 5, 10);
+                            c.MvtInterface.Follow(player, Constants.UNITS_TO_FEET_MIN, Constants.UNITS_TO_FEET_MAX);
                             break;
                         }
                     }

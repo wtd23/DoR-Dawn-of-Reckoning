@@ -176,11 +176,11 @@ namespace AuthenticationServer.Server.Handler
             {
                 cclient.LastInfoRequest = TCPManager.GetTimeStampMS();
 
-                List<Realm> Rms = Core.AcctMgr.GetRealms();
+                List<realms> Rms = Core.AcctMgr.GetRealms();
 
                 PacketOut Out = new PacketOut((byte)Opcodes.LCR_INFO);
                 Out.WriteByte((byte)Rms.Count);
-                foreach (Realm Rm in Rms)
+                foreach (realms Rm in Rms)
                 {
                     Out.WriteByte(Convert.ToByte(Rm.Info != null));
                     Out.WriteString(Rm.Name);

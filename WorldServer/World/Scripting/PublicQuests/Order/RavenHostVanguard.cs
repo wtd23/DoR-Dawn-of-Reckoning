@@ -44,7 +44,7 @@ namespace WorldServer.World.Scripting.PublicQuests.Order
 
             for (int i = 0; i < 3; i++)
             {
-                Creature_spawn Spawn = new Creature_spawn
+                creature_spawns Spawn = new creature_spawns
                 {
                     Guid = (uint)CreatureService.GenerateCreatureSpawnGUID()
                 };

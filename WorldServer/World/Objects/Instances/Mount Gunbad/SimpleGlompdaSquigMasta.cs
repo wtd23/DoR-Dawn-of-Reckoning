@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.Mount_Gunbad
     {
         #region Constructors
 
-        public SimpleGlompdaSquigMasta(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleGlompdaSquigMasta(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

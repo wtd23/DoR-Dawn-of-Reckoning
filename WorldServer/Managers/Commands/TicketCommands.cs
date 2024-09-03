@@ -18,7 +18,7 @@ namespace WorldServer.Managers.Commands
         /// <returns></returns>
         public static bool ListTickets(Player plr, ref List<string> values)
         {
-            foreach (Bug_report report in CharMgr._report)
+            foreach (bugs_reports report in CharMgr._report)
             {
                 string assignee = "nobody";
                 if (report.Assigned != null)
@@ -47,19 +47,19 @@ namespace WorldServer.Managers.Commands
                  *  report.type     report.category     what it means
                  *      3               18              Goldseller
                  *      0               1               Stuck in world
-                 *      0               2               Missing Character
+                 *      0               2               Missing characters
                  *      0               3               Missing Item
                  *      2               4               Violation report, it also have a subtype defined in report.reporttype
                  *      1               5               Naming Violation
-                 *      0               6               Character Issues
+                 *      0               6               characters Issues
                  *      0               19              Paid Item Issues
-                 *      0               20              Paid Character Transfer
+                 *      0               20              Paid characters Transfer
                  *      0               21              Paid Namechange
                  *      0               7               PQ Issue
                  *      0               8               SC Issue
                  *      0               10              Monster Issue
                  *      0               9               BattlefieldObjective and Keep Issue
-                 *      0               11              Quest and Quest Item Issue
+                 *      0               11              quests and quests Item Issue
                  *      0               12              Combat Issue
                  *      0               13              TOK Issue
                  *      0               14              Mail Issue
@@ -70,10 +70,10 @@ namespace WorldServer.Managers.Commands
                  *      4               6               Bugreport: Other
                  *      4               1               Bugreport: Art
                  *      4               5               Bugreport: Item
-                 *      4               0               Bugreport: Character
+                 *      4               0               Bugreport: characters
                  *      4               2               Bugrepoort: Monster
                  *      4               3               Bugreport: Crash
-                 *      4               4               Bugreport: Quest and PQ
+                 *      4               4               Bugreport: quests and PQ
                  *      THIS IS THE END OF BUGREPORTS, HERE FEEDBACK STARTS
                  *      5               7               Feedback: Cities
                  *      5               8               Feedback: TOK
@@ -153,7 +153,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            Bug_report report = CharMgr.GetReport(reportID);
+            bugs_reports report = CharMgr.GetReport(reportID);
 
             if (report == null)
             {
@@ -199,7 +199,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            Bug_report report = CharMgr.GetReport(reportID);
+            bugs_reports report = CharMgr.GetReport(reportID);
 
             if (report == null)
             {
@@ -253,7 +253,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            Bug_report report = CharMgr.GetReport(reportID);
+            bugs_reports report = CharMgr.GetReport(reportID);
 
             if (report == null)
             {
@@ -270,7 +270,7 @@ namespace WorldServer.Managers.Commands
             {
                 plr.SendClientMessage("You have deleted ticket: " + reportID);
 
-                GMCommandLog log = new GMCommandLog
+                gm_commands_logs log = new gm_commands_logs
                 {
                     PlayerName = plr.Client._Account.Username,
                     AccountId = (uint)plr.Client._Account.AccountId,
@@ -319,7 +319,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            Bug_report report = CharMgr.GetReport(reportID);
+            bugs_reports report = CharMgr.GetReport(reportID);
 
             if (report == null)
             {
@@ -342,7 +342,7 @@ namespace WorldServer.Managers.Commands
             {
                 plr.SendClientMessage("You have answered ticket: " + reportID);
 
-                GMCommandLog log = new GMCommandLog
+                gm_commands_logs log = new gm_commands_logs
                 {
                     PlayerName = plr.Client._Account.Username,
                     AccountId = (uint)plr.Client._Account.AccountId,
@@ -350,8 +350,8 @@ namespace WorldServer.Managers.Commands
                     Date = DateTime.Now
                 };
 
-                Character chara = CharMgr.GetCharacter(report.CharacterId, false);
-                Character_mail ticketMail = new Character_mail
+                characters chara = CharMgr.GetCharacter(report.CharacterId, false);
+                characters_mails ticketMail = new characters_mails
                 {
                     Guid = CharMgr.GenerateMailGuid(),
                     CharacterId = chara.CharacterId,

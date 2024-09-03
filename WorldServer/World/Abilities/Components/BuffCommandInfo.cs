@@ -10,7 +10,7 @@ namespace WorldServer.World.Abilities.Components
         {
         }
 
-        public BuffCommandInfo(DBBuffCommandInfo dbObj)
+        public BuffCommandInfo(buff_commands dbObj)
         {
             Entry = dbObj.Entry;
             Name = dbObj.Name;
@@ -41,11 +41,11 @@ namespace WorldServer.World.Abilities.Components
             NoAutoUse = dbObj.NoAutoUse;
         }
 
-        public static List<BuffCommandInfo> Convert(List<DBBuffCommandInfo> dbObjs)
+        public static List<BuffCommandInfo> Convert(List<buff_commands> dbObjs)
         {
             List<BuffCommandInfo> objects = new List<BuffCommandInfo>();
 
-            foreach (DBBuffCommandInfo dbObj in dbObjs)
+            foreach (buff_commands dbObj in dbObjs)
                 objects.Add(new BuffCommandInfo(dbObj));
 
             return objects;

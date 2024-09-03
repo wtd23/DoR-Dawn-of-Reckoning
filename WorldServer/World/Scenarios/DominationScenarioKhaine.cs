@@ -20,10 +20,10 @@ namespace WorldServer.World.Scenarios
     {
         public List<ClickFlag> Flags = new List<ClickFlag>();
 
-        public DominationScenarioKhaine(Scenario_Info info, int tier)
+        public DominationScenarioKhaine(scenario_infos info, int tier)
             : base(info, tier)
         {
-            foreach (Scenario_Object scenarioObject in info.ScenObjects.OrderBy(e => e.Identifier).ToList())
+            foreach (scenario_objects scenarioObject in info.ScenObjects.OrderBy(e => e.Identifier).ToList())
             {
                 if (scenarioObject.Type == "Flag")
                 {
@@ -113,7 +113,7 @@ namespace WorldServer.World.Scenarios
 
         private void Lock()
         {
-            Broadcast(new[] { "The forces of " + (Flags[0].Owner == (int)Realms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " bring forth Khaine's Wrath!" },
+            Broadcast(new[] { "The forces of " + (Flags[0].Owner == (int)SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " bring forth Khaine's Wrath!" },
                 ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.CHAT_TAG_DEFAULT);
 
             foreach (var obj in Region.GetObjects<GameObject>().Where(e => e.Name == "Khaine Flames").ToList())
@@ -246,14 +246,14 @@ namespace WorldServer.World.Scenarios
                 }
             }
 
-            if (flag.Owner == (int)Realms.REALMS_REALM_ORDER)
+            if (flag.Owner == (int)SetRealms.REALMS_REALM_ORDER)
                 PlaySoundToAll(580);
-            else if (flag.Owner == (int)Realms.REALMS_REALM_DESTRUCTION)
+            else if (flag.Owner == (int)SetRealms.REALMS_REALM_DESTRUCTION)
                 PlaySoundToAll(818);
 
             if (Flags[0].Owner == Flags[1].Owner)
             {
-                Broadcast(new[] { (Flags[0].Owner == (int)Realms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " will lock down both control points in 15 seconds!" },
+                Broadcast(new[] { (Flags[0].Owner == (int)SetRealms.REALMS_REALM_ORDER ? "Order" : "Destruction") + " will lock down both control points in 15 seconds!" },
                     ChatLogFilters.CHATLOGFILTERS_C_WHITE, Localized_text.CHAT_TAG_DEFAULT);
                 EvtInterface.AddEvent(Lock, 15000, 1);
             }

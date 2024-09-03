@@ -15,7 +15,7 @@ namespace WorldServer.World.Abilities.Components
         {
         }
 
-        public BuffInfo(DBBuffInfo dbObj)
+        public BuffInfo(buff_infos dbObj)
         {
             Entry = dbObj.Entry;
             Name = dbObj.Name;
@@ -42,11 +42,11 @@ namespace WorldServer.World.Abilities.Components
             EffectType = dbObj.Silent;
         }
 
-        public static List<BuffInfo> Convert(List<DBBuffInfo> dbObjs)
+        public static List<BuffInfo> Convert(List<buff_infos> dbObjs)
         {
             List<BuffInfo> objects = new List<BuffInfo>();
 
-            foreach (DBBuffInfo dbObj in dbObjs)
+            foreach (buff_infos dbObj in dbObjs)
                 objects.Add(new BuffInfo(dbObj));
 
             return objects;

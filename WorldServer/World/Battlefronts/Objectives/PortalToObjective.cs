@@ -17,13 +17,13 @@ namespace WorldServer.World.Battlefronts.Objectives
         private const string NAME_START = "Portal to ";
 
         /// <summary>Portal targets depending on realm</summary>
-        private BattleFrontObject _target;
+        private battlefront_objects _target;
 
         private Point3D _targetPos;
 
         private long _nextAvailableTimestamp;
 
-        public PortalToObjective(BattleFrontObject origin, BattleFrontObject target, string name)
+        public PortalToObjective(battlefront_objects origin, battlefront_objects target, string name)
             : base(origin)
         {
             Name = NAME_START + name;

@@ -385,7 +385,7 @@ namespace WorldServer.World.Interfaces
             #endregion Multiplicative
         }
 
-        internal void LoadPetOverrides(List<PetStatOverride> list, object v)
+        internal void LoadPetOverrides(List<pet_stat_override> list, object v)
         {
             throw new NotImplementedException();
         }
@@ -415,32 +415,32 @@ namespace WorldServer.World.Interfaces
             base.Load();
         }*/
 
-        public void Load(List<CharacterInfo_stats> stats)
+        public void Load(List<character_info_stats> stats)
         {
             if (IsLoad)
                 return;
 
-            foreach (CharacterInfo_stats stat in stats)
+            foreach (character_info_stats stat in stats)
             {
                 if (stat.StatId < _baseStats.Length)
                     _baseStats[stat.StatId] = stat.StatValue;
             }
 
-            foreach (CharacterInfo_stats stat in stats)
+            foreach (character_info_stats stat in stats)
             {
                 if (_Owner != null && _Owner is Pet && ((Pet)_Owner).Owner != null && WorldMgr.WorldSettingsMgr.GetGenericSetting(19) == 0)
                 {
-                    List<PetStatOverride> overrides = CharMgr.GetPetStatOverride(stat.CareerLine);
-                    List<PetMasteryModifiers> modifiers = CharMgr.GetPetMasteryModifiers(stat.CareerLine);
+                    List<pet_stat_override> overrides = CharMgr.GetPetStatOverride(stat.CareerLine);
+                    List<pet_mastery_modifiers> modifiers = CharMgr.GetPetMasteryModifiers(stat.CareerLine);
 
-                    foreach (PetStatOverride ovr in overrides)
+                    foreach (pet_stat_override ovr in overrides)
                     {
                         if (stat.StatId == ovr.PrimaryValue)
                         {
                             AddBonusMultiplier((Stats)ovr.PrimaryValue, ovr.SecondaryValue * .01f, BuffClass.Career);
                         }
                     }
-                    foreach (PetMasteryModifiers mod in modifiers)
+                    foreach (pet_mastery_modifiers mod in modifiers)
                     {
                         if (stat.StatId == mod.PrimaryValue)
                         {
@@ -1143,6 +1143,27 @@ namespace WorldServer.World.Interfaces
             }
 
             ((Player)_Owner).SendPacket(Out);
+        }
+
+        public ushort BonusSpeed = 0;
+
+        public void AddBonusSpeed(ushort Speed)
+        {
+            BonusSpeed += Speed;
+
+            if (_Owner.IsUnit())
+                _Owner.GetUnit().Speed = this.Speed;
+        }
+
+        public void RemoveBonusSpeed(ushort Speed)
+        {
+            if (BonusSpeed < Speed)
+                BonusSpeed = 0;
+            else
+                BonusSpeed -= Speed;
+
+            if (_Owner.IsUnit())
+                _Owner.GetUnit().Speed = this.Speed;
         }
     }
 }

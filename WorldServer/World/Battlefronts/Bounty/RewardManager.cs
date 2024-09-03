@@ -213,7 +213,7 @@ namespace WorldServer.World.Battlefronts.Bounty
                             DistributeInsigniaReward(playerToBeRewarded, $"++ You have been awarded 1 {insigniaName} for a deathblow on {victim.Name}", 1);
                         }
 
-                        if (killer.GetBattlefrontManager(killer.Region.RegionId).ActiveBattleFront.ZoneId == killer.ZoneId)
+                        if (killer.GetBattlefrontManager(killer.Region.RegionId).IsInContestedZone((ushort)killer.ZoneId))
                             DistributeDeathBlowContributionForPlayerKill(killer, victim.Name);
                         else
                         {
@@ -235,7 +235,7 @@ namespace WorldServer.World.Battlefronts.Bounty
                                 1);
                         }
 
-                        if (killer.GetBattlefrontManager(playerToBeRewarded.Region.RegionId).ActiveBattleFront.ZoneId == playerToBeRewarded.ZoneId)
+                        if (killer.GetBattlefrontManager(playerToBeRewarded.Region.RegionId).IsInContestedZone((ushort)playerToBeRewarded.ZoneId))
                             DistributeKillAssistContributionForPlayerKill(playerToBeRewarded);
                         else
                         {
@@ -479,11 +479,11 @@ namespace WorldServer.World.Battlefronts.Bounty
         /// <param name="rvrKeepRewards"></param>
         public void DistributeKeepTakeBaseRewards(ConcurrentDictionary<Player, int> eligibleLosingRealmPlayers,
             ConcurrentDictionary<Player, int> eligibleWinningRealmPlayers,
-            Realms lockingRealm,
+            SetRealms lockingRealm,
             int baselineContribution,
             float tierRewardScale,
             List<Player> allPlayersInZone,
-            List<RVRKeepLockReward> rvrKeepRewards)
+            List<rvr_keep_lock_reward> rvrKeepRewards)
         {
             // Distribute rewards to losing players with eligibility - halve rewards.
             foreach (var losingRealmPlayer in eligibleLosingRealmPlayers)
@@ -736,7 +736,7 @@ namespace WorldServer.World.Battlefronts.Bounty
             RewardLogger.Debug($"Recording Player Kill history - item drop {killer.Name} kills {victim.Name}, receives {itemId}");
             try
             {
-                var history = new PlayerKillRewardHistory
+                var history = new rvr_player_kill_reward_history
                 {
                     VictimCharacterId = (int)victim.CharacterId,
                     KillerCharacterId = (int)killer.CharacterId,
@@ -783,7 +783,7 @@ namespace WorldServer.World.Battlefronts.Bounty
                 try
                 {
                     var name = realmPlayers.SingleOrDefault(x => x.Key.CharacterId == pair.Key);
-                    Logger.Debug($"===== Character / Contribution pre bonus : {pair.Key}:{pair.Value} ({name.Key.Name})");
+                    Logger.Debug($"===== characters / Contribution pre bonus : {pair.Key}:{pair.Value} ({name.Key.Name})");
                 }
                 catch (Exception e)
                 {
@@ -815,11 +815,11 @@ namespace WorldServer.World.Battlefronts.Bounty
 
             var characterList = (from kvp in sortedPairs select kvp.Key).Distinct().ToList();
             var characterJoinedList = string.Join(",", characterList);
-            var bagBonusCharacters = new List<RVRPlayerBagBonus>();
+            var bagBonusCharacters = new List<characters_bag_bonus>();
             if (characterJoinedList != "")
             {
                 bagBonusCharacters =
-                    CharMgr.Database.SelectObjects<RVRPlayerBagBonus>($"CharacterId in ({characterJoinedList})").ToList();
+                    CharMgr.Database.SelectObjects<characters_bag_bonus>($"CharacterId in ({characterJoinedList})").ToList();
             }
 
             Logger.Debug(characterJoinedList);
@@ -830,12 +830,12 @@ namespace WorldServer.World.Battlefronts.Bounty
 
             // Assign eligible players to the bag definitions.
             var pairingContributions = new Dictionary<uint, int>();
-            var zoneEligibiltyCharacters = new List<ZoneLockEligibilityHistory>();
+            var zoneEligibiltyCharacters = new List<rvr_zone_lock_eligibility_history>();
             if ((leadInZones != "") && (characterJoinedList != ""))
             {
                 var query =
                     $"CharacterId in ({characterJoinedList}) and ZoneId in ({leadInZones}) and timestamp BETWEEN DATE_SUB(UTC_TIMESTAMP(), INTERVAL {Core.Config.PairingContributionTimeIntervalHours} HOUR) AND UTC_TIMESTAMP() ";
-                zoneEligibiltyCharacters = (List<ZoneLockEligibilityHistory>)WorldMgr.Database.SelectObjects<ZoneLockEligibilityHistory>(query);
+                zoneEligibiltyCharacters = (List<rvr_zone_lock_eligibility_history>)WorldMgr.Database.SelectObjects<rvr_zone_lock_eligibility_history>(query);
                 Logger.Debug($"{query}");
                 Logger.Debug($"zoneEligibiltyCharacters : {zoneEligibiltyCharacters.Count}");
             }
@@ -854,7 +854,7 @@ namespace WorldServer.World.Battlefronts.Bounty
                 }
             }
 
-            return rewardAssigner.AssignLootToPlayers(numberOfBagsToAward, bagDefinitions, sortedPairs, bagBonusCharacters, randomRollList, pairingContributions, new WorldConfigs { AllowBagBonusContribution = "Y", AllowPairingContribution = "Y", AllowRandomContribution = "Y" });
+            return rewardAssigner.AssignLootToPlayers(numberOfBagsToAward, bagDefinitions, sortedPairs, bagBonusCharacters, randomRollList, pairingContributions, new WorldConfig { AllowBagBonusContribution = "Y", AllowPairingContribution = "Y", AllowRandomContribution = "Y" });
         }
 
         public void GenerateKeepTakeLootBags(
@@ -862,12 +862,12 @@ namespace WorldServer.World.Battlefronts.Bounty
             ConcurrentDictionary<Player, int> allEligiblePlayers,
             ConcurrentDictionary<Player, int> winningEligiblePlayers,
             ConcurrentDictionary<Player, int> losingEligiblePlayers,
-            Realms lockingRealm,
+            SetRealms lockingRealm,
             int zoneId,
             List<RVRRewardItem> lootOptions,
             LootChest destructionLootChest,
             LootChest orderLootChest,
-            Keep_Info keep, int playersKilledInRange,
+            keep_infos keep, int playersKilledInRange,
           int forceNumberBags = 0)
         {
             logger.Info($"*************************GenerateKeepTakeLootBags*************************");
@@ -876,7 +876,7 @@ namespace WorldServer.World.Battlefronts.Bounty
             if (forceNumberBags == -1)
                 return;
 
-            var bagBonus = new Dictionary<Player, RVRPlayerBagBonus>();
+            var bagBonus = new Dictionary<Player, characters_bag_bonus>();
 
             try
             {
@@ -923,7 +923,7 @@ namespace WorldServer.World.Battlefronts.Bounty
                 foreach (var eligiblePlayersAllRealm in allEligiblePlayers)
                 {
                     logger.Debug($"eligible : {eligiblePlayersAllRealm.Key.Name} ({eligiblePlayersAllRealm.Key.CharacterId}) {eligiblePlayersAllRealm.Key.Realm}");
-                    bagBonus.Add(eligiblePlayersAllRealm.Key, CharMgr.Database.SelectObject<RVRPlayerBagBonus>($"CharacterId = {eligiblePlayersAllRealm.Key.CharacterId}"));
+                    bagBonus.Add(eligiblePlayersAllRealm.Key, CharMgr.Database.SelectObject<characters_bag_bonus>($"CharacterId = {eligiblePlayersAllRealm.Key.CharacterId}"));
                 }
 
                 foreach (var bonus in bagBonus.Keys.ToList())
@@ -932,7 +932,7 @@ namespace WorldServer.World.Battlefronts.Bounty
                 }
 
                 var bagContentSelector = new BagContentSelector(lootOptions, StaticRandom.Instance);
-                var lootBagReportList = new List<KeyValuePair<Item_Info, List<Talisman>>>();
+                var lootBagReportList = new List<KeyValuePair<item_infos, List<Talisman>>>();
 
                 foreach (var reward in rewardAssignments)
                 {
@@ -960,7 +960,7 @@ namespace WorldServer.World.Battlefronts.Bounty
                                 lootBagReportList.Add(generatedLootBag);
                                 switch (assignedPlayer.Realm)
                                 {
-                                    case Realms.REALMS_REALM_DESTRUCTION:
+                                    case SetRealms.REALMS_REALM_DESTRUCTION:
                                         {
                                             if (destructionLootChest == null)
                                             {
@@ -974,7 +974,7 @@ namespace WorldServer.World.Battlefronts.Bounty
 
                                             break;
                                         }
-                                    case Realms.REALMS_REALM_ORDER:
+                                    case SetRealms.REALMS_REALM_ORDER:
                                         {
                                             if (orderLootChest == null)
                                             {
@@ -1033,7 +1033,7 @@ namespace WorldServer.World.Battlefronts.Bounty
             }
         }
 
-        public int CalculateAdditionalBagsDueToEnemyRatio(int winningEligiblePlayers, int losingEligiblePlayers, WorldConfigs config)
+        public int CalculateAdditionalBagsDueToEnemyRatio(int winningEligiblePlayers, int losingEligiblePlayers, WorldConfig config)
         {
             if (winningEligiblePlayers <= config.AdditionalBagRatioMinimumWinners)
                 return 0;
@@ -1065,8 +1065,8 @@ namespace WorldServer.World.Battlefronts.Bounty
         /// <param name="player"></param>
         /// <param name="item"></param>
         /// <param name="singleOrDefault"></param>
-        private KeyValuePair<Player, RVRPlayerBagBonus> ResetBagBonus(Player player, Item_Info item,
-            KeyValuePair<Player, RVRPlayerBagBonus> bagBonus)
+        private KeyValuePair<Player, characters_bag_bonus> ResetBagBonus(Player player, item_infos item,
+            KeyValuePair<Player, characters_bag_bonus> bagBonus)
         {
             var bagDescription = "";
             if (bagBonus.Value != null)
@@ -1111,13 +1111,13 @@ namespace WorldServer.World.Battlefronts.Bounty
         /// </summary>
 
         /// <param name="bonus"></param>
-        public RVRPlayerBagBonus UpdatePlayerBagBonus(uint characterId, string characterName, RVRPlayerBagBonus bonus, WorldConfigs settings)
+        public characters_bag_bonus UpdatePlayerBagBonus(uint characterId, string characterName, characters_bag_bonus bonus, WorldConfig settings)
         {
             var increment = settings.EligiblePlayerBagBonusIncrement;
 
             if (bonus == null)
             {
-                var bagBonus = new RVRPlayerBagBonus
+                var bagBonus = new characters_bag_bonus
                 {
                     CharacterId = (int)characterId,
                     GoldBag = increment,
@@ -1149,7 +1149,7 @@ namespace WorldServer.World.Battlefronts.Bounty
             return bonus;
         }
 
-        private void RecordKeepTakeRewardHistory(ILogger logger, Player assignedPlayer, KeyValuePair<Item_Info, List<Talisman>> generatedLootBag, Realms lockingRealm, Keep_Info keep)
+        private void RecordKeepTakeRewardHistory(ILogger logger, Player assignedPlayer, KeyValuePair<item_infos, List<Talisman>> generatedLootBag, SetRealms lockingRealm, keep_infos keep)
         {
             logger.Debug($"Recording zone lock bag reward history for {assignedPlayer.Name} ({assignedPlayer.CharacterId}) {generatedLootBag.Key.Name}");
             try
@@ -1174,7 +1174,7 @@ namespace WorldServer.World.Battlefronts.Bounty
                     return;
                 }
 
-                var history = new KeepLockBagRewardHistory
+                var history = new rvr_keep_lock_bag_reward_history
                 {
                     CharacterId = (int)assignedPlayer.CharacterId,
                     BagRarity = (int)generatedLootBag.Key.Entry,
@@ -1196,12 +1196,12 @@ namespace WorldServer.World.Battlefronts.Bounty
             }
         }
 
-        private void MailLootBag(uint keyCharacterId, KeyValuePair<Item_Info, List<Talisman>> lootBag, string senderName, string title = "Reward", string content = "Reward")
+        private void MailLootBag(uint keyCharacterId, KeyValuePair<item_infos, List<Talisman>> lootBag, string senderName, string title = "Reward", string content = "Reward")
         {
             var character = CharMgr.GetCharacter(keyCharacterId, false);
             var characterName = character?.Name;
 
-            Character_mail mail = new Character_mail
+            characters_mails mail = new characters_mails
             {
                 Guid = CharMgr.GenerateMailGuid(),
                 CharacterId = keyCharacterId, //CharacterId
@@ -1215,7 +1215,7 @@ namespace WorldServer.World.Battlefronts.Bounty
                 CharacterIdSender = keyCharacterId
             };
 
-            MailItem item = new MailItem(lootBag.Key.Entry, lootBag.Value, 0, 0, 1);
+            mail_item item = new mail_item(lootBag.Key.Entry, lootBag.Value, 0, 0, 1);
             if (item != null)
             {
                 mail.Items.Add(item);
@@ -1223,14 +1223,14 @@ namespace WorldServer.World.Battlefronts.Bounty
             }
         }
 
-        public void MailItem(uint keyCharacterId, Item_Info itemToSend, int count, string senderName, string title = "", string content = "mail")
+        public void MailItem(uint keyCharacterId, item_infos itemToSend, int count, string senderName, string title = "", string content = "mail")
         {
             try
             {
                 var character = CharMgr.GetCharacter(keyCharacterId, false);
                 var characterName = character?.Name;
 
-                Character_mail mail = new Character_mail
+                characters_mails mail = new characters_mails
                 {
                     Guid = CharMgr.GenerateMailGuid(),
                     CharacterId = keyCharacterId, //CharacterId
@@ -1246,7 +1246,7 @@ namespace WorldServer.World.Battlefronts.Bounty
 
                 Logger.Info($"Mail : {characterName} ({keyCharacterId}) {itemToSend.Name} {senderName}");
 
-                MailItem item = new MailItem(itemToSend.Entry, (ushort)count);
+                mail_item item = new mail_item(itemToSend.Entry, (ushort)count);
                 if (item != null)
                 {
                     mail.Items.Add(item);
@@ -1300,7 +1300,7 @@ namespace WorldServer.World.Battlefronts.Bounty
         public void DistributeZoneFlipBaseRewards(
             ConcurrentDictionary<Player, int> eligibleLosingRealmPlayers,
             ConcurrentDictionary<Player, int> eligibleWinningRealmPlayers,
-            Realms lockingRealm,
+            SetRealms lockingRealm,
             int baselineContribution,
             float tierRewardScale,
             List<Player> allPlayersInZone

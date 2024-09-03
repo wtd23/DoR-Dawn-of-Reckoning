@@ -22,7 +22,7 @@ namespace WorldServer.World.Objects.Instances.TomboftheVultureLord
 
         public Pendulum(GameObject_proto proto, byte vfxstart, int WX, int WY, int WZ)
         {
-            GameObject_spawn sp = new GameObject_spawn();
+            gameobject_spawns sp = new gameobject_spawns();
             sp.ZoneId = 179;
             sp.DisplayID = 7394;
             sp.WorldX = WX;
@@ -130,7 +130,7 @@ namespace WorldServer.World.Objects.Instances.TomboftheVultureLord
 
         public Firetrap(GameObject_proto proto, int WX, int WY, int WZ)
         {
-            GameObject_spawn sp = new GameObject_spawn();
+            gameobject_spawns sp = new gameobject_spawns();
             sp.ZoneId = 179;
             sp.DisplayID = proto.DisplayID;
             sp.WorldX = WX;
@@ -212,7 +212,7 @@ namespace WorldServer.World.Objects.Instances.TomboftheVultureLord
 
         public DartTrap(GameObject_proto proto, byte vfxstart, int WX, int WY, int WZ)
         {
-            GameObject_spawn sp = new GameObject_spawn();
+            gameobject_spawns sp = new gameobject_spawns();
             sp.ZoneId = 179;
             sp.DisplayID = 7471;
             sp.WorldX = WX;
@@ -268,7 +268,7 @@ namespace WorldServer.World.Objects.Instances.TomboftheVultureLord
         private bool Firetrap_active = true;
         private bool Darttrap_active = true;
 
-        public TOTVL(ushort zoneid, ushort id, byte realm, Instance_Lockouts lockouts) : base(zoneid, id, realm, lockouts)
+        public TOTVL(ushort zoneid, ushort id, byte realm, instance_lockouts lockouts) : base(zoneid, id, realm, lockouts)
         {
             _evtInterface = new EventInterface();
             ZoneID = zoneid;

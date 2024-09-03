@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.Database.World.Battlefront;
 using Common.Database.World.Characters;
 using FrameWork;
 using GameData;
@@ -62,7 +63,7 @@ namespace WorldServer.Managers
         // DEV - Development mode, PRD - Production Mode.
         public static string ServerMode;
 
-        public static UpperTierCampaignManager UpperTierCampaignManager;
+        public static ScalingCampaignManager ScalingCampaignManager;
         public static LowerTierCampaignManager LowerTierCampaignManager;
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
         public static RVRArea RVRArea = new RVRArea();
@@ -114,7 +115,7 @@ namespace WorldServer.Managers
 
             if (player.CurrentArea != null)
             {
-                // If player is in a Public Quest
+                // If player is in a Public quests
                 if (player.QtsInterface.PublicQuest != null)
                 {
                     var pqRespawns = ZoneService.GetZoneRespawns(zoneId);
@@ -128,9 +129,9 @@ namespace WorldServer.Managers
                 // Scenario respawn - random if > 1
                 if (player.ScnInterface.Scenario != null)
                 {
-                    List<Zone_Respawn> respawns = ZoneService.GetZoneRespawns(zoneId);
-                    List<Zone_Respawn> options = new List<Zone_Respawn>();
-                    foreach (Zone_Respawn res in respawns)
+                    List<zone_respawns> respawns = ZoneService.GetZoneRespawns(zoneId);
+                    List<zone_respawns> options = new List<zone_respawns>();
+                    foreach (zone_respawns res in respawns)
                     {
                         if (res.Realm != realm)
                             continue;
@@ -169,10 +170,10 @@ namespace WorldServer.Managers
             else
             {
                 // World Spawns
-                List<Zone_Respawn> respawns = ZoneService.GetZoneRespawns(zoneId);
+                List<zone_respawns> respawns = ZoneService.GetZoneRespawns(zoneId);
                 float lastDistance = float.MaxValue;
 
-                foreach (Zone_Respawn res in respawns)
+                foreach (zone_respawns res in respawns)
                 {
                     if (res.Realm != realm)
                         continue;
@@ -194,12 +195,12 @@ namespace WorldServer.Managers
             }
         }
 
-        public static List<Zone_Taxi> GetTaxis(Player Plr)
+        public static List<zone_taxis> GetTaxis(Player Plr)
         {
-            List<Zone_Taxi> L = new List<Zone_Taxi>();
+            List<zone_taxis> L = new List<zone_taxis>();
 
-            Zone_Taxi[] Taxis;
-            foreach (KeyValuePair<ushort, Zone_Taxi[]> Kp in ZoneService._Zone_Taxi)
+            zone_taxis[] Taxis;
+            foreach (KeyValuePair<ushort, zone_taxis[]> Kp in ZoneService._Zone_Taxi)
             {
                 Taxis = Kp.Value;
                 if (Taxis[(byte)Plr.Realm] == null || Taxis[(byte)Plr.Realm].WorldX == 0)
@@ -246,34 +247,39 @@ namespace WorldServer.Managers
 
         public static uint GenerateXPCount(Player plr, Unit victim)
         {
-            uint KLvl = plr.AdjustedLevel;
-            uint VLvl = victim.AdjustedLevel;
-
-            if (KLvl > VLvl + 8)
-                return 0;
-
-            uint XP = VLvl * 100;
-
-            if (victim is Creature)
+            if (plr != null)
             {
-                switch (victim.Rank)
+                uint KLvl = plr.AdjustedLevel;
+                uint VLvl = victim.AdjustedLevel;
+                if (KLvl > VLvl + 8)
+                    return 0;
+
+                uint XP = VLvl * 100;
+
+                if (victim is Creature)
                 {
-                    case 1:
-                        XP *= 4; break;
-                    case 2:
-                        if (plr.WorldGroup != null)
-                            XP *= 12;
-                        break;
+                    switch (victim.Rank)
+                    {
+                        case 1:
+                            XP *= 4; break;
+                        case 2:
+                            if (plr.WorldGroup != null)
+                                XP *= 12;
+                            break;
+                    }
                 }
+
+                if (KLvl > VLvl)
+                    XP -= (uint)((XP / (float)100) * (KLvl - VLvl + 1)) * 5;
+                else if (Core.Config.XpRate > 0)
+                    XP *= (uint)Core.Config.XpRate;
+
+                return XP;
             }
-
-            if (KLvl > VLvl)
-                XP -= (uint)((XP / (float)100) * (KLvl - VLvl + 1)) * 5;
-
-            else if (Core.Config.XpRate > 0)
-                XP *= (uint)Core.Config.XpRate;
-
-            return XP;
+            else
+            {
+                return 0;
+            }
         }
 
         public static void GenerateXP(Player killer, Unit victim, float bonusMod)
@@ -312,7 +318,7 @@ namespace WorldServer.Managers
 
         #region items
 
-        public static void SendDynamicVendorItems(Player plr, List<Vendor_items> items)
+        public static void SendDynamicVendorItems(Player plr, List<creature_vendors> items)
         {
             if (plr == null)
                 return;
@@ -340,10 +346,10 @@ namespace WorldServer.Managers
                 return;
 
             //guildrank check
-            List<Vendor_items> Itemsprecheck = VendorService.GetVendorItems(id).ToList();
-            List<Vendor_items> Items = new List<Vendor_items>();
+            List<creature_vendors> Itemsprecheck = VendorService.GetVendorItems(id).ToList();
+            List<creature_vendors> Items = new List<creature_vendors>();
 
-            foreach (Vendor_items vi in Itemsprecheck)
+            foreach (creature_vendors vi in Itemsprecheck)
             {
                 if (vi.ReqGuildlvl > 0 && Plr.GldInterface.IsInGuild() && vi.ReqGuildlvl > Plr.GldInterface.Guild.Info.Level)
                     continue;
@@ -368,7 +374,7 @@ namespace WorldServer.Managers
             Plr.ItmInterface.SendBuyBack();
         }
 
-        public static void SendVendorPage(Player Plr, ref List<Vendor_items> items, byte Count, byte Page)
+        public static void SendVendorPage(Player Plr, ref List<creature_vendors> items, byte Count, byte Page)
         {
             Count = (byte)Math.Min(Count, items.Count);
 
@@ -399,7 +405,7 @@ namespace WorldServer.Managers
                     Out.WriteByte(1);
                     foreach (KeyValuePair<uint, ushort> Kp in items[i].ItemsReq)
                     {
-                        Item_Info item = ItemService.GetItem_Info(Kp.Key);
+                        item_infos item = ItemService.GetItem_Info(Kp.Key);
                         Out.WriteUInt32(Kp.Key);
                         Out.WriteUInt16((ushort)item.ModelId);
                         Out.WritePascalString(item.Name);
@@ -428,10 +434,10 @@ namespace WorldServer.Managers
                 Count = 1;
 
             //guildrank check
-            List<Vendor_items> Itemsprecheck = VendorService.GetVendorItems(id).ToList();
-            List<Vendor_items> Vendors = new List<Vendor_items>();
+            List<creature_vendors> Itemsprecheck = VendorService.GetVendorItems(id).ToList();
+            List<creature_vendors> Vendors = new List<creature_vendors>();
 
-            foreach (Vendor_items vi in Itemsprecheck)
+            foreach (creature_vendors vi in Itemsprecheck)
             {
                 if (vi.ReqGuildlvl > 0 && Plr.GldInterface.IsInGuild() && vi.ReqGuildlvl > Plr.GldInterface.Guild.Info.Level)
                     continue;
@@ -475,7 +481,7 @@ namespace WorldServer.Managers
             }
         }
 
-        public static void BuyItemHonorDynamicVendor(Player plr, InteractMenu Menu, List<Vendor_items> items)
+        public static void BuyItemHonorDynamicVendor(Player plr, InteractMenu Menu, List<creature_vendors> items)
         {
             int Num = (Menu.Page * VendorService.MAX_ITEM_PAGE) + Menu.Num;
             ushort Count = Menu.Packet.GetUint16();
@@ -511,7 +517,7 @@ namespace WorldServer.Managers
                 }
 
                 // Add the definitive reward cooldown for this item
-                var honorRewardCooldown = new HonorRewardCooldown
+                var honorRewardCooldown = new characters_honor_reward_cooldown
                 {
                     CharacterId = plr.CharacterId,
                     Cooldown = FrameWork.TCPManager.GetTimeStamp() + reward.Cooldown,
@@ -530,7 +536,7 @@ namespace WorldServer.Managers
             }
         }
 
-        public static void BuyItemRealmCaptainDynamicVendor(Player plr, InteractMenu Menu, List<Vendor_items> items)
+        public static void BuyItemRealmCaptainDynamicVendor(Player plr, InteractMenu Menu, List<creature_vendors> items)
         {
             int Num = (Menu.Page * VendorService.MAX_ITEM_PAGE) + Menu.Num;
             ushort Count = Menu.Packet.GetUint16();
@@ -556,7 +562,7 @@ namespace WorldServer.Managers
         #region Quests
 
         // TODO move that to QuestService
-        public static void GenerateObjective(Quest_Objectives Obj, Quest Q)
+        public static void GenerateObjective(quests_objectives Obj, quests Q)
         {
             switch ((Objective_Type)Obj.ObjType)
             {
@@ -666,14 +672,14 @@ namespace WorldServer.Managers
                                     Creature_proto Proto = CreatureService.GetCreatureProtoByName(Name) ?? CreatureService.GetCreatureProtoByName(RestWords[0]);
                                     if (Proto != null)
                                     {
-                                        Obj.Item = new Item_Info();
+                                        Obj.Item = new item_infos();
                                         Obj.Item.Entry = ObjID;
                                         Obj.Item.Name = Obj.Description;
                                         Obj.Item.MaxStack = 20;
                                         Obj.Item.ModelId = 531;
                                         ItemService._Item_Info.Add(Obj.Item.Entry, Obj.Item);
 
-                                        Log.Info("WorldMgr", "Creating Quest(" + Obj.Entry + ") Item : " + Obj.Item.Entry + ",  " + Obj.Item.Name + "| Adding Loot to : " + Proto.Name);
+                                        Log.Info("WorldMgr", "Creating quests(" + Obj.Entry + ") Item : " + Obj.Item.Entry + ",  " + Obj.Item.Name + "| Adding Loot to : " + Proto.Name);
                                         /*Creature_loot loot = new Creature_loot();
                                         loot.Entry = Proto.Entry;
                                         loot.ItemId = Obj.Item.Entry;
@@ -710,9 +716,9 @@ namespace WorldServer.Managers
 
                         if (ObjID != 0)
                         {
-                            foreach (List<BattleFront_Objective> boList in BattleFrontService._BattleFrontObjectives.Values)
+                            foreach (List<battlefront_objectives> boList in BattleFrontService._BattleFrontObjectives.Values)
                             {
-                                foreach (BattleFront_Objective bo in boList)
+                                foreach (battlefront_objectives bo in boList)
                                 {
                                     if (bo.Entry == ObjID)
                                     {
@@ -741,9 +747,9 @@ namespace WorldServer.Managers
 
                         if (ObjID != 0)
                         {
-                            foreach (List<Keep_Info> keepList in BattleFrontService._KeepInfos.Values)
+                            foreach (List<keep_infos> keepList in BattleFrontService._KeepInfos.Values)
                             {
-                                foreach (Keep_Info keep in keepList)
+                                foreach (keep_infos keep in keepList)
                                 {
                                     if (keep.KeepId == ObjID)
                                     {
@@ -776,11 +782,11 @@ namespace WorldServer.Managers
         {
             Log.Success("LoadRelation", "Loading Relations");
 
-            foreach (Item_Info info in ItemService._Item_Info.Values)
+            foreach (item_infos info in ItemService._Item_Info.Values)
             {
                 if (info.Career != 0)
                 {
-                    foreach (KeyValuePair<byte, CharacterInfo> Kp in CharMgr.CharacterInfos)
+                    foreach (KeyValuePair<byte, character_info> Kp in CharMgr.CharacterInfos)
                     {
                         if ((info.Career & (1 << (Kp.Value.CareerLine - 1))) == 0)
                             continue;
@@ -802,8 +808,8 @@ namespace WorldServer.Managers
             LoadQuestsRelation();
             LoadScripts(false);
 
-            foreach (List<Keep_Info> keepInfos in BattleFrontService._KeepInfos.Values)
-                foreach (Keep_Info keepInfo in keepInfos)
+            foreach (List<keep_infos> keepInfos in BattleFrontService._KeepInfos.Values)
+                foreach (keep_infos keepInfo in keepInfos)
                     if (PQuestService._PQuests.ContainsKey(keepInfo.PQuestId))
                         keepInfo.PQuest = PQuestService._PQuests[keepInfo.PQuestId];
 
@@ -842,9 +848,9 @@ namespace WorldServer.Managers
 
             long InvalidChapters = 0;
 
-            Zone_Info Zone = null;
-            Chapter_Info Info;
-            foreach (KeyValuePair<uint, Chapter_Info> Kp in ChapterService._Chapters)
+            zone_infos Zone = null;
+            chapter_infos Info;
+            foreach (KeyValuePair<uint, chapter_infos> Kp in ChapterService._Chapters)
             {
                 Info = Kp.Value;
                 Zone = ZoneService.GetZone_Info(Info.ZoneId);
@@ -856,16 +862,16 @@ namespace WorldServer.Managers
                 }
 
                 if (Info.T1Rewards == null)
-                    Info.T1Rewards = new List<Chapter_Reward>();
+                    Info.T1Rewards = new List<chapter_rewards>();
                 if (Info.T2Rewards == null)
-                    Info.T2Rewards = new List<Chapter_Reward>();
+                    Info.T2Rewards = new List<chapter_rewards>();
                 if (Info.T3Rewards == null)
-                    Info.T3Rewards = new List<Chapter_Reward>();
+                    Info.T3Rewards = new List<chapter_rewards>();
 
-                List<Chapter_Reward> Rewards;
+                List<chapter_rewards> Rewards;
                 if (ChapterService._Chapters_Reward.TryGetValue(Info.Entry, out Rewards))
                 {
-                    foreach (Chapter_Reward CW in Rewards)
+                    foreach (chapter_rewards CW in Rewards)
                     {
                         if (Info.Tier1InfluenceCount == CW.InfluenceCount)
                         {
@@ -882,7 +888,7 @@ namespace WorldServer.Managers
                     }
                 }
 
-                foreach (Chapter_Reward Reward in Info.T1Rewards.ToArray())
+                foreach (chapter_rewards Reward in Info.T1Rewards.ToArray())
                 {
                     Reward.Item = ItemService.GetItem_Info(Reward.ItemId);
                     Reward.Chapter = Info;
@@ -891,7 +897,7 @@ namespace WorldServer.Managers
                         Info.T1Rewards.Remove(Reward);
                 }
 
-                foreach (Chapter_Reward Reward in Info.T2Rewards.ToArray())
+                foreach (chapter_rewards Reward in Info.T2Rewards.ToArray())
                 {
                     Reward.Item = ItemService.GetItem_Info(Reward.ItemId);
                     Reward.Chapter = Info;
@@ -899,7 +905,7 @@ namespace WorldServer.Managers
                     if (Reward.Item == null)
                         Info.T2Rewards.Remove(Reward);
                 }
-                foreach (Chapter_Reward Reward in Info.T3Rewards.ToArray())
+                foreach (chapter_rewards Reward in Info.T3Rewards.ToArray())
                 {
                     Reward.Item = ItemService.GetItem_Info(Reward.ItemId);
                     Reward.Chapter = Info;
@@ -917,11 +923,11 @@ namespace WorldServer.Managers
 
         public static void LoadPublicQuests()
         {
-            Zone_Info Zone = null;
-            PQuest_Info Info;
+            zone_infos Zone = null;
+            pquest_info Info;
             List<string> skippedPQs = new List<string>();
 
-            foreach (KeyValuePair<uint, PQuest_Info> Kp in PQuestService._PQuests)
+            foreach (KeyValuePair<uint, pquest_info> Kp in PQuestService._PQuests)
             {
                 Info = Kp.Value;
                 Zone = ZoneService.GetZone_Info(Info.ZoneId);
@@ -929,16 +935,16 @@ namespace WorldServer.Managers
                     continue;
 
                 if (!PQuestService._PQuest_Objectives.TryGetValue(Info.Entry, out Info.Objectives))
-                    Info.Objectives = new List<PQuest_Objective>();
+                    Info.Objectives = new List<pquest_objectives>();
                 else
                 {
-                    foreach (PQuest_Objective Obj in Info.Objectives)
+                    foreach (pquest_objectives Obj in Info.Objectives)
                     {
                         Obj.Quest = Info;
                         PQuestService.GeneratePQuestObjective(Obj, Obj.Quest);
 
                         if (!PQuestService._PQuest_Spawns.TryGetValue(Obj.Guid, out Obj.Spawns))
-                            Obj.Spawns = new List<PQuest_Spawn>();
+                            Obj.Spawns = new List<pquest_spawns>();
                     }
                 }
 
@@ -946,7 +952,7 @@ namespace WorldServer.Managers
 
                 bool skipLoad = false;
 
-                foreach (List<Keep_Info> keepInfos in BattleFrontService._KeepInfos.Values)
+                foreach (List<keep_infos> keepInfos in BattleFrontService._KeepInfos.Values)
                 {
                     if (keepInfos.Any(keep => keep.PQuestId == Kp.Key))
                     {
@@ -975,16 +981,16 @@ namespace WorldServer.Managers
                 Kp.Value.FinishingQuests = QuestService.GetFinishersQuests(Kp.Key);
             }
 
-            Quest quest;
+            quests quest;
 
             int MaxGuid = 0;
-            foreach (KeyValuePair<int, Quest_Objectives> Kp in QuestService._Objectives)
+            foreach (KeyValuePair<int, quests_objectives> Kp in QuestService._Objectives)
             {
                 if (Kp.Value.Guid >= MaxGuid)
                     MaxGuid = Kp.Value.Guid;
             }
 
-            foreach (KeyValuePair<int, Quest_Objectives> Kp in QuestService._Objectives)
+            foreach (KeyValuePair<int, quests_objectives> Kp in QuestService._Objectives)
             {
                 quest = Kp.Value.Quest = QuestService.GetQuest(Kp.Value.Entry);
                 if (quest == null)
@@ -993,7 +999,7 @@ namespace WorldServer.Managers
                 quest.Objectives.Add(Kp.Value);
             }
 
-            foreach (Quest_Map Q in QuestService._QuestMaps)
+            foreach (quests_maps Q in QuestService._QuestMaps)
             {
                 quest = QuestService.GetQuest(Q.Entry);
                 if (quest == null)
@@ -1002,7 +1008,7 @@ namespace WorldServer.Managers
                 quest.Maps.Add(Q);
             }
 
-            foreach (KeyValuePair<ushort, Quest> Kp in QuestService._Quests)
+            foreach (KeyValuePair<ushort, quests> Kp in QuestService._Quests)
             {
                 quest = Kp.Value;
 
@@ -1011,7 +1017,7 @@ namespace WorldServer.Managers
                     uint Finisher = QuestService.GetQuestCreatureFinisher(quest.Entry);
                     if (Finisher != 0)
                     {
-                        Quest_Objectives NewObj = new Quest_Objectives();
+                        quests_objectives NewObj = new quests_objectives();
                         NewObj.Guid = ++MaxGuid;
                         NewObj.Entry = quest.Entry;
                         NewObj.ObjType = (uint)Objective_Type.QUEST_SPEAK_TO;
@@ -1027,7 +1033,7 @@ namespace WorldServer.Managers
                 }
             }
 
-            foreach (KeyValuePair<int, Quest_Objectives> Kp in QuestService._Objectives)
+            foreach (KeyValuePair<int, quests_objectives> Kp in QuestService._Objectives)
             {
                 if (Kp.Value.Quest == null)
                     continue;
@@ -1036,8 +1042,8 @@ namespace WorldServer.Managers
 
             string sItemID, sCount;
             uint ItemID, Count;
-            Item_Info Info;
-            foreach (KeyValuePair<ushort, Quest> Kp in QuestService._Quests)
+            item_infos Info;
+            foreach (KeyValuePair<ushort, quests> Kp in QuestService._Quests)
             {
                 if (Kp.Value.Choice.Length <= 0)
                     continue;
@@ -1070,7 +1076,7 @@ namespace WorldServer.Managers
         #endregion Relation
 
         #region Scripts
-        
+
         public static Dictionary<string, Type> LocalScripts = new Dictionary<string, Type>();
         public static Dictionary<string, AGeneralScript> GlobalScripts = new Dictionary<string, AGeneralScript>();
         public static Dictionary<uint, Type> CreatureScripts = new Dictionary<uint, Type>();
@@ -1080,7 +1086,7 @@ namespace WorldServer.Managers
         public static void LoadScripts(bool Reload)
         {
             GeneralScripts = new ScriptsInterface();
-                     
+
             GeneralScripts.ClearScripts();
 
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -1410,9 +1416,9 @@ namespace WorldServer.Managers
 
         public static void SendKeepStatus(Player Plr)
         {
-            foreach (List<Keep_Info> list in BattleFrontService._KeepInfos.Values)
+            foreach (List<keep_infos> list in BattleFrontService._KeepInfos.Values)
             {
-                foreach (Keep_Info KeepInfo in list)
+                foreach (keep_infos KeepInfo in list)
                 {
                     if (_Keeps.ContainsKey(KeepInfo.KeepId))
                     {
@@ -1455,30 +1461,36 @@ namespace WorldServer.Managers
             foreach (var regionMgr in _Regions)
             {
                 var objectiveList = LoadObjectives(regionMgr);
+                int pairingId = 2;
                 switch (regionMgr.RegionId)
                 {
                     case 1: // t1 dw/gs
-                        regionMgr.Campaign = new Campaign(regionMgr, objectiveList, new HashSet<Player>(), WorldMgr.LowerTierCampaignManager, new ApocCommunications());
-                        break;
-
+                        pairingId = 1;
+                        goto case 8;
                     case 3: // t1 he/de
-                        regionMgr.Campaign = new Campaign(regionMgr, objectiveList, new HashSet<Player>(), WorldMgr.LowerTierCampaignManager, new ApocCommunications());
-                        break;
-
+                        pairingId = 3;
+                        goto case 8;
                     case 8: // t1 em/ch
-                        regionMgr.Campaign = new Campaign(regionMgr, objectiveList, new HashSet<Player>(), WorldMgr.LowerTierCampaignManager, new ApocCommunications());
+                        regionMgr.Campaign = new Campaign(regionMgr, objectiveList, new HashSet<Player>(), WorldMgr.LowerTierCampaignManager, new ApocCommunications(), pairingId);
                         break;
-                    // Tier 4
-                    case 11:
-                        regionMgr.Campaign = new Campaign(regionMgr, objectiveList, new HashSet<Player>(), WorldMgr.UpperTierCampaignManager, new ApocCommunications());
-                        break;
-
-                    case 2:
-                        regionMgr.Campaign = new Campaign(regionMgr, objectiveList, new HashSet<Player>(), WorldMgr.UpperTierCampaignManager, new ApocCommunications());
-                        break;
-
+                    // Tier 2-4
                     case 4:
-                        regionMgr.Campaign = new Campaign(regionMgr, objectiveList, new HashSet<Player>(), WorldMgr.UpperTierCampaignManager, new ApocCommunications());
+                    case 15:
+                    case 16:
+                        pairingId = 3;
+                        goto case 11;
+                    case 12:
+                    case 2:
+                    case 10:
+                        pairingId = 1;
+                        goto case 11;
+                    case 6:
+                    case 14:
+                    case 11:
+                        if (IsActivePairing(pairingId))
+                        {
+                            regionMgr.Campaign = new Campaign(regionMgr, objectiveList, new HashSet<Player>(), WorldMgr.ScalingCampaignManager, new ApocCommunications(), pairingId);
+                        }
                         break;
 
                     default: // Everything else...
@@ -1487,9 +1499,19 @@ namespace WorldServer.Managers
             }
         }
 
+        private static bool IsActivePairing(int pairingId)
+        {
+            foreach(pairing_infos info in RVRProgressionService.RVRPairings)
+            {
+                if (info.PairingId == pairingId)
+                    return true;
+            }
+            return false;
+        }
+
         public static List<BattlefieldObjective> LoadObjectives(RegionMgr regionMgr)
         {
-            List<BattleFront_Objective> objectives = BattleFrontService.GetBattleFrontObjectives(regionMgr.RegionId);
+            List<battlefront_objectives> objectives = BattleFrontService.GetBattleFrontObjectives(regionMgr.RegionId);
             if (objectives == null)
             {
                 _logger.Warn($"Region = {regionMgr.RegionId} has no objectives");
@@ -1497,7 +1519,7 @@ namespace WorldServer.Managers
             }
             var resultList = new List<BattlefieldObjective>();
             _logger.Debug($"Region = {regionMgr.RegionId} ObjectiveCount = {objectives.Count}");
-            foreach (BattleFront_Objective obj in objectives.Where(x => x.KeepSpawn == false))
+            foreach (battlefront_objectives obj in objectives.Where(x => x.KeepSpawn == false))
             {
                 BattlefieldObjective flag = new BattlefieldObjective(regionMgr, obj);
                 resultList.Add(flag);
@@ -1509,75 +1531,80 @@ namespace WorldServer.Managers
         /// <summary>
         /// Inform the server of the change in the RVR Progression across all regions.
         /// </summary>
-        public static void UpdateRegionCaptureStatus(LowerTierCampaignManager lowerTierCampaignManager, UpperTierCampaignManager upperTierCampaignManager)
+        public static void UpdateRegionCaptureStatus(LowerTierCampaignManager lowerTierCampaignManager, ScalingCampaignManager upperTierCampaignManager)
         {
             if ((lowerTierCampaignManager == null) || (upperTierCampaignManager == null))
                 return;
             _logger.Trace("F_CAMPAIGN_STATUS1");
             PacketOut Out = new PacketOut((byte)Opcodes.F_CAMPAIGN_STATUS, 159);
-            Out.WriteHexStringBytes("0005006700CB00"); // 7
+            Out.WriteHexStringBytes("0005006700CD00"); // 7
 
+            //progress should be 50%\50% on free pairings
+            //progress 100%\0% means order lock
+            //progress 0%\100% means destro lock
             // Dwarfs vs Greenskins T1
-            Out.WriteByte(0);    // 0 and ignored
+            Out.WriteByte(0);    // ignored byte
             Out.WriteByte((byte)lowerTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_DWARF_GREENSKIN_TIER1_EKRUND).OrderVictoryPointPercentage);  // % Order lock
             Out.WriteByte((byte)lowerTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_DWARF_GREENSKIN_TIER1_EKRUND).DestructionVictoryPointPercentage);    // % Dest lock
             // Dwarfs vs Greenskins T2
-            //BuildCaptureStatus(Out, WorldMgr.GetRegion(12, false), realm);
             Out.WriteByte(0);
-            Out.WriteByte(0);  // % Order lock
-            Out.WriteByte(0);    // % Dest lock
+            Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_DWARF_GREENSKIN_TIER2).OrderVictoryPointPercentage);  // % Order lock
+            Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_DWARF_GREENSKIN_TIER2).DestructionVictoryPointPercentage);    // % Dest lock
             // Dwarfs vs Greenskins T3
-            //BuildCaptureStatus(Out, WorldMgr.GetRegion(10, false), realm);
             Out.WriteByte(0);
-            Out.WriteByte(0);  // % Order lock
-            Out.WriteByte(0);    // % Dest lock
+            Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_DWARF_GREENSKIN_TIER3).OrderVictoryPointPercentage);  // % Order lock
+            Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_DWARF_GREENSKIN_TIER3).DestructionVictoryPointPercentage);    // % Dest lock
             // Dwarfs vs Greenskins T4
-            //BuildCaptureStatus(Out, WorldMgr.GetRegion(2, false), realm);
             Out.WriteByte(0);
             Out.WriteByte(0);  // % Order lock
             Out.WriteByte(0);    // % Dest lock
             // Empire vs Chaos T1
-            //BuildCaptureStatus(Out, WorldMgr.GetRegion(8, false), realm);
             Out.WriteByte(0);
             Out.WriteByte((byte)lowerTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_EMPIRE_CHAOS_TIER1_NORDLAND).OrderVictoryPointPercentage);  // % Order lock
             Out.WriteByte((byte)lowerTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_EMPIRE_CHAOS_TIER1_NORDLAND).DestructionVictoryPointPercentage);    // % Dest lock
             // Empire vs Chaos T2
-            //BuildCaptureStatus(Out, WorldMgr.GetRegion(14, false), realm);
             Out.WriteByte(0);
-            Out.WriteByte(0);  // % Order lock
-            Out.WriteByte(0);    // % Dest lock
+            Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_EMPIRE_CHAOS_TIER2).OrderVictoryPointPercentage);  // % Order lock
+            Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_EMPIRE_CHAOS_TIER2).DestructionVictoryPointPercentage);    // % Dest lock
             // Empire vs Chaos T3
-            // BuildCaptureStatus(Out, WorldMgr.GetRegion(6, false), realm);
             Out.WriteByte(0);
-            Out.WriteByte(45);  // % Order lock
-            Out.WriteByte(55);    // % Dest lock
+            Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_EMPIRE_CHAOS_TIER3).OrderVictoryPointPercentage);  // % Order lock
+            Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_EMPIRE_CHAOS_TIER3).DestructionVictoryPointPercentage);    // % Dest lock
             // Empire vs Chaos T4
-            // BuildCaptureStatus(Out, WorldMgr.GetRegion(11, false), realm);
             Out.WriteByte(0);
             Out.WriteByte(40);  // % Order lock
             Out.WriteByte(60);    // % Dest lock
             // High Elves vs Dark Elves T1
-            //BuildCaptureStatus(Out, WorldMgr.GetRegion(3, false), realm);
             Out.WriteByte(0);
             Out.WriteByte((byte)lowerTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_ELF_DARKELF_TIER1_CHRACE).OrderVictoryPointPercentage);  // % Order lock
             Out.WriteByte((byte)lowerTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_ELF_DARKELF_TIER1_CHRACE).DestructionVictoryPointPercentage);    // % Dest lock
             // High Elves vs Dark Elves T2
-            //BuildCaptureStatus(Out, WorldMgr.GetRegion(15, false), realm);
             Out.WriteByte(0);
-            Out.WriteByte(0);  // % Order lock
-            Out.WriteByte(0);    // % Dest lock
+            Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_ELF_DARKELF_TIER2).OrderVictoryPointPercentage);  // % Order lock
+            Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_ELF_DARKELF_TIER2).DestructionVictoryPointPercentage);    // % Dest lock
             // High Elves vs Dark Elves T3
-            // BuildCaptureStatus(Out, WorldMgr.GetRegion(16, false), realm);
             Out.WriteByte(0);
-            Out.WriteByte(0);  // % Order lock
-            Out.WriteByte(0);    // % Dest lock
+            Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_ELF_DARKELF_TIER3).OrderVictoryPointPercentage);  // % Order lock
+            Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_ELF_DARKELF_TIER3).DestructionVictoryPointPercentage);    // % Dest lock
             // High Elves vs Dark Elves T4
-            //BuildCaptureStatus(Out, WorldMgr.GetRegion(4, false), realm);
             Out.WriteByte(0);
             Out.WriteByte(0);  // % Order lock
             Out.WriteByte(0);    // % Dest lock
+           /* for(int i = 0; i < 12; ++i)
+            {
+                Out.WriteByte(35);
+                Out.WriteByte(134);
 
-            Out.Fill(0, 83);
+            }
+            Out.WriteByte(0);
+            Out.WriteHexStringBytes("445900003209033244321607321F"); // 14
+
+            for (int i = 0; i < 44; ++i)
+            {
+                Out.WriteByte(0);
+            }*/
+            //  Out.Fill(0, 59);
+             Out.Fill(0, 83);
 
             Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_DWARF_GREENSKIN_TIER4_STONEWATCH).LockStatus);  //  Dwarf Fort
             Out.WriteByte((byte)upperTierCampaignManager.GetBattleFrontStatus(BattleFrontConstants.BATTLEFRONT_DWARF_GREENSKIN_TIER4_KADRIN_VALLEY).LockStatus);  // (ZONE_STATUS_ORDER_LOCKED/ZONE_STATUS_DESTRO_LOCKED)
@@ -1654,7 +1681,7 @@ namespace WorldServer.Managers
             }
         }
 
-        public static void BuyItemBlackMarketVendor(Player plr, InteractMenu menu, List<Vendor_items> items)
+        public static void BuyItemBlackMarketVendor(Player plr, InteractMenu menu, List<creature_vendors> items)
         {
             int Num = (menu.Page * VendorService.MAX_ITEM_PAGE) + menu.Num;
             ushort Count = menu.Packet.GetUint16();
@@ -1680,6 +1707,15 @@ namespace WorldServer.Managers
             else if (result == ItemResult.RESULT_ITEMID_INVALID)
             {
             }
+        }
+
+        public static Dictionary<uint, mount_infos> _Mount_Info;
+
+        public static mount_infos GetMount(uint Id)
+        {
+            mount_infos info;
+            _Mount_Info.TryGetValue(Id, out info);
+            return info;
         }
     }
 }

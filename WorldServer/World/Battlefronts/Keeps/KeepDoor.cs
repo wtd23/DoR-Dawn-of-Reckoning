@@ -27,12 +27,12 @@ namespace WorldServer.World.Battlefronts.Keeps
     {
         public RegionMgr Region;
         public KeepGameObject GameObject;
-        public Keep_Door Info;
+        public keep_doors Info;
         public BattleFrontKeep Keep;
 
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
-        public KeepDoor(RegionMgr region, Keep_Door info, BattleFrontKeep keep)
+        public KeepDoor(RegionMgr region, keep_doors info, BattleFrontKeep keep)
         {
             Region = region;
             Info = info;
@@ -56,7 +56,7 @@ namespace WorldServer.World.Battlefronts.Keeps
 
             private readonly Point3D[] _enterExitPoints = new Point3D[2];
 
-            public KeepGameObject(GameObject_spawn spawn, KeepDoor keepDoor, BattleFrontKeep keep)
+            public KeepGameObject(gameobject_spawns spawn, KeepDoor keepDoor, BattleFrontKeep keep)
             {
                 _keep = keep;
                 Spawn = spawn;
@@ -285,7 +285,7 @@ namespace WorldServer.World.Battlefronts.Keeps
 
             _logger.Debug($"Spawning Keep Door = {Info.DoorId} Number = {Info.Number} for Keep = {Keep.Info.Name}");
 
-            GameObject_spawn spawn = new GameObject_spawn
+            gameobject_spawns spawn = new gameobject_spawns
             {
                 Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                 WorldO = Info.O,

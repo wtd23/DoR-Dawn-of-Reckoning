@@ -144,7 +144,7 @@ namespace WorldServer.Managers.Commands
 
             if (unit.IsInvulnerable)
             {
-                GMCommandLog log = new GMCommandLog
+                gm_commands_logs log = new gm_commands_logs
                 {
                     PlayerName = plr.Name,
                     AccountId = (uint)plr.Client._Account.AccountId,
@@ -156,7 +156,7 @@ namespace WorldServer.Managers.Commands
             }
             else
             {
-                GMCommandLog log = new GMCommandLog
+                gm_commands_logs log = new gm_commands_logs
                 {
                     PlayerName = plr.Name,
                     AccountId = (uint)plr.Client._Account.AccountId,
@@ -183,7 +183,7 @@ namespace WorldServer.Managers.Commands
                 List<string> paramValue = temp.Split(' ').ToList();
                 SetEffectStateSelf(plr, ref paramValue);
 
-                GMCommandLog log = new GMCommandLog
+                gm_commands_logs log = new gm_commands_logs
                 {
                     PlayerName = plr.Name,
                     AccountId = (uint)plr.Client._Account.AccountId,
@@ -199,7 +199,7 @@ namespace WorldServer.Managers.Commands
                 List<string> paramValue = temp.Split(' ').ToList();
                 SetEffectStateSelf(plr, ref paramValue);
 
-                GMCommandLog log = new GMCommandLog
+                gm_commands_logs log = new gm_commands_logs
                 {
                     PlayerName = plr.Name,
                     AccountId = (uint)plr.Client._Account.AccountId,
@@ -552,7 +552,7 @@ namespace WorldServer.Managers.Commands
                     plr.Cloak(2);
                     plr.OSInterface.AddEffect(0x0C);
 
-                    GMCommandLog logOn = new GMCommandLog
+                    gm_commands_logs logOn = new gm_commands_logs
                     {
                         PlayerName = plr.Name,
                         AccountId = (uint)plr.Client._Account.AccountId,
@@ -572,7 +572,7 @@ namespace WorldServer.Managers.Commands
                     plr.Uncloak();
                     plr.OSInterface.RemoveEffect(0x0C);
 
-                    GMCommandLog logOff = new GMCommandLog
+                    gm_commands_logs logOff = new gm_commands_logs
                     {
                         PlayerName = plr.Name,
                         AccountId = (uint)plr.Client._Account.AccountId,
@@ -848,20 +848,20 @@ namespace WorldServer.Managers.Commands
 
                 result += $"Loot Chest : Bags : {lo?.LootBags.Count}";
 
-                IList<Quest_Objectives> quests = WorldMgr.Database.SelectObjects<Quest_Objectives>("objtype = 3 AND objid = " + go.Entry);
+                IList<quests_objectives> quests = WorldMgr.Database.SelectObjects<quests_objectives>("objtype = 3 AND objid = " + go.Entry);
 
                 if (quests != null)
                 {
-                    foreach (Quest_Objectives quest in quests)
+                    foreach (quests_objectives quest in quests)
                     {
                         result = result + ", QuestEntry=" + quest.Entry.ToString();
                     }
                 }
 
-                IList<PQuest_Objective> pquests = WorldMgr.Database.SelectObjects<PQuest_Objective>("type = 3 AND objectid = " + go.Entry);
+                IList<pquest_objectives> pquests = WorldMgr.Database.SelectObjects<pquest_objectives>("type = 3 AND objectid = " + go.Entry);
                 if (pquests != null)
                 {
-                    foreach (PQuest_Objective quest in pquests)
+                    foreach (pquest_objectives quest in pquests)
                     {
                         result = result + ", PQEntry=" + quest.Entry.ToString();
                     }
@@ -883,21 +883,21 @@ namespace WorldServer.Managers.Commands
                 if (c.Spawn.Proto.TokUnlock != null && c.Spawn.Proto.TokUnlock != "0")
                     result = result + ", TokUnlock=" + c.Spawn.Proto.TokUnlock;
 
-                IList<Quest_Objectives> quests = WorldMgr.Database.SelectObjects<Quest_Objectives>("objtype = 2 AND objid = " + c.Entry);
+                IList<quests_objectives> quests = WorldMgr.Database.SelectObjects<quests_objectives>("objtype = 2 AND objid = " + c.Entry);
 
                 if (quests != null)
                 {
-                    foreach (Quest_Objectives quest in quests)
+                    foreach (quests_objectives quest in quests)
                     {
                         result = result + ", QuestEntry=" + quest.Entry.ToString();
                     }
                 }
 
-                IList<PQuest_Objective> pquests = WorldMgr.Database.SelectObjects<PQuest_Objective>("type = 2 AND objectid = " + c.Entry);
+                IList<pquest_objectives> pquests = WorldMgr.Database.SelectObjects<pquest_objectives>("type = 2 AND objectid = " + c.Entry);
 
                 if (pquests != null)
                 {
-                    foreach (PQuest_Objective quest in pquests)
+                    foreach (pquest_objectives quest in pquests)
                     {
                         result = result + ", PQEntry=" + quest.Entry.ToString();
                     }
@@ -1087,7 +1087,7 @@ namespace WorldServer.Managers.Commands
 
         #endregion Gps
 
-        private static AbilityKnockbackInfo _jumpbackInfo = new AbilityKnockbackInfo { Angle = 75, Power = 200, GravMultiplier = 2 };
+        private static ability_knockback_info _jumpbackInfo = new ability_knockback_info { Angle = 75, Power = 200, GravMultiplier = 2 };
 
         public static bool Unlock(Player plr, ref List<string> values)
         {
@@ -1388,7 +1388,7 @@ namespace WorldServer.Managers.Commands
 
             if (target.IsPlayer())
             {
-                GMCommandLog log = new GMCommandLog();
+                gm_commands_logs log = new gm_commands_logs();
                 log.PlayerName = plr.Name;
                 log.AccountId = (uint)plr.Client._Account.AccountId;
                 log.Command = "REZ PLAYER " + target.Name;
@@ -1447,7 +1447,7 @@ namespace WorldServer.Managers.Commands
                 }
             }
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = player.Name,
                 AccountId = (uint)player.Client._Account.AccountId,
@@ -1503,7 +1503,7 @@ namespace WorldServer.Managers.Commands
                 }
             }
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = player.Name,
                 AccountId = (uint)player.Client._Account.AccountId,
@@ -1592,7 +1592,7 @@ namespace WorldServer.Managers.Commands
                 }
             }
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = player.Name,
                 AccountId = (uint)player.Client._Account.AccountId,
@@ -1687,7 +1687,7 @@ namespace WorldServer.Managers.Commands
 
             Player target = Player.GetPlayer(playerName);
 
-            Account account = GetAccountForPlayer(playerName);
+            accounts account = GetAccountForPlayer(playerName);
 
             if (account == null)
             {
@@ -2101,7 +2101,7 @@ namespace WorldServer.Managers.Commands
 
                 guild.LeaveAlliance();
 
-                GMCommandLog log = new GMCommandLog
+                gm_commands_logs log = new gm_commands_logs
                 {
                     PlayerName = plr.Name,
                     AccountId = (uint)plr.Client._Account.AccountId,
@@ -2130,7 +2130,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            Account acct = Core.AcctMgr.GetAccount(accountName);
+            accounts acct = Core.AcctMgr.GetAccount(accountName);
 
             if (acct == null)
             {
@@ -2150,7 +2150,7 @@ namespace WorldServer.Managers.Commands
 
             for (int i = 0; i < chars.Chars.Length; ++i)
             {
-                Character curChar = chars.Chars[i];
+                characters curChar = chars.Chars[i];
 
                 if (curChar == null)
                     continue;
@@ -2181,7 +2181,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            Account acct = Core.AcctMgr.GetAccount(accountName);
+            accounts acct = Core.AcctMgr.GetAccount(accountName);
 
             if (acct == null)
             {
@@ -2205,7 +2205,7 @@ namespace WorldServer.Managers.Commands
 
             byte slotId = (byte)GetInt(ref values);
 
-            Character chara = chars.GetCharacterBySlot(slotId);
+            characters chara = chars.GetCharacterBySlot(slotId);
 
             if (chara == null)
             {
@@ -2399,10 +2399,8 @@ namespace WorldServer.Managers.Commands
 
         public static bool QuestComplete(Player plr, ref List<string> values)
         {
-            ushort QuestId = 0;
-            ushort.TryParse(values[0], out QuestId);
-            ushort Command = 0;
-            ushort.TryParse(values[1], out Command);
+            ushort.TryParse(values[0], out ushort QuestId);
+            ushort.TryParse(values[1], out ushort Command);
 
             Unit target = plr.CbtInterface.GetCurrentTarget();
             Player player = target as Player;
@@ -2416,15 +2414,15 @@ namespace WorldServer.Managers.Commands
                     player.QtsInterface.AcceptQuest(QuestId);
                 }
             }
-            else if (Command == 2) // Finish Quest
+            else if (Command == 2) // Finish quests
             {
                 if (player != null && player.IsPlayer() && QuestId != 0)
                 {
                     if (player.QtsInterface.GetQuest(QuestId) != null)
                     {
-                        Character_quest quest = player.QtsInterface.GetQuest(QuestId);
+                        characters_quests quest = player.QtsInterface.GetQuest(QuestId);
 
-                        foreach (KeyValuePair<ushort, Character_quest> questKp in player.QtsInterface.Quests)
+                        foreach (KeyValuePair<ushort, characters_quests> questKp in player.QtsInterface.Quests)
                         {
                             if (questKp.Value == quest)
                             {
@@ -2464,7 +2462,7 @@ namespace WorldServer.Managers.Commands
                 {
                     if (player.QtsInterface.GetQuest(QuestId) != null)
                     {
-                        Character_quest characterQuest = player.QtsInterface.GetQuest(QuestId);
+                        characters_quests characterQuest = player.QtsInterface.GetQuest(QuestId);
                         characterQuest.Dirty = true;
                         CharMgr.Database.DeleteObject(characterQuest);
                         player.QtsInterface.AbandonQuest(QuestId);
@@ -2518,7 +2516,7 @@ namespace WorldServer.Managers.Commands
                     return true;
                 }
 
-                World_Settings Settings = WorldMgr.Database.SelectObject<World_Settings>("SettingId = 1");
+                world_settings Settings = WorldMgr.Database.SelectObject<world_settings>("SettingId = 1");
 
                 Settings.Setting = GetInt(ref values);
                 WorldMgr.Database.SaveObject(Settings);
@@ -2571,7 +2569,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            IList<AccountSanctionInfo> sanctions = Core.AcctMgr.GetSanctionsFor(plr.Info.AccountId);
+            IList<accounts_sanction_logs> sanctions = Core.AcctMgr.GetSanctionsFor(plr.Info.AccountId);
 
             foreach (var sanction in sanctions)
             {
@@ -2665,7 +2663,7 @@ namespace WorldServer.Managers.Commands
 
             LogSanction(plr.Info.AccountId, plr, "Name Change", "", $"From {plr.Info.OldName} to {plr.Info.Name}");
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Info.OldName,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -2687,15 +2685,15 @@ namespace WorldServer.Managers.Commands
 
             ushort questID = Convert.ToUInt16(arg1);
 
-            Quest q = QuestService.GetQuest(questID);
+            quests q = QuestService.GetQuest(questID);
 
             if (q != null)
             {
                 q.Active = !q.Active;
-                plr.SendClientMessage("Quest: \"" + q.Name + "\" is now " + (q.Active ? "Active" : "Inactive"), ChatLogFilters.CHATLOGFILTERS_CSR_TELL_RECEIVE);
+                plr.SendClientMessage("quests: \"" + q.Name + "\" is now " + (q.Active ? "Active" : "Inactive"), ChatLogFilters.CHATLOGFILTERS_CSR_TELL_RECEIVE);
             }
             else
-                plr.SendClientMessage("Quest not found!", ChatLogFilters.CHATLOGFILTERS_CSR_TELL_RECEIVE);
+                plr.SendClientMessage("quests not found!", ChatLogFilters.CHATLOGFILTERS_CSR_TELL_RECEIVE);
 
             int database = GetInt(ref values);
 
@@ -2703,7 +2701,7 @@ namespace WorldServer.Managers.Commands
             {
                 WorldMgr.Database.SaveObject(q);
 
-                GMCommandLog log = new GMCommandLog();
+                gm_commands_logs log = new gm_commands_logs();
                 log.PlayerName = plr.Name;
                 log.AccountId = (uint)plr.Client._Account.AccountId;
                 log.Command = (q.Active ? "ACTIVATED QUEST " : "DEACTIVATED QUEST ") + q.Entry + " " + q.Name;
@@ -2718,14 +2716,14 @@ namespace WorldServer.Managers.Commands
 
         #region Kick / Ban
 
-        private static Account GetAccountForPlayer(string playerName)
+        private static accounts GetAccountForPlayer(string playerName)
         {
             Player target = Player.GetPlayer(playerName);
 
             if (target != null && target.Client != null)
                 return target.Client._Account;
 
-            Character chara = CharMgr.GetCharacter(playerName, false);
+            characters chara = CharMgr.GetCharacter(playerName, false);
 
             if (chara == null)
                 return null;
@@ -2756,7 +2754,7 @@ namespace WorldServer.Managers.Commands
                 .OrderBy(e => e.Realm)
                 .ThenBy(e => e.Name).ToList();
 
-            Account account = Core.AcctMgr.GetAccountById(chr.AccountId);
+            accounts account = Core.AcctMgr.GetAccountById(chr.AccountId);
             string result = "Player '" + Player.AsCharacterName(charName) + "' (account='" + account.Username + "') has " + chars.Count + " characters.";
 
             if (account.GmLevel > 0)
@@ -2788,7 +2786,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            Account acct = Core.AcctMgr.GetAccount(accountName);
+            accounts acct = Core.AcctMgr.GetAccount(accountName);
 
             if (acct == null)
             {
@@ -2823,7 +2821,7 @@ namespace WorldServer.Managers.Commands
 
             string playerName = Player.AsCharacterName(GetString(ref values));
 
-            List<Character> targets = new List<Character>();
+            List<characters> targets = new List<characters>();
 
             CharMgr.GetCharactersWithName(playerName, targets);
 
@@ -2837,14 +2835,14 @@ namespace WorldServer.Managers.Commands
 
             foreach (var target in targets)
             {
-                Account acct = Core.AcctMgr.GetAccountById(target.AccountId);
+                accounts acct = Core.AcctMgr.GetAccountById(target.AccountId);
 
-                List<AccountSanctionInfo> sanctions = Core.AcctMgr.GetSanctionsFor(target.AccountId).OrderBy(x => x.ActionTime).ToList();
+                List<accounts_sanction_logs> sanctions = Core.AcctMgr.GetSanctionsFor(target.AccountId).OrderBy(x => x.ActionTime).ToList();
 
                 if (sanctions.Count > 0)
                 {
                     plr.SendClientMessage("[Sanction Log]");
-                    plr.SendClientMessage(string.IsNullOrEmpty(target.OldName) ? $"Character: {target.Name}" : $"Character: {target.Name} (formerly: {target.OldName})");
+                    plr.SendClientMessage(string.IsNullOrEmpty(target.OldName) ? $"characters: {target.Name}" : $"characters: {target.Name} (formerly: {target.OldName})");
                     plr.SendClientMessage($"Account: {acct.Username}");
                     plr.SendClientMessage($"Last IP used: {acct.Ip}");
 
@@ -2875,7 +2873,7 @@ namespace WorldServer.Managers.Commands
                 else
                 {
                     plr.SendClientMessage("[No Sanctions Logged]");
-                    plr.SendClientMessage($"Character: {target.Name}");
+                    plr.SendClientMessage($"characters: {target.Name}");
                     plr.SendClientMessage($"Account: {acct.Username}");
                 }
 
@@ -2897,7 +2895,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            Character chara = CharMgr.GetCharacter(playerName, false);
+            characters chara = CharMgr.GetCharacter(playerName, false);
 
             if (chara == null)
             {
@@ -2940,7 +2938,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            Character chara = CharMgr.GetCharacter(playerName, false);
+            characters chara = CharMgr.GetCharacter(playerName, false);
 
             if (chara == null)
             {
@@ -2950,7 +2948,7 @@ namespace WorldServer.Managers.Commands
 
             LogSanction(chara.AccountId, plr, "Warning", "", warningReason);
 
-            Account account = Core.AcctMgr.GetAccountById(chara.AccountId);
+            accounts account = Core.AcctMgr.GetAccountById(chara.AccountId);
 
             if (account == null)
                 return true;
@@ -2960,7 +2958,7 @@ namespace WorldServer.Managers.Commands
 
             Core.AcctMgr.UpdateAccount(account);
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -3063,7 +3061,7 @@ namespace WorldServer.Managers.Commands
             string playerName = GetString(ref values);
 
             Player target = Player.GetPlayer(playerName);
-            //Character character = (Character)CharMgr.Database.SelectObject<Character>("");
+            //characters character = (characters)CharMgr.Database.SelectObject<characters>("");
 
             if (target?.Client == null)
             {
@@ -3144,7 +3142,7 @@ namespace WorldServer.Managers.Commands
             LogSanction(target.Client._Account.AccountId, plr, "Mute", duration + " " + lengthTypeString, reasonString);
             plr.SendClientMessage("User " + playerName + " is now hellmuted.");
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -3188,7 +3186,7 @@ namespace WorldServer.Managers.Commands
             Out.WriteHexStringBytes("01000000");
             target.SendPacket(Out);
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -3221,7 +3219,7 @@ namespace WorldServer.Managers.Commands
             target.Client?.Disconnect("Connection severance");
             target.Destroy();
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -3246,7 +3244,7 @@ namespace WorldServer.Managers.Commands
             }
 
             Player target = Player.GetPlayer(playerName);
-            Character chara = CharMgr.GetCharacter(playerName, false);
+            characters chara = CharMgr.GetCharacter(playerName, false);
 
             if (chara == null)
             {
@@ -3254,7 +3252,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            Account account = target?.Client != null ? target.Client._Account : Core.AcctMgr.GetAccountById(chara.AccountId);
+            accounts account = target?.Client != null ? target.Client._Account : Core.AcctMgr.GetAccountById(chara.AccountId);
 
             if (account.GmLevel > 1)
             {
@@ -3281,7 +3279,7 @@ namespace WorldServer.Managers.Commands
                 target.SendPacket(Out);
             }
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -3305,7 +3303,7 @@ namespace WorldServer.Managers.Commands
 
                 Player target = Player.GetPlayer(playerName);
 
-                Account account = GetAccountForPlayer(playerName);
+                accounts account = GetAccountForPlayer(playerName);
 
                 if (account == null)
                 {
@@ -3417,7 +3415,7 @@ namespace WorldServer.Managers.Commands
 
                 target?.SendClientMessage("Your account has been exiled for " + duration + " " + lengthTypeString + " by " + plr.Client._Account.Username + " for the following reason:\n" + reasonString + "\nThis timer will continue to run even if you are offline.", ChatLogFilters.CHATLOGFILTERS_CSR_TELL_RECEIVE);
 
-                GMCommandLog log = new GMCommandLog
+                gm_commands_logs log = new gm_commands_logs
                 {
                     PlayerName = plr.Name,
                     AccountId = (uint)plr.Client._Account.AccountId,
@@ -3441,7 +3439,7 @@ namespace WorldServer.Managers.Commands
 
             Player target = Player.GetPlayer(playerName);
 
-            Account account = GetAccountForPlayer(playerName);
+            accounts account = GetAccountForPlayer(playerName);
 
             if (account == null)
             {
@@ -3463,7 +3461,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            List<AccountSanctionInfo> sanctions = Core.AcctMgr.GetSanctionsFor(account.AccountId).OrderBy(x => x.ActionTime).ToList();
+            List<accounts_sanction_logs> sanctions = Core.AcctMgr.GetSanctionsFor(account.AccountId).OrderBy(x => x.ActionTime).ToList();
 
             for (int i = sanctions.Count - 1; i > 0; --i)
             {
@@ -3494,7 +3492,7 @@ namespace WorldServer.Managers.Commands
 
             Core.AcctMgr.UpdateAccount(account);
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -3518,7 +3516,7 @@ namespace WorldServer.Managers.Commands
                 return true;
             }
 
-            Account account = Core.AcctMgr.GetAccount(accountName);
+            accounts account = Core.AcctMgr.GetAccount(accountName);
 
             if (account == null)
             {
@@ -3569,7 +3567,7 @@ namespace WorldServer.Managers.Commands
             return true;
         }
 
-        private static void ProcessAnnihilate(Player developer, Account account)
+        private static void ProcessAnnihilate(Player developer, accounts account)
         {
             AccountChars acctChars = CharMgr.GetAccountChar(account.AccountId);
 
@@ -3579,7 +3577,7 @@ namespace WorldServer.Managers.Commands
                 return;
             }
 
-            foreach (Character cha in acctChars.Chars)
+            foreach (characters cha in acctChars.Chars)
             {
                 if (cha == null)
                     continue;
@@ -3591,7 +3589,7 @@ namespace WorldServer.Managers.Commands
                 }
             }
 
-            foreach (Character cha in acctChars.Chars)
+            foreach (characters cha in acctChars.Chars)
             {
                 if (cha == null)
                     continue;
@@ -3641,7 +3639,7 @@ namespace WorldServer.Managers.Commands
             CharMgr.Database.ForceSave();
 
             LogSanction(account.AccountId, developer, "Annihilate", "", "");
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = developer.Name,
                 AccountId = (uint)developer.Client._Account.AccountId,
@@ -3658,7 +3656,7 @@ namespace WorldServer.Managers.Commands
 
             Player target = Player.GetPlayer(playerName);
 
-            Account account = GetAccountForPlayer(playerName);
+            accounts account = GetAccountForPlayer(playerName);
 
             if (account == null)
             {
@@ -3689,7 +3687,7 @@ namespace WorldServer.Managers.Commands
 
             LogSanction(target.Client._Account.AccountId, plr, "No Surname ", "", reasonString);
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -3707,7 +3705,7 @@ namespace WorldServer.Managers.Commands
 
             Player target = Player.GetPlayer(playerName);
 
-            Account account = GetAccountForPlayer(playerName);
+            accounts account = GetAccountForPlayer(playerName);
 
             if (account == null)
             {
@@ -3738,7 +3736,7 @@ namespace WorldServer.Managers.Commands
 
             LogSanction(target.Client._Account.AccountId, plr, "Allow Surname ", "", reasonString);
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -3756,7 +3754,7 @@ namespace WorldServer.Managers.Commands
 
             Player target = Player.GetPlayer(playerName);
 
-            Account account = GetAccountForPlayer(playerName);
+            accounts account = GetAccountForPlayer(playerName);
 
             if (account == null)
             {
@@ -3777,7 +3775,7 @@ namespace WorldServer.Managers.Commands
 
             target?.SendClientMessage("Your surname has been cleared by " + plr.Client._Account.Username, ChatLogFilters.CHATLOGFILTERS_CSR_TELL_RECEIVE);
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -3813,7 +3811,7 @@ namespace WorldServer.Managers.Commands
             if (filterType.Equals('S'))
             {
                 if (CharMgr.AddBannedName(name, NameFilterType.StartsWith))
-                    plr.SendClientMessage($"Character names beginning with {name} are now prohibited.");
+                    plr.SendClientMessage($"characters names beginning with {name} are now prohibited.");
                 else
                     plr.SendClientMessage($"BLOCKNAME: The string {name} is already filtered, either directly or through a more general existing filter.");
                 return true;
@@ -3822,7 +3820,7 @@ namespace WorldServer.Managers.Commands
             if (filterType.Equals('C'))
             {
                 if (CharMgr.AddBannedName(name, NameFilterType.Contains))
-                    plr.SendClientMessage($"Character names containing {name} are now prohibited.");
+                    plr.SendClientMessage($"characters names containing {name} are now prohibited.");
                 else
                     plr.SendClientMessage($"BLOCKNAME: The string {name} is already filtered, either directly or through a more general existing filter.");
                 return true;
@@ -3871,7 +3869,7 @@ namespace WorldServer.Managers.Commands
                 plr.SendClientMessage("REMOVEQUESTS: must specify a player");
                 return true;
             }
-            Character chara = CharMgr.GetCharacter(playerName, false);
+            characters chara = CharMgr.GetCharacter(playerName, false);
 
             if (chara == null)
             {
@@ -3883,7 +3881,7 @@ namespace WorldServer.Managers.Commands
                 CharMgr.RemoveQuestsFromCharacter(chara);
                 plr.SendClientMessage("Removed all quests from character: " + playerName);
 
-                GMCommandLog log = new GMCommandLog
+                gm_commands_logs log = new gm_commands_logs
                 {
                     PlayerName = plr.Name,
                     AccountId = (uint)plr.Client._Account.AccountId,
@@ -3907,7 +3905,7 @@ namespace WorldServer.Managers.Commands
                 GmMgr.NotifyGMOffline(plr);
                 plr.SendClientMessage("You have been removed from the gmlist");
 
-                GMCommandLog log = new GMCommandLog
+                gm_commands_logs log = new gm_commands_logs
                 {
                     PlayerName = plr.Name,
                     AccountId = (uint)plr.Client._Account.AccountId,
@@ -3961,7 +3959,7 @@ namespace WorldServer.Managers.Commands
 
                 int modelID = 0;
 
-                if (plr.Realm == Realms.REALMS_REALM_ORDER)
+                if (plr.Realm == SetRealms.REALMS_REALM_ORDER)
                 {
                     if (plr.Info.Race == 1)
                     {
@@ -4087,52 +4085,6 @@ namespace WorldServer.Managers.Commands
 
         #region Pets
 
-        public static bool Beastmaster(Player plr, ref List<string> values)
-        {
-            if (plr.Info.CareerLine == 19)
-            {
-                if (plr.Realm == Realms.REALMS_REALM_ORDER)
-                {
-                    if (plr.Info.Sex == 0)
-                    {
-                        plr.Info.ModelId = 39;
-                        plr.Model = 39;
-                    }
-                    else
-                    {
-                        plr.Info.ModelId = 43;
-                        plr.Model = 43;
-                    }
-
-                    plr.Info.Realm = (byte)Realms.REALMS_REALM_DESTRUCTION;
-                    plr.Info.RealmId = (int)Realms.REALMS_REALM_DESTRUCTION;
-                }
-                else
-                {
-                    if (plr.Info.Sex == 0)
-                    {
-                        plr.Info.ModelId = 46;
-                        plr.Model = 46;
-                    }
-                    else
-                    {
-                        plr.Info.ModelId = 47;
-                        plr.Model = 47;
-                    }
-
-                    plr.Info.Realm = (byte)Realms.REALMS_REALM_ORDER;
-                    plr.Info.RealmId = (int)Realms.REALMS_REALM_ORDER;
-                }
-                plr.ForceSave();
-                plr.EvtInterface.AddEvent(Kick, 2000, 1, plr);
-            }
-            else
-            {
-                plr.SendClientMessage("You are not White Lion, go away...", ChatLogFilters.CHATLOGFILTERS_CSR_TELL_RECEIVE);
-            }
-            return true;
-        }
-
         public static bool SpawnTest(Player plr, ref List<string> values)
         {
             var creatureList = new List<Unit>();
@@ -4149,7 +4101,7 @@ namespace WorldServer.Managers.Commands
 
             foreach (var guard in guardList)
             {
-                Creature_spawn spawn = new Creature_spawn { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
+                creature_spawns spawn = new creature_spawns { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
                 spawn.BuildFromProto(CreatureService.GetCreatureProto(guard));
                 if (spawn.Proto == null)
                     continue;
@@ -4163,7 +4115,7 @@ namespace WorldServer.Managers.Commands
 
                 Creature c = plr.Region.CreateCreature(spawn);
                 // Potion of healing
-                var item = new Creature_item { Entry = 208221, ModelId = 695, SlotId = 10, EffectId = 0 };
+                var item = new creature_items { Entry = 208221, ModelId = 695, SlotId = 10, EffectId = 0 };
 
                 c.ItmInterface.AddCreatureItem(item);
                 c.PlayersInRange = plr.PlayersInRange;
@@ -4185,9 +4137,8 @@ namespace WorldServer.Managers.Commands
         {
             if (plr == null || plr.CrrInterface == null)
                 return false;
-            IPetCareerInterface petInterface = plr.CrrInterface as IPetCareerInterface;
 
-            if (petInterface == null)
+            if (!(plr.CrrInterface is IPetCareerInterface petInterface))
                 return false;
 
             petInterface.SummonPet(Convert.ToUInt16(values[0]));
@@ -4206,7 +4157,7 @@ namespace WorldServer.Managers.Commands
 
             var bossSpawn = CreatureService.BossSpawns.SingleOrDefault(x => x.BossSpawnId == Convert.ToInt32(bossSpawnId));
 
-            Creature_spawn spawn = new Creature_spawn { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
+            creature_spawns spawn = new creature_spawns { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
             var proto = CreatureService.GetCreatureProto((uint)bossSpawn.ProtoId);
             if (proto == null)
                 return true;
@@ -4287,7 +4238,7 @@ namespace WorldServer.Managers.Commands
             // Find the boss in the boss_spawn table
             var bossSpawn = CreatureService.BossSpawns.SingleOrDefault(x => x.BossSpawnId == Convert.ToInt32(bossSpawnId));
 
-            Creature_spawn spawn = new Creature_spawn { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
+            creature_spawns spawn = new creature_spawns { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
             var proto = CreatureService.GetCreatureProto((uint)bossSpawn.ProtoId);
             if (proto == null)
                 return null;
@@ -4374,7 +4325,7 @@ namespace WorldServer.Managers.Commands
             // If no value passed, create the chest on the player
             if (values.Count == 0)
             {
-                GameObject_spawn spawn = new GameObject_spawn
+                gameobject_spawns spawn = new gameobject_spawns
                 {
                     Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                     WorldX = plr.WorldPosition.X + StaticRandom.Instance.Next(50),
@@ -4417,7 +4368,7 @@ namespace WorldServer.Managers.Commands
             var Y = plr.WorldPosition.Y;
             var Z = plr.WorldPosition.Z;
 
-            Creature_spawn spawn = new Creature_spawn { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
+            creature_spawns spawn = new creature_spawns { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
             var proto = CreatureService.GetCreatureProto((uint)72675);
             if (proto == null)
                 return true;
@@ -4492,7 +4443,7 @@ namespace WorldServer.Managers.Commands
             var Y = plr.WorldPosition.Y;
             var Z = plr.WorldPosition.Z;
 
-            Creature_spawn spawn = new Creature_spawn { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
+            creature_spawns spawn = new creature_spawns { Guid = (uint)CreatureService.GenerateCreatureSpawnGUID() };
             var proto = CreatureService.GetCreatureProto(Convert.ToUInt32(values[0]));
             if (proto == null)
                 return true;
@@ -4576,7 +4527,7 @@ namespace WorldServer.Managers.Commands
             var Out = new PacketOut((byte)Opcodes.F_OBJECTIVE_INFO, 32);
             Out.WriteUInt32(606);
             Out.WriteByte(0);
-            Out.WriteByte((byte)Realms.REALMS_REALM_DESTRUCTION);
+            Out.WriteByte((byte)SetRealms.REALMS_REALM_DESTRUCTION);
             Out.WriteByte(1);
             Out.WriteUInt16(0);
             Out.WritePascalString("KeepName");
@@ -4871,7 +4822,7 @@ namespace WorldServer.Managers.Commands
 
             plr.SendClientMessage($"MAIL Item {itemId} x{count} to {characterId}");
 
-            GMCommandLog log = new GMCommandLog
+            gm_commands_logs log = new gm_commands_logs
             {
                 PlayerName = plr.Name,
                 AccountId = (uint)plr.Client._Account.AccountId,
@@ -4919,7 +4870,7 @@ namespace WorldServer.Managers.Commands
             return true;
         }
 
-        public static bool MakeRealmCaptain(Player plr, ref List<string> values)
+       /* public static bool MakeRealmCaptain(Player plr, ref List<string> values)
         {
             Unit playerTarget = GetTargetOrMe(plr);
 
@@ -4931,7 +4882,7 @@ namespace WorldServer.Managers.Commands
                     return true;
                 }
 
-                var status = WorldMgr.UpperTierCampaignManager.GetActiveCampaign().ActiveBattleFrontStatus;
+                var status = WorldMgr.ScalingCampaignManager.GetActiveCampaign().ActiveBattleFrontStatus;
 
                 foreach (var player in Player._Players)
                 {
@@ -4956,7 +4907,7 @@ namespace WorldServer.Managers.Commands
             }
 
             return true;
-        }
+        }*/
 
         public static bool CreateGateHousePortal(Player plr, ref List<string> values)
         {
@@ -4978,7 +4929,7 @@ namespace WorldServer.Managers.Commands
         }
 
         /// <summary>
-        /// Creates a vendor that sells a junk item for your RR level silver and your Character Level copper.
+        /// Creates a vendor that sells a junk item for your RR level silver and your characters Level copper.
         /// Current need to use proto = 32
         /// </summary>
         /// <param name="plr"></param>
@@ -5007,7 +4958,7 @@ namespace WorldServer.Managers.Commands
 
             proto.InteractType = InteractType.INTERACTTYPE_DYEMERCHANT;
 
-            Creature_spawn spawn = new Creature_spawn();
+            creature_spawns spawn = new creature_spawns();
             spawn.BuildFromProto(proto);
             spawn.WorldO = 2048;
             spawn.WorldX = plr.WorldPosition.X;
@@ -5098,7 +5049,7 @@ namespace WorldServer.Managers.Commands
             //| 00 03 01 00 02 03 03 01 01 00 03 03 01 00 02 03 |................|
             //| 02 FE 3C 28 0A 3C 00 00 00 03 84 00 00 00 00 |............... |
 
-            //     new ApocCommunications().SendCampaignStatus(plr, new VictoryPointProgress(50f, 50f), Realms.REALMS_REALM_DESTRUCTION);
+            //     new ApocCommunications().SendCampaignStatus(plr, new VictoryPointProgress(50f, 50f), SetRealms.REALMS_REALM_DESTRUCTION);
             return true;
         }
 

@@ -13,7 +13,7 @@ namespace WorldServer.Services.World
             if (character == null) return false;
             var characterName = character?.Name;
 
-            Character_mail mail = new Character_mail
+            characters_mails mail = new characters_mails
             {
                 Guid = CharMgr.GenerateMailGuid(),
                 CharacterId = characterId, //CharacterId
@@ -27,7 +27,7 @@ namespace WorldServer.Services.World
                 CharacterIdSender = 283
             };
 
-            MailItem item = new MailItem(itemId, count);
+            mail_item item = new mail_item(itemId, count);
             if (item != null)
             {
                 mail.Items.Add(item);

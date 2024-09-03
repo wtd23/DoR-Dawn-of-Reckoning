@@ -23,7 +23,7 @@ namespace WorldServer.Managers.Commands
             if (target == null || !target.IsCreature())
                 return false;
 
-            Waypoint wp = new Waypoint
+            waypoints wp = new waypoints
             {
                 X = (uint)plr.WorldPosition.X,
                 Y = (uint)plr.WorldPosition.Y,
@@ -52,7 +52,7 @@ namespace WorldServer.Managers.Commands
             int id = GetInt(ref values);
             AIInterface ia = target.GetCreature().AiInterface;
 
-            Waypoint wp = ia.GetWaypoint(id);
+            waypoints wp = ia.GetWaypoint(id);
             if (wp == null)
             {
                 plr.SendMessage(0, "Server", "Invalid Waypoint ID. Use .waypoint list", ChatLogFilters.CHATLOGFILTERS_SHOUT);
@@ -80,7 +80,7 @@ namespace WorldServer.Managers.Commands
             int id = GetInt(ref values);
             AIInterface ia = target.GetCreature().AiInterface;
 
-            Waypoint wp = ia.GetWaypoint(id);
+            waypoints wp = ia.GetWaypoint(id);
             if (wp == null)
             {
                 plr.SendMessage(0, "Server", "Invalid Waypoint ID. Use .waypoint list", ChatLogFilters.CHATLOGFILTERS_SHOUT);
@@ -111,7 +111,7 @@ namespace WorldServer.Managers.Commands
             AIInterface ia = target.GetCreature().AiInterface;
             string message = "Waypoints :" + ia.Waypoints.Count + "\n";
 
-            foreach (Waypoint wp in ia.Waypoints)
+            foreach (waypoints wp in ia.Waypoints)
             {
                 message += wp + "\n";
             }

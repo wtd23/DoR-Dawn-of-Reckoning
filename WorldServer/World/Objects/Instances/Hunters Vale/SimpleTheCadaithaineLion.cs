@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.Hunters_Vale
     {
         #region Constructors
 
-        public SimpleTheCadaithaineLion(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleTheCadaithaineLion(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

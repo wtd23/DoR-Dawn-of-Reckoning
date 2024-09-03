@@ -23,11 +23,11 @@ namespace WorldServer.Managers.Commands
             string str = GetTotalString(ref values);
             str = str.Replace(" ", "%");
 
-            List<Item_Info> l = WorldMgr.Database.SelectObjects<Item_Info>("Name Like '%" + WorldMgr.Database.Escape(str) + "%' LIMIT 0,30") as List<Item_Info>;
+            List<item_infos> l = WorldMgr.Database.SelectObjects<item_infos>("Name Like '%" + WorldMgr.Database.Escape(str) + "%' LIMIT 0,30") as List<item_infos>;
             plr.SendMessage(0, "", "Items : " + (l != null ? l.Count : 0), ChatLogFilters.CHATLOGFILTERS_SHOUT);
             if (l != null)
             {
-                foreach (Item_Info proto in l)
+                foreach (item_infos proto in l)
                     plr.SendMessage(0, "", "ID:" + proto.Entry + ",Name:" + proto.Name + ",Type:" + proto.Type + ",Race:" + proto.Race + ",Career:" + proto.Career + ",Armor:" + proto.Armor + ",Speed:" + proto.Speed + ",Script:" + proto.ScriptName, ChatLogFilters.CHATLOGFILTERS_EMOTE);
             }
 
@@ -89,11 +89,11 @@ namespace WorldServer.Managers.Commands
             string str = GetTotalString(ref values);
             str = str.Replace(" ", "%");
 
-            List<Quest> l = WorldMgr.Database.SelectObjects<Quest>("Name Like '%" + WorldMgr.Database.Escape(str) + "%' LIMIT 0,30") as List<Quest>;
+            List<quests> l = WorldMgr.Database.SelectObjects<quests>("Name Like '%" + WorldMgr.Database.Escape(str) + "%' LIMIT 0,30") as List<quests>;
             plr.SendMessage(0, "", "Quests : " + (l != null ? l.Count : 0), ChatLogFilters.CHATLOGFILTERS_SHOUT);
             if (l != null)
             {
-                foreach (Quest proto in l)
+                foreach (quests proto in l)
                     plr.SendMessage(0, "", "ID:" + proto.Entry + ",Name:" + proto.Name + ",Level:" + proto.MinLevel + ",Objectives:" + proto.Objectives.Count + ",Prev:" + proto.PrevQuest + ",Xp:" + proto.Xp + ",Rewars:" + proto.Rewards.Count + ",Type:" + proto.Type, ChatLogFilters.CHATLOGFILTERS_EMOTE);
             }
 
@@ -111,11 +111,11 @@ namespace WorldServer.Managers.Commands
             string str = GetTotalString(ref values);
             str = str.Replace(" ", "%");
 
-            List<Zone_Info> l = WorldMgr.Database.SelectObjects<Zone_Info>("Name Like '%" + WorldMgr.Database.Escape(str) + "%' LIMIT 0,30") as List<Zone_Info>;
+            List<zone_infos> l = WorldMgr.Database.SelectObjects<zone_infos>("Name Like '%" + WorldMgr.Database.Escape(str) + "%' LIMIT 0,30") as List<zone_infos>;
             plr.SendMessage(0, "", "Zones : " + (l != null ? l.Count : 0), ChatLogFilters.CHATLOGFILTERS_SHOUT);
             if (l != null)
             {
-                foreach (Zone_Info proto in l)
+                foreach (zone_infos proto in l)
                     plr.SendMessage(0, "", "ID:" + proto.ZoneId + ",Name:" + proto.Name + ",X:" + proto.OffX + ",Y:" + proto.OffY + ",Region:" + proto.Region + ",Level:" + proto.MinLevel + ",Price:" + proto.Price + ",Tier:" + proto.Tier, ChatLogFilters.CHATLOGFILTERS_EMOTE);
             }
 
@@ -146,7 +146,7 @@ namespace WorldServer.Managers.Commands
                     return true;
                 }
                 var characterItemList = CharMgr.GetItemsForCharacter(character);
-                var itemList = new List<Item_Info>();
+                var itemList = new List<item_infos>();
 
                 if (values.Count > 0)
                 {
@@ -154,7 +154,7 @@ namespace WorldServer.Managers.Commands
                     filter = values[0];
                 }
 
-                foreach (CharacterItem itm in characterItemList)
+                foreach (characters_items itm in characterItemList)
                 {
                     if (itm != null)
                         itemList.Add(ItemService.GetItem_Info(itm.Entry));
@@ -162,7 +162,7 @@ namespace WorldServer.Managers.Commands
 
                 itemList.OrderBy(x => x.Name);
 
-                foreach (Item_Info proto in itemList)
+                foreach (item_infos proto in itemList)
                 {
                     if (!String.IsNullOrEmpty(filter))
                     {

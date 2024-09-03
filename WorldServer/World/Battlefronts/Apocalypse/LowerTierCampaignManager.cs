@@ -20,16 +20,17 @@ namespace WorldServer.World.Battlefronts.Apocalypse
     {
         private static readonly object LockObject = new object();
         public List<RegionMgr> RegionMgrs { get; }
-        public List<RVRProgression> BattleFrontProgressions { get; }
+        public List<rvr_progression> BattleFrontProgressions { get; }
         private static readonly Logger ProgressionLogger = LogManager.GetLogger("RVRProgressionLogger");
-        public RVRProgression ActiveBattleFront { get; set; }
+        public Dictionary<int, rvr_progression> ActiveBattlefronts { get; set; }
         public List<BattleFrontStatus> BattleFrontStatuses { get; set; }
         protected readonly EventInterface _EvtInterface = new EventInterface();
         public ImpactMatrixManager ImpactMatrixManagerInstance { get; set; }
         public BountyManager BountyManagerInstance { get; set; }
 
-        public LowerTierCampaignManager(List<RVRProgression> _RVRT1Progressions, List<RegionMgr> regionMgrs)
+        public LowerTierCampaignManager(List<rvr_progression> _RVRT1Progressions, List<RegionMgr> regionMgrs)
         {
+            ActiveBattlefronts = new Dictionary<int, rvr_progression>();
             BattleFrontProgressions = _RVRT1Progressions;
             RegionMgrs = regionMgrs;
             BattleFrontStatuses = new List<BattleFrontStatus>();
@@ -49,7 +50,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// Sets up the Battlefront status list with default values.
         /// </summary>
         /// <param name="battleFrontProgressions"></param>
-        private void BuildApocBattleFrontStatusList(List<RVRProgression> battleFrontProgressions)
+        private void BuildApocBattleFrontStatusList(List<rvr_progression> battleFrontProgressions)
         {
             lock (LockObject)
             {
@@ -57,19 +58,22 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                 foreach (var battleFrontProgression in battleFrontProgressions)
                 {
                     // BattleFront Objectives for this region.
-                    var battlefieldObjectives = BattleFrontService.GetZoneBattlefrontObjectives(battleFrontProgression.RegionId, battleFrontProgression.ZoneId);
-
+                    var battlefieldObjectives = BattleFrontService.GetZoneBattlefrontObjectives(battleFrontProgression.RegionId, battleFrontProgression.OrderZoneId);
+                    battlefieldObjectives.AddRange(BattleFrontService.GetZoneBattlefrontObjectives(battleFrontProgression.RegionId, battleFrontProgression.DestroZoneId));
                     BattleFrontStatuses.Add(new BattleFrontStatus(ImpactMatrixManagerInstance, battleFrontProgression.BattleFrontId)
                     {
-                        LockingRealm = (Realms)BattleFrontProgressions.Single(x => x.BattleFrontId == battleFrontProgression.BattleFrontId).LastOwningRealm,
+                        RegionId = battleFrontProgression.RegionId,
+                        PairingId = battleFrontProgression.PairingId,
+                        LockingRealm = (SetRealms)BattleFrontProgressions.Single(x => x.BattleFrontId == battleFrontProgression.BattleFrontId).LastOwningRealm,
                         FinalVictoryPoint = new VictoryPointProgress(battleFrontProgression.OrderVP, battleFrontProgression.DestroVP),
                         OpenTimeStamp = 0,
                         LockTimeStamp = 0,
                         Locked = true,
-                        RegionId = battleFrontProgression.RegionId,
                         Description = battleFrontProgression.Description,
-                        ZoneId = battleFrontProgression.ZoneId,
-                        BattlefieldObjectives = battlefieldObjectives
+                        OrderZoneId = battleFrontProgression.OrderZoneId,
+                        DestroZoneId = battleFrontProgression.DestroZoneId,
+                        BattlefieldObjectives = battlefieldObjectives,
+                        Progression = battleFrontProgression
                     });
                 }
             }
@@ -98,14 +102,38 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             }
         }
 
-        public Campaign GetActiveCampaign()
+
+        /// <summary>
+        /// Returns the active campaign based upon the region.
+        /// </summary>
+        /// <returns></returns>
+        public Campaign GetActiveCampaign(int pairingId)
         {
-            var activeRegionId = ActiveBattleFront.RegionId;
+            var activeRegionId = ActiveBattlefronts[pairingId].RegionId;
             foreach (var regionMgr in RegionMgrs)
             {
                 if (regionMgr.RegionId == activeRegionId)
                 {
                     return regionMgr.Campaign;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns the active campaign based upon the zoneId.
+        /// </summary>
+        /// <returns></returns>
+        public Campaign GetActiveCampaign(ushort zoneId)
+        {
+            foreach (BattleFrontStatus status in BattleFrontStatuses)
+            {
+                foreach (var regionMgr in RegionMgrs)
+                {
+                    if (regionMgr.RegionId == status.RegionId && (status.DestroZoneId == zoneId || status.OrderZoneId == zoneId))
+                    {
+                        return regionMgr.Campaign;
+                    }
                 }
             }
             return null;
@@ -133,44 +161,53 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// </summary>
         public void LockBattleFrontsAllRegions(int tier, bool forceDefaultRealm = false)
         {
-            foreach (var regionMgr in RegionMgrs)
+            foreach (pairing_infos campaign in RVRProgressionService.RVRPairings)
             {
-                if (regionMgr.GetTier() == tier)
+                foreach (var regionMgr in RegionMgrs)
                 {
-                    // Find and update the status of the battlefront status (list of BFStatuses is only for this Tier)
-                    foreach (var apocBattleFrontStatus in BattleFrontStatuses)
+                    if (regionMgr.GetTier() == tier)
                     {
-                        apocBattleFrontStatus.Locked = true;
-                        apocBattleFrontStatus.OpenTimeStamp = FrameWork.TCPManager.GetTimeStamp();
-                        // Determine what the "start" realm this battlefront should be locked to.
-                        if (forceDefaultRealm)
-                            apocBattleFrontStatus.LockingRealm = (Realms)BattleFrontProgressions.Single(x => x.BattleFrontId == apocBattleFrontStatus.BattleFrontId).DefaultRealmLock;
-                        else
+                        // Find and update the status of the battlefront status (list of BFStatuses is only for this Tier)
+                        foreach (var apocBattleFrontStatus in BattleFrontStatuses)
                         {
-                            apocBattleFrontStatus.LockingRealm = (Realms)BattleFrontProgressions.Single(x => x.BattleFrontId == apocBattleFrontStatus.BattleFrontId).LastOwningRealm;
+                            apocBattleFrontStatus.Locked = true;
+                            apocBattleFrontStatus.OpenTimeStamp = FrameWork.TCPManager.GetTimeStamp();
+                            // Determine what the "start" realm this battlefront should be locked to.
+                            if (forceDefaultRealm)
+                                apocBattleFrontStatus.LockingRealm = (SetRealms)BattleFrontProgressions.Single(x => x.BattleFrontId == apocBattleFrontStatus.BattleFrontId).DefaultRealmLock;
+                            else
+                            {
+                                apocBattleFrontStatus.LockingRealm = (SetRealms)BattleFrontProgressions.Single(x => x.BattleFrontId == apocBattleFrontStatus.BattleFrontId).LastOwningRealm;
+                            }
+                            apocBattleFrontStatus.FinalVictoryPoint = new VictoryPointProgress();
+                            apocBattleFrontStatus.LockTimeStamp = FrameWork.TCPManager.GetTimeStamp();
                         }
-                        apocBattleFrontStatus.FinalVictoryPoint = new VictoryPointProgress();
-                        apocBattleFrontStatus.LockTimeStamp = FrameWork.TCPManager.GetTimeStamp();
-                    }
 
-                    if (regionMgr.Campaign == null)
-                        continue;
+                        if (regionMgr.Campaign == null)
+                            continue;
 
-                    regionMgr.Campaign.VictoryPointProgress = new VictoryPointProgress();
+                        regionMgr.Campaign.VictoryPointProgress = new VictoryPointProgress();
 
-                    foreach (var objective in regionMgr.Campaign.Objectives)
-                    {
-                        if (forceDefaultRealm)
-                            objective.OwningRealm = (Realms)regionMgr.Campaign.BattleFrontManager.ActiveBattleFront.DefaultRealmLock;
-                        else
+                        foreach (var objective in regionMgr.Campaign.Objectives)
                         {
-                            objective.OwningRealm = (Realms)regionMgr.Campaign.BattleFrontManager.ActiveBattleFront.LastOwningRealm;
+                            if (!regionMgr.Campaign.BattleFrontManager.ActiveBattlefronts.ContainsKey(campaign.PairingId))
+                            {
+                                continue;
+                            }
+
+                            if (forceDefaultRealm)
+                            {
+                                objective.OwningRealm = (SetRealms)regionMgr.Campaign.BattleFrontManager.ActiveBattlefronts[campaign.PairingId].DefaultRealmLock;
+                            }
+                            else
+                            {
+                                objective.OwningRealm = (SetRealms)regionMgr.Campaign.BattleFrontManager.ActiveBattlefronts[campaign.PairingId].LastOwningRealm;
+                            }
+                            //objective.fsm.Fire(CampaignObjectiveStateMachine.Command.OnLockZone);
+                            objective.SetObjectiveLocked();
+                            ProgressionLogger.Debug($" Locking BattlefieldObjective to {(SetRealms)regionMgr.Campaign.BattleFrontManager.ActiveBattlefronts[campaign.PairingId].LastOwningRealm} {objective.Name} {objective.State} {objective.State}");
                         }
-                        //objective.fsm.Fire(CampaignObjectiveStateMachine.Command.OnLockZone);
-                        objective.SetObjectiveLocked();
-                        ProgressionLogger.Debug($" Locking BattlefieldObjective to {(Realms)regionMgr.Campaign.BattleFrontManager.ActiveBattleFront.LastOwningRealm} {objective.Name} {objective.State} {objective.State}");
                     }
-                    
                 }
             }
         }
@@ -184,7 +221,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         {
             foreach (var ApocBattleFrontStatus in BattleFrontStatuses)
             {
-                if (ApocBattleFrontStatus.BattleFrontId == ActiveBattleFront.BattleFrontId)
+                if (ApocBattleFrontStatus.BattleFrontId == battleFrontId)
                 {
                     return ApocBattleFrontStatus.Locked;
                 }
@@ -205,7 +242,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             }
         }
 
-        public void LockBattleFrontStatus(int battleFrontId, Realms lockingRealm, VictoryPointProgress vpp)
+        public void LockBattleFrontStatus(int battleFrontId, SetRealms lockingRealm, VictoryPointProgress vpp)
         {
             var activeStatus = BattleFrontStatuses.Single(x => x.BattleFrontId == battleFrontId);
 
@@ -220,16 +257,18 @@ namespace WorldServer.World.Battlefronts.Apocalypse
             ProgressionLogger.Info($"Locking BF Status {activeStatus.Description} to realm:{lockingRealm}");
         }
 
-        public RVRProgression LockActiveBattleFront(Realms realm, int forceNumberBags = 0)
+        public void LockActiveBattleFront(int pairingId, SetRealms realm, int forceNumberBags = 0)
         {
-            var activeRegion = RegionMgrs.Single(x => x.RegionId == ActiveBattleFront.RegionId);
-            ProgressionLogger.Info($" Locking battlefront in {activeRegion.RegionName} Zone : {ActiveBattleFront.ZoneId} {ActiveBattleFrontName}");
+            rvr_progression activeBf = ActiveBattlefronts[pairingId];
 
-            LockBattleFrontStatus(ActiveBattleFront.BattleFrontId, realm, activeRegion.Campaign.VictoryPointProgress);
+            var activeRegion = RegionMgrs.Single(x => x.RegionId == activeBf.RegionId);
+            ProgressionLogger.Info($" Locking battlefront in {activeRegion.RegionName} Destro Zone : {activeBf.DestroZoneId}, Order Zone : {activeBf.OrderZoneId} {activeBf.Description}");
+
+            LockBattleFrontStatus(activeBf.BattleFrontId, realm, activeRegion.Campaign.VictoryPointProgress);
 
             foreach (var flag in activeRegion.Campaign.Objectives)
             {
-                if (ActiveBattleFront.ZoneId == flag.ZoneId)
+                if (activeBf.DestroZoneId == flag.ZoneId)
                 {
                     flag.OwningRealm = realm;
                     flag.SetObjectiveLocked();
@@ -238,9 +277,16 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
             foreach (BattleFrontKeep keep in activeRegion.Campaign.Keeps)
             {
-                if (ActiveBattleFront.ZoneId == keep.ZoneId)
+                if (activeBf.DestroZoneId == keep.ZoneId)
                     keep.OnLockZone(realm);
             }
+
+            foreach (BattleFrontKeep keep in activeRegion.Campaign.Keeps)
+            {
+                if (activeBf.OrderZoneId == keep.ZoneId)
+                    keep.OnLockZone(realm);
+            }
+
             ProgressionLogger.Debug($"Removing any siege from active region");
             // Destroy any active siege in this zone.
             try
@@ -260,10 +306,7 @@ namespace WorldServer.World.Battlefronts.Apocalypse
                 ProgressionLogger.Debug($"{e.Message}{e.StackTrace}");
             }
 
-            activeRegion.Campaign.LockBattleFront(realm, forceNumberBags);
-
-            // Use Locking Realm in the BFM, not the BF (BF applies to region)
-            return ActiveBattleFront;
+            activeRegion.Campaign.LockBattleFront(activeBf, realm, forceNumberBags);
         }
 
         /// <summary>
@@ -271,156 +314,201 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         /// Reset the VPP for the active battlefront.
         /// </summary>
         /// <returns></returns>
-        public RVRProgression OpenActiveBattlefront()
+        public void OpenActiveBattlefront()
         {
-            try
+            foreach (pairing_infos campaign in RVRProgressionService.RVRPairings)
             {
-                var activeRegion = RegionMgrs.Single(x => x.RegionId == ActiveBattleFront.RegionId);
-                ProgressionLogger.Info($"Opening Active battlefront in {activeRegion.RegionName} Zone : {ActiveBattleFront.ZoneId} {ActiveBattleFrontName}");
-
-                activeRegion.Campaign.VictoryPointProgress.Reset(activeRegion.Campaign);
-                ProgressionLogger.Info($"Resetting VP Progress {activeRegion.RegionName} BF Id : {ActiveBattleFront.BattleFrontId} Zone : {ActiveBattleFront.ZoneId} {ActiveBattleFrontName}");
-
-                // Find and update the status of the battlefront status.
-                foreach (var apocBattleFrontStatus in BattleFrontStatuses)
+                if (!ActiveBattlefronts.ContainsKey(campaign.PairingId))
                 {
-                    if (apocBattleFrontStatus.BattleFrontId == ActiveBattleFront.BattleFrontId)
+                    continue;
+                }
+
+                rvr_progression activeBattlefront = ActiveBattlefronts[campaign.PairingId];
+                try
+                {
+                    var activeRegion = RegionMgrs.Single(x => x.RegionId == activeBattlefront.RegionId);
+                    ProgressionLogger.Info($"Opening Active battlefront in {activeRegion.RegionName} Destro Zone : {activeBattlefront.DestroZoneId} Order Zone : {activeBattlefront.OrderZoneId} {activeBattlefront.Description}");
+
+                    activeRegion.Campaign.VictoryPointProgress.Reset(activeRegion.Campaign);
+                    ProgressionLogger.Info($"Resetting VP Progress {activeRegion.RegionName} BF Id : {activeBattlefront.BattleFrontId}  Destro Zone : {activeBattlefront.DestroZoneId} Order Zone : {activeBattlefront.OrderZoneId} {activeBattlefront.Description}");
+
+                    // Find and update the status of the battlefront status.
+                    foreach (var apocBattleFrontStatus in BattleFrontStatuses)
                     {
-                        lock (apocBattleFrontStatus)
+                        if (apocBattleFrontStatus.BattleFrontId == activeBattlefront.BattleFrontId)
                         {
-                            ProgressionLogger.Info(
-                                $"Resetting BFStatus {activeRegion.RegionName} BF Id : {ActiveBattleFront.BattleFrontId} Zone : {ActiveBattleFront.ZoneId} {ActiveBattleFrontName}");
+                            lock (apocBattleFrontStatus)
+                            {
+                                ProgressionLogger.Info(
+                                    $"Resetting BFStatus {activeRegion.RegionName} BF Id : {activeBattlefront.BattleFrontId}  Destro Zone : {activeBattlefront.DestroZoneId} Order Zone : {activeBattlefront.OrderZoneId} {activeBattlefront.Description}");
 
-                            apocBattleFrontStatus.Locked = false;
-                            apocBattleFrontStatus.OpenTimeStamp = FrameWork.TCPManager.GetTimeStamp();
-                            apocBattleFrontStatus.LockingRealm = Realms.REALMS_REALM_NEUTRAL;
-                            apocBattleFrontStatus.FinalVictoryPoint = new VictoryPointProgress
-                            (
-                            activeRegion.Campaign.VictoryPointProgress.OrderVictoryPoints = ActiveBattleFront.OrderVP,
-                            activeRegion.Campaign.VictoryPointProgress.DestructionVictoryPoints = ActiveBattleFront.DestroVP);
-                                
-                            
-                            apocBattleFrontStatus.LockTimeStamp = 0;
+                                apocBattleFrontStatus.Locked = false;
+                                apocBattleFrontStatus.OpenTimeStamp = FrameWork.TCPManager.GetTimeStamp();
+                                apocBattleFrontStatus.LockingRealm = SetRealms.REALMS_REALM_NEUTRAL;
+                                apocBattleFrontStatus.FinalVictoryPoint = new VictoryPointProgress();
+                                apocBattleFrontStatus.LockTimeStamp = 0;
 
-                            // Reset the population for the battle front status
-                            ProgressionLogger.Info(
-                                $"InitializePopulationList {activeRegion.RegionName} BF Id : {ActiveBattleFront.BattleFrontId} Zone : {ActiveBattleFront.ZoneId} {ActiveBattleFrontName}");
-                            GetActiveCampaign().InitializePopulationList(ActiveBattleFront.BattleFrontId);
+                                // Reset the population for the battle front status
+                                ProgressionLogger.Info(
+                                    $"InitializePopulationList {activeRegion.RegionName} BF Id : {activeBattlefront.BattleFrontId}  Destro Zone : {activeBattlefront.DestroZoneId} Order Zone : {activeBattlefront.OrderZoneId} {activeBattlefront.Description}");
+                                GetActiveCampaign(campaign.PairingId).InitializePopulationList(activeBattlefront.BattleFrontId);
 
-                            //GetActiveCampaign().StartWanderingMobs(ActiveBattleFront.ZoneId);
+                                //GetActiveCampaign().StartWanderingMobs(ActiveBattleFront.ZoneId);
+                            }
                         }
                     }
-                }
 
-                if (activeRegion.Campaign == null)
-                {
-                    ProgressionLogger.Info($"activeRegion.Campaign is null");
-                    return ActiveBattleFront;
-                }
-
-                if (activeRegion.Campaign.Objectives == null)
-                {
-                    ProgressionLogger.Warn($"activeRegion.Campaign (objectives) is null");
-                    return ActiveBattleFront;
-                }
-
-                ProgressionLogger.Info($"Unlocking objectives {activeRegion.RegionName} BF Id : {ActiveBattleFront.BattleFrontId} Zone : {ActiveBattleFront.ZoneId} {ActiveBattleFrontName}");
-                foreach (var flag in activeRegion.Campaign.Objectives)
-                {
-                    if (ActiveBattleFront.ZoneId == flag.ZoneId)
+                    if (activeRegion.Campaign == null)
                     {
-                        flag.OpenBattleFront();
-                        //flag.SetObjectiveSafe();
+                        ProgressionLogger.Info($"activeRegion.Campaign is null");
+                        return;
                     }
-                }
 
-                if (activeRegion.Campaign.Keeps == null)
-                {
-                    ProgressionLogger.Warn($"activeRegion.Campaign (keeps) is null");
-                    return ActiveBattleFront;
-                }
-
-                ProgressionLogger.Info($"Unlocking keeps {activeRegion.RegionName} BF Id : {ActiveBattleFront.BattleFrontId} Zone : {ActiveBattleFront.ZoneId} {ActiveBattleFrontName}");
-                foreach (var keep in activeRegion.Campaign.Keeps)
-                {
-                    if (ActiveBattleFront.ZoneId == keep.ZoneId)
+                    if (activeRegion.Campaign.Objectives == null)
                     {
-                        ProgressionLogger.Debug($"Informing Keep of Open battlefront Name : {keep.Info.Name} Zone : {keep.ZoneId} ");
-                        keep.OpenBattleFront();
+                        ProgressionLogger.Warn($"activeRegion.Campaign (objectives) is null");
+                        return;
                     }
+
+                    ProgressionLogger.Info($"Unlocking objectives {activeRegion.RegionName} BF Id : {activeBattlefront.BattleFrontId}  Destro Zone : {activeBattlefront.DestroZoneId} Order Zone : {activeBattlefront.OrderZoneId} {activeBattlefront.Description}");
+                    foreach (var flag in activeRegion.Campaign.Objectives)
+                    {
+                        if (activeBattlefront.OrderZoneId == flag.ZoneId || activeBattlefront.DestroZoneId == flag.ZoneId)
+                        {
+                            flag.OpenBattleFront();
+                            //flag.SetObjectiveSafe();
+                        }
+                    }
+
+                    if (activeRegion.Campaign.Keeps == null)
+                    {
+                        ProgressionLogger.Warn($"activeRegion.Campaign (keeps) is null");
+                        return;
+                    }
+
+                    ProgressionLogger.Info($"Unlocking keeps {activeRegion.RegionName} BF Id : {activeBattlefront.BattleFrontId}  Destro Zone : {activeBattlefront.DestroZoneId} Order Zone : {activeBattlefront.OrderZoneId} {activeBattlefront.Description}");
+                    foreach (var keep in activeRegion.Campaign.Keeps)
+                    {
+                        if (activeBattlefront.OrderZoneId == keep.ZoneId || activeBattlefront.DestroZoneId == keep.ZoneId)
+                        {
+                            ProgressionLogger.Debug($"Informing Keep of Open battlefront Name : {keep.Info.Name} Zone : {keep.ZoneId} ");
+                            keep.OpenBattleFront();
+                        }
+                    }
+
+                    activeRegion.Campaign.DestructionDominationCounter = Core.Config.DestructionDominationTimerLength;
+                    activeRegion.Campaign.OrderDominationCounter = Core.Config.OrderDominationTimerLength;
+
                 }
-
-                activeRegion.Campaign.DestructionDominationCounter = Core.Config.DestructionDominationTimerLength;
-                activeRegion.Campaign.OrderDominationCounter = Core.Config.OrderDominationTimerLength;
-
-                return ActiveBattleFront;
-            }
-            catch (Exception e)
-            {
-                ProgressionLogger.Error($"Exception. Zone : {ActiveBattleFront.ZoneId} {ActiveBattleFrontName} {e.Message} {e.StackTrace}");
-                throw;
+                catch (Exception e)
+                {
+                    ProgressionLogger.Error($"Exception.  Destro Zone : {activeBattlefront.DestroZoneId} Order Zone : {activeBattlefront.OrderZoneId} {activeBattlefront.Description} {e.Message} {e.StackTrace}");
+                    throw;
+                }
             }
         }
 
         /// <summary>
         /// Get the ActiveBattleFront to be Praag if no zones are marked open in rvr_progression, otherwise use the LastOpenedZone
         /// </summary>
-        public RVRProgression GetActiveBattleFrontFromProgression()
+        public rvr_progression GetActiveBattleFrontFromProgression(int pairing)
         {
-            ProgressionLogger.Debug($" Getting battlefront progression...");
-
-            var list = BattleFrontProgressions.Select(x => x).Where(x => x.LastOpenedZone == 1).ToList();
-            if (list == null || list.Count == 0)
-                ActiveBattleFront = GetBattleFrontByName("Praag");
-            else
-                ActiveBattleFront = list.FirstOrDefault();
-
-            ProgressionLogger.Debug($"Active : {ActiveBattleFrontName}");
-            return ActiveBattleFront;
+           // ProgressionLogger.Debug($" Getting battlefront progression...");
+          
+            pairing_infos campaign = RVRProgressionService.RVRPairings.Where(x => x.PairingId == pairing).FirstOrDefault();
+            if (campaign != null)
+            {
+                var list = BattleFrontProgressions.Select(x => x).Where(x => x.LastOpenedZone == 1 && x.PairingId == pairing).ToList();
+                rvr_progression bf = list.FirstOrDefault();
+                if (bf == null)
+                    return null;
+                if (ActiveBattlefronts.Count > 0)
+                {
+                    if(bf.PairingId <= ActiveBattlefronts.First().Key)
+                    {
+                        ActiveBattlefronts.Remove(ActiveBattlefronts.First().Key);
+                    }
+                    else
+                    {
+                        return ActiveBattlefronts.First().Value;
+                    }
+                }
+                if (ActiveBattlefronts.ContainsKey(bf.PairingId))
+                {
+                    if (ActiveBattlefronts[bf.PairingId].BattleFrontId == bf.BattleFrontId)
+                    {
+                        return ActiveBattlefronts.First().Value;
+                    }
+                    else
+                    {
+                        ActiveBattlefronts.Remove(bf.PairingId);
+                    }
+                }
+                ActiveBattlefronts.Add(bf.PairingId, bf);
+                ProgressionLogger.Debug($"Campaign: {campaign.PairingId} Active : {bf.Description}");
+                return bf;
+            }
+            return null;
         }
 
-        public RVRProgression GetBattleFrontByName(string name)
+        public rvr_progression GetBattleFrontByName(string name)
         {
             return BattleFrontProgressions.Single(x => x.Description.Contains(name));
         }
 
-        public RVRProgression GetBattleFrontByBattleFrontId(int id)
+        public rvr_progression GetBattleFrontByBattleFrontId(int id)
         {
             return BattleFrontProgressions.Single(x => x.BattleFrontId == id);
-        }
-
-        public string ActiveBattleFrontName
-        {
-            get
-            {
-                return ActiveBattleFront?.Description;
-            }
-            set { ActiveBattleFront.Description = value; }
         }
 
         /// <summary>
         /// Given a realm that locked the current Active Battlefront, find the next Battlefront.
         /// </summary>
-        public RVRProgression AdvanceBattleFront(Realms lockingRealm)
+        public rvr_progression AdvanceBattleFront(int pairingid, SetRealms lockingRealm)
         {
-            if (lockingRealm == Realms.REALMS_REALM_ORDER)
+            rvr_progression activeBattleFront = ActiveBattlefronts[pairingid];
+            bool found = false;
+            while (!found)
             {
-                var newBattleFront = GetBattleFrontByBattleFrontId(ActiveBattleFront.OrderWinProgression);
-                ProgressionLogger.Debug($"Order Win : Advancing Battlefront from {ActiveBattleFrontName} to {newBattleFront.Description}");
-                return ActiveBattleFront = newBattleFront;
-            }
+                ++pairingid;
 
-            if (lockingRealm == Realms.REALMS_REALM_DESTRUCTION)
-            {
-                var newBattleFront = GetBattleFrontByBattleFrontId(ActiveBattleFront.DestWinProgression);
-                ProgressionLogger.Debug($"Destruction Win : Advancing Battlefront from {ActiveBattleFrontName} to {newBattleFront.Description}");
-                return ActiveBattleFront = newBattleFront;
+                if (pairingid > 3)
+                    pairingid = 1;
+                if (IsPairingOpen(pairingid))
+                {
+                    found = true;
+                }
             }
-
-            return GetActiveBattleFrontFromProgression();
+            var newBattleFront = GetBattleFrontByBattleFrontByPairing(pairingid);
+            ProgressionLogger.Debug($"Order Win : Advancing Battlefront from {activeBattleFront.Description} to {newBattleFront.Description}");
+            ActiveBattlefronts.Remove(pairingid);
+            ActiveBattlefronts.Add(pairingid, newBattleFront);
+            return newBattleFront;
         }
 
-        public void UpdateRVRPRogression(Realms lockingRealm, RVRProgression oldProg, RVRProgression newProg)
+        private rvr_progression GetBattleFrontByBattleFrontByPairing(int pairingid)
+        {
+            foreach (rvr_progression progression in BattleFrontProgressions)
+            {
+                if (progression.PairingId == pairingid)
+                {
+                    return progression;
+                }
+            }
+            return null;
+        }
+
+        private bool IsPairingOpen(int pairingid)
+        {
+            foreach (pairing_infos info in RVRProgressionService.RVRPairings)
+            {
+                if (info.PairingId == pairingid)
+                    return true;
+            }
+            return false;
+        }
+
+        public void UpdateRVRPRogression(SetRealms lockingRealm, rvr_progression oldProg, rvr_progression newProg)
         {
             oldProg.DestroVP = oldProg.OrderVP = 0;
             oldProg.LastOpenedZone = 0;
@@ -428,6 +516,31 @@ namespace WorldServer.World.Battlefronts.Apocalypse
 
             newProg.LastOwningRealm = 0;
             newProg.LastOpenedZone = 1;
+        }
+
+        public BattleFrontStatus GetActiveCampaign(RegionMgr region)
+        {
+            foreach (BattleFrontStatus status in BattleFrontStatuses)
+            {
+                if (status.RegionId == region.RegionId)
+                    return status;
+            }
+            return null;
+        }
+
+        public bool IsInContestedZone(ushort zoneId)
+        {
+            foreach (BattleFrontStatus status in BattleFrontStatuses)
+            {
+                if (!status.Locked && (status.DestroZoneId == zoneId || status.OrderZoneId == zoneId))
+                    return true;
+            }
+            return false;
+        }
+
+        public byte GetBattleFrontState(int pairing, int tier)
+        {
+            return 3;
         }
     }
 }

@@ -8,3 +8,23 @@ C:\Users\DoR\Desktop\WitchKRAFT-shadwar2\ServerLauncher\obj\Release\ServerLaunch
 C:\Users\DoR\Desktop\WitchKRAFT-shadwar2\ServerLauncher\obj\Release\ServerLauncher.csproj.CoreCompileInputs.cache
 C:\Users\DoR\Desktop\WitchKRAFT-shadwar2\ServerLauncher\obj\Release\ServerLauncher.exe
 C:\Users\DoR\Desktop\WitchKRAFT-shadwar2\ServerLauncher\obj\Release\ServerLauncher.pdb
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\ServerLauncher.exe.config
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\ServerLauncher.exe
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\ServerLauncher.pdb
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\ServerLauncher\obj\Release\ServerLauncher.csproj.AssemblyReference.cache
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\ServerLauncher\obj\Release\ServerLauncher.Form1.resources
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\ServerLauncher\obj\Release\ServerLauncher.Properties.Resources.resources
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\ServerLauncher\obj\Release\ServerLauncher.csproj.GenerateResource.cache
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\ServerLauncher\obj\Release\ServerLauncher.csproj.CoreCompileInputs.cache
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\ServerLauncher\obj\Release\ServerLauncher.exe
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\ServerLauncher\obj\Release\ServerLauncher.pdb
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\ServerLauncher.exe.config
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\ServerLauncher.exe
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\ServerLauncher.pdb
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\ServerLauncher\obj\Release\ServerLauncher.csproj.AssemblyReference.cache
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\ServerLauncher\obj\Release\ServerLauncher.Form1.resources
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\ServerLauncher\obj\Release\ServerLauncher.Properties.Resources.resources
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\ServerLauncher\obj\Release\ServerLauncher.csproj.GenerateResource.cache
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\ServerLauncher\obj\Release\ServerLauncher.csproj.CoreCompileInputs.cache
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\ServerLauncher\obj\Release\ServerLauncher.exe
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\ServerLauncher\obj\Release\ServerLauncher.pdb

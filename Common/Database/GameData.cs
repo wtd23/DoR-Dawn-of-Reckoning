@@ -1137,7 +1137,7 @@ namespace GameData
         BUFFTARGETTYPE_GROUP_MEMBER_START = 0
     };
 
-    public enum Realms
+    public enum SetRealms
     {
         REALMS_REALM_NEUTRAL = 0,
         REALMS_REALM_ORDER = 1,
@@ -1665,7 +1665,7 @@ namespace GameData
         LABEL_NO,	//No
         LABEL_OK,	//Ok
         LABEL_CANCEL,	//Cancel
-        TEXT_NEW_PUBLIC_QUEST,	//New Public Quest: <<1>>
+        TEXT_NEW_PUBLIC_QUEST,	//New Public quests: <<1>>
         TEXT_NEW_RVR_OBJECTIVE,	//New RvR Objective: <<1>>
         TEXT_CORE_XP_DING,	//You have gained an Ability Advance Point!
         TEXT_SPEC_XP_DING,	//You have gained a Tactic Advance Point!
@@ -1849,7 +1849,7 @@ namespace GameData
         TEXT_DESTRUCTION_CONTROLLED,	//Destruction controlled
         TEXT_CONTESTED,	//Contested
         TEXT_ENTERING,	//Entering
-        TEXT_PUBLIC_QUEST_RACE_CHAPTER,	//Public Quest, <<1>> Chapter <<2>>
+        TEXT_PUBLIC_QUEST_RACE_CHAPTER,	//Public quests, <<1>> Chapter <<2>>
         TEXT_SAFE,	//Safe
         TEXT_CAPTURED,	//Captured
         TEXT_OUTPUT_FORMAT_BESTIARY,	//<<1>> [<<2>> - <<3>> - <<4>>]
@@ -2876,11 +2876,11 @@ namespace GameData
         TEXT_COPTER_MISSING_CHARACTER_APPEAL_SENT,	//Your missing character appeal has been sent to Customer Support.
         TEXT_COPTER_MISSING_ITEM_APPEAL_SENT,	//Your missing item appeal has been sent to Customer Support.
         TEXT_COPTER_CHARACTER_ISSUES_APPEAL_SENT,	//Your character appeal has been sent to Customer Support.
-        TEXT_COPTER_PUBLIC_QUEST_APPEAL_SENT,	//Your Public Quest appeal has been sent to Customer Support.
+        TEXT_COPTER_PUBLIC_QUEST_APPEAL_SENT,	//Your Public quests appeal has been sent to Customer Support.
         TEXT_COPTER_SCENARIO_APPEAL_SENT,	//Your Scenario appeal has been sent to Customer Support.
         TEXT_COPTER_BATTLEFIELD_OBJECTIVES_AND_KEEPS_APPEAL_SENT,	//Your Battlefield Objective or Keep appeal has been sent to Customer Support.
         TEXT_COPTER_MONSTER_APPEAL_SENT,	//Your monster appeal has been sent to Customer Support.
-        TEXT_COPTER_QUEST_AND_QUEST_ITEMS_APPEAL_SENT,	//Your Quest appeal has been sent to Customer Support.
+        TEXT_COPTER_QUEST_AND_QUEST_ITEMS_APPEAL_SENT,	//Your quests appeal has been sent to Customer Support.
         TEXT_COPTER_COMBAT_OR_SKIRMISH_APPEAL_SENT,	//Your combat appeal has been sent to Customer Support.
         TEXT_COPTER_TOME_OF_KNOWLEDGE_APPEAL_SENT,	//Your Tome of Knowledge appeal has been sent to Customer Support.
         TEXT_COPTER_MAIL_APPEAL_SENT,	//Your in-game mail appeal has been sent to Customer Support.
@@ -2889,7 +2889,7 @@ namespace GameData
         TEXT_COPTER_TRADESKILL_APPEAL_SENT,	//Your tradeskill appeal has been sent to Customer Support.
         TEXT_COPTER_CITY_FEEDBACK_SENT,	//Your city feedback has been sent.
         TEXT_COPTER_TOME_OF_KNOWLEDGE_FEEDBACK_SENT,	//Your Tome of Knowledge feedback has been sent.
-        TEXT_COPTER_QUESTS_AND_PUBLIC_QUESTS_FEEDBACK_SENT,	//Your Quest or Public Quest feedback has been sent.
+        TEXT_COPTER_QUESTS_AND_PUBLIC_QUESTS_FEEDBACK_SENT,	//Your quests or Public quests feedback has been sent.
         TEXT_COPTER_CAREER_FEEDBACK_SENT,	//Your career feedback has been sent.
         TEXT_COPTER_COMBAT_FEEDBACK_SENT,	//Your combat feedback has been sent.
         TEXT_COPTER_TRADESKILL_AND_ECONOMY_FEEDBACK_SENT,	//Your trade feedback has been sent.

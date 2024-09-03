@@ -47,7 +47,7 @@ namespace AuthenticationServer
         #region MYP Files
 
         public static List<PatchFile> _Patch_Files;
-        public static Dictionary<Patch_MYP, List<PatchAsset>> _Patch_Assets;
+        public static Dictionary<launcher_myps, List<PatchAsset>> _Patch_Assets;
         public static readonly bool use_cache = false;
 
         [LoadingFunction(true)]
@@ -102,9 +102,9 @@ namespace AuthenticationServer
             Log.Success("LoadPatch_Assets", "Loaded " + _Patch_Assets.Count + " MYPs");
         }
 
-        public static Dictionary<Patch_MYP, List<PatchAsset>> LoadAssetsFromDisk()
+        public static Dictionary<launcher_myps, List<PatchAsset>> LoadAssetsFromDisk()
         {
-            Dictionary<Patch_MYP, List<PatchAsset>> patch_assets = new Dictionary<Patch_MYP, List<PatchAsset>>();
+            Dictionary<launcher_myps, List<PatchAsset>> patch_assets = new Dictionary<launcher_myps, List<PatchAsset>>();
 
             DirectoryInfo d = new DirectoryInfo(Core.Config.PatcherFilesPath);
 #if DEBUG
@@ -116,7 +116,7 @@ namespace AuthenticationServer
 
             foreach (var myp in myps)
             {
-                Patch_MYP pMYP = new Patch_MYP();
+                launcher_myps pMYP = new launcher_myps();
                 pMYP.Name = myp.Name.Replace(".MYP", "");
                 pMYP.Id = (int)strToArchive(myp.Name);
 

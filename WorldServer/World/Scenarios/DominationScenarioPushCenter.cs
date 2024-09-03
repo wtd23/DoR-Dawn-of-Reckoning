@@ -16,13 +16,13 @@ namespace WorldServer.World.Scenarios
         public ClickFlag CurrentFlag = null;
         private GameObject _glowObject = null;
 
-        public DominationScenarioPushCenter(Scenario_Info info, int tier)
+        public DominationScenarioPushCenter(scenario_infos info, int tier)
             : base(info, tier)
         {
             int i = 0;
             int flagCount = info.ScenObjects.Where(e => e.Type == "Flag").ToList().Count;
 
-            foreach (Scenario_Object scenarioObject in info.ScenObjects.OrderBy(e => e.Identifier).ToList())
+            foreach (scenario_objects scenarioObject in info.ScenObjects.OrderBy(e => e.Identifier).ToList())
             {
                 if (scenarioObject.Type == "Flag")
                 {
@@ -69,7 +69,7 @@ namespace WorldServer.World.Scenarios
 
             if (glowProto != null)
             {
-                GameObject_spawn spawn = new GameObject_spawn
+                gameobject_spawns spawn = new gameobject_spawns
                 {
                     Guid = (uint)GameObjectService.GenerateGameObjectSpawnGUID(),
                     WorldO = flag.Heading,

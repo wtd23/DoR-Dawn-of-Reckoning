@@ -7,20 +7,20 @@ namespace WorldServer.Services.World
     [Service]
     public class BountyService : ServiceBase
     {
-        public static List<ContributionDefinition> _ContributionDefinitions;
+        public static List<bounty_contribution_definition> _ContributionDefinitions;
 
         [LoadingFunction(true)]
         public static void LoadContributionDefinition()
         {
             Log.Debug("WorldMgr", "Loading ContributionManagerInstance Definitions...");
-            _ContributionDefinitions = Database.SelectAllObjects<ContributionDefinition>() as List<ContributionDefinition>;
+            _ContributionDefinitions = Database.SelectAllObjects<bounty_contribution_definition>() as List<bounty_contribution_definition>;
             Log.Success("ContributionDefinition", "Loaded " + _ContributionDefinitions.Count + " ContributionDefinitions");
 
             if (_ContributionDefinitions.Count == 0)
                 Log.Error("Error Loading DB", "No Bounty Contributions Loaded");
         }
 
-        public ContributionDefinition GetDefinition(byte value)
+        public bounty_contribution_definition GetDefinition(byte value)
         {
             foreach (var contributionDefinition in _ContributionDefinitions)
             {

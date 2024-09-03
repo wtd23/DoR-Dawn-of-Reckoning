@@ -23,8 +23,9 @@ namespace WorldServer.World.Objects
     {
         public long NextMove { get; set; }
 
-        public Creature_spawn Spawn;
+        public creature_spawns Spawn;
         public SiegeInterface SiegeInterface;
+
         public uint Entry => Spawn?.Entry ?? 0;
         protected byte Scale;
         public string PQSpawnId { get; set; }
@@ -32,6 +33,8 @@ namespace WorldServer.World.Objects
         public ushort Model1 { get; set; }
         public ushort Model2 { get; set; }
         public ushort IsWandering { get; set; }
+        public bool IsStationary { get; set; }
+        public bool CanWalk { get; set; } = true;
 
         /// <summary>
         /// Random movement Time set Here
@@ -41,7 +44,7 @@ namespace WorldServer.World.Objects
             NextMove = Core.TickCount + Utils.RandomMinMax(2000, 18000);
         }
 
-        public Creature(Creature_spawn spawn) : this()
+        public Creature(creature_spawns spawn) : this()
         {
             if (spawn == null)
                 throw new ArgumentNullException("NULL spawn passed to Creature.");
@@ -51,6 +54,11 @@ namespace WorldServer.World.Objects
             Model1 = spawn.Proto.Model1;
             Model2 = spawn.Proto.Model2;
             IsWandering = spawn.Proto.IsWandering;
+            IsStationary = spawn.Proto.IsStationary;
+            if (spawn.Proto.IsStationary == true)
+            {
+                CanWalk = false;
+            }
             if (spawn.Proto.Emote >= 0)
             {
                 IsWandering = 0;
@@ -71,7 +79,7 @@ namespace WorldServer.World.Objects
 
         #region CrowdControl
 
-        public override void ApplyKnockback(Unit caster, AbilityKnockbackInfo kbInfo)
+        public override void ApplyKnockback(Unit caster, ability_knockback_info kbInfo)
         {
             BuffInterface.QueueBuff(new BuffQueueInfo(caster, caster.EffectiveLevel, AbilityMgr.GetBuffInfo(237)));
         }
@@ -85,7 +93,7 @@ namespace WorldServer.World.Objects
 
         protected virtual void SetCreatureStats()
         {
-            List<CharacterInfo_stats> baseStats;
+            List<character_info_stats> baseStats;
 
             float statBonusMult = 1.0f;
 
@@ -182,7 +190,7 @@ namespace WorldServer.World.Objects
 
             //List<Creature_stats>
 
-            foreach (Creature_stats stat in CreatureService.GetCreatureStats(Entry))
+            foreach (creature_stats stat in CreatureService.GetCreatureStats(Entry))
             {
                 if (stat != null)
                 {
@@ -255,7 +263,7 @@ namespace WorldServer.World.Objects
             return 1;
         }
 
-        public void ApplyCareer(List<CharacterInfo_stats> baseStats, Creature_spawn Spawn, float statBonusMult)
+        public void ApplyCareer(List<character_info_stats> baseStats, creature_spawns Spawn, float statBonusMult)
         {
             foreach (var stat in baseStats)
             {
@@ -435,13 +443,13 @@ namespace WorldServer.World.Objects
             byte statesLength = (byte)(States.Count + Spawn.Proto.States.Length);
             CreatureState questState = CreatureState.Merchant;
 
-            if (QtsInterface.CreatureHasQuestToComplete(plr))
+            if (QtsInterface.CreatureHasQuestForPlayer(plr))
                 questState = CreatureState.QuestFinishable;
             else if (QtsInterface.CreatureHasStartRepeatingQuest(plr))
                 questState = CreatureState.RepeatableQuestAvailable;
-            else if (QtsInterface.CreatureHasStartQuest(plr))
+            else if (QtsInterface.CreatureHasCompletedQuest(plr))
                 questState = CreatureState.QuestAvailable;
-            else if (QtsInterface.CreatureHasQuestToAchieve(plr))
+            else if (QtsInterface.CreatureHasQuestInProgress(plr))
                 questState = CreatureState.QuestInProgress;
 
             if (questState != CreatureState.Merchant)
@@ -857,7 +865,7 @@ namespace WorldServer.World.Objects
 
                             // Theese were previously in there, nice to keep them unless theres info in creature_texts
                             if (text == string.Empty)
-                                if (player.Realm == Realms.REALMS_REALM_ORDER)
+                                if (player.Realm == SetRealms.REALMS_REALM_ORDER)
                                     text = "Hail defender of the Empire!  Your performance in battle is the only thing that keeps the hordes of Chaos at bay. Let's begin your training at once!";
                                 else
                                     text = "Learn these lessons well, for gaining the favor of the Raven god should be of utmost importance to you. Otherwise... There is always room for more Spawn within our ranks.";
@@ -951,9 +959,7 @@ namespace WorldServer.World.Objects
             {
                 Player credited;
 
-                CombatInterface_Npc npc = CbtInterface as CombatInterface_Npc;
-
-                if (npc != null)
+                if (CbtInterface is CombatInterface_Npc npc)
                     credited = npc.FirstStriker ?? killer as Player;
                 else
                     credited = killer as Player;
@@ -1216,9 +1222,9 @@ namespace WorldServer.World.Objects
 
             slot -= 1;
 
-            Chapter_Info Info = ChapterService.GetChapterEntry(ChapterService.GetChapterByNPCID(Entry));
+            chapter_infos Info = ChapterService.GetChapterEntry(ChapterService.GetChapterByNPCID(Entry));
 
-            foreach (Characters_influence Obj in player.Info.Influences)
+            foreach (characters_influences Obj in player.Info.Influences)
             {
                 if (Obj.InfluenceId == ChapterService.GetChapterByNPCID(Entry))
                 {
@@ -1257,9 +1263,9 @@ namespace WorldServer.World.Objects
             player.SendInfluenceItems((byte)ChapterService.GetChapterByNPCID(Entry));
         }
 
-        private uint GetCharpterRewardItemId(Player player, byte tier, Chapter_Info Info, ushort slot)
+        private uint GetCharpterRewardItemId(Player player, byte tier, chapter_infos Info, ushort slot)
         {
-            List<Chapter_Reward> rewards = player.ItmInterface.GetChapterRewards(tier, Info);
+            List<chapter_rewards> rewards = player.ItmInterface.GetChapterRewards(tier, Info);
             if (slot >= rewards.Count)
             {
                 Log.Error("GetCharpterRewardItemId", string.Concat("Item in slot ", slot, " was not found for chapter ", Info.Name));
@@ -1271,7 +1277,7 @@ namespace WorldServer.World.Objects
 
         private void SetRallyPoint(Player player, InteractMenu menu)
         {
-            RallyPoint rally = RallyPointService.GetRallyPointFromNPC(Entry);
+            rally_points rally = RallyPointService.GetRallyPointFromNPC(Entry);
             if (rally != null)
             {
                 player._Value.RallyPoint = rally.Id;
@@ -1293,7 +1299,7 @@ namespace WorldServer.World.Objects
             PacketOut Out = new PacketOut((byte)Opcodes.F_INTERACT_RESPONSE, 64);
             Out.WriteByte(0x1B);
 
-            List<Dye_Info> dyes = DyeService.GetDyes();
+            List<dye_infos> dyes = DyeService.GetDyes();
             byte count = (byte)Math.Min(dyes.Count, MAX_DYES);
 
             Out.WriteByte(count);
@@ -1417,9 +1423,9 @@ namespace WorldServer.World.Objects
 
             PacketOut Out = new PacketOut((byte)Opcodes.F_INTERACT_RESPONSE, 64);
             Out.WriteByte(0x0A);
-            List<Zone_Taxi> taxis = WorldMgr.GetTaxis(player);
+            List<zone_taxis> taxis = WorldMgr.GetTaxis(player);
             Out.WriteByte((byte)taxis.Count);
-            foreach (Zone_Taxi taxi in taxis)
+            foreach (zone_taxis taxi in taxis)
             {
                 Out.WriteUInt16(counts);
                 Out.WriteByte((byte)taxi.Info.Pairing);

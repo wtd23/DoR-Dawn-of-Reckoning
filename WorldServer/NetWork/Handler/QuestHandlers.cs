@@ -27,20 +27,20 @@ namespace WorldServer.NetWork.Handler
 
             switch (State)
             {
-                case 1: // Show Quest
+                case 1: // Show quests
                     {
                         if (Crea.QtsInterface.HasQuestStarter(QuestID))
                             Crea.QtsInterface.BuildQuest(QuestID, cclient.Plr);
                     }
                     break;
 
-                case 2: // Accept Quest
+                case 2: // Accept quests
                     {
                         if (Crea.QtsInterface.HasQuestStarter(QuestID))
                         {
                             if (cclient.Plr.QtsInterface.AcceptQuest(QuestID))
                             {
-                                if (!Crea.QtsInterface.CreatureHasStartQuest(cclient.Plr))
+                                if (!Crea.QtsInterface.CreatureHasCompletedQuest(cclient.Plr))
                                 {
                                     cclient.Plr.SendPacket(Packets.UpdateQuestState(Crea.Oid, Crea.QtsInterface.GetQuestStatusFor(cclient.Plr, Crea)));
                                 }
@@ -49,7 +49,7 @@ namespace WorldServer.NetWork.Handler
                     }
                     break;
 
-                case 3: // Quest Done
+                case 3: // quests Done
                     {
                         if (Crea.QtsInterface.HasQuestFinisher(QuestID))
                         {
@@ -61,7 +61,7 @@ namespace WorldServer.NetWork.Handler
                     }
                     break;
 
-                case 4: // Quest Done Info
+                case 4: // quests Done Info
                     {
                         if (Crea.QtsInterface.HasQuestFinisher(QuestID))
                             Crea.QtsInterface.SendQuestDoneInfo(cclient.Plr, QuestID);
@@ -72,7 +72,7 @@ namespace WorldServer.NetWork.Handler
                     }
                     break;
 
-                case 5: // Select Quest Reward
+                case 5: // Select quests Reward
                     {
                         if (Crea.QtsInterface.HasQuestFinisher(QuestID))
                             cclient.Plr.QtsInterface.SelectRewards(QuestID, Unk3);
@@ -91,13 +91,13 @@ namespace WorldServer.NetWork.Handler
 
             switch (state)
             {
-                case 0: // Show Quest
+                case 0: // Show quests
                     {
                         cclient.Plr.QtsInterface.SendQuest(questID);
                     }
                     break;
 
-                case 1: // Decline Quest
+                case 1: // Decline quests
                     {
                         cclient.Plr.QtsInterface.AbandonQuest(questID);
                     }
@@ -119,7 +119,7 @@ namespace WorldServer.NetWork.Handler
                                     }
                                     else
                                     {
-                                        member.SendClientMessage("Quest '" + Services.World.QuestService._Quests[questID].Name + "' cannot be shared.");
+                                        member.SendClientMessage("quests '" + Services.World.QuestService._Quests[questID].Name + "' cannot be shared.");
                                         cclient.Plr.SendClientMessage("You cannot share quest '" + Services.World.QuestService._Quests[questID].Name + "' with " + member.Name);
                                     }
                                 }

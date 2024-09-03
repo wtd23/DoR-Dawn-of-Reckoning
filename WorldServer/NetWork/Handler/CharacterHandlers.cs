@@ -56,16 +56,16 @@ namespace WorldServer.NetWork.Handler
 
             if (name.Length > 2 && !CharMgr.NameIsUsed(name) && CharMgr.AllowName(name) && !CharMgr.NameIsDeleted(name) && duplicate < 3)
             {
-                CharacterInfo CharInfo = CharMgr.GetCharacterInfo(Info.career);
+                character_info CharInfo = CharMgr.GetCharacterInfo(Info.career);
                 if (CharInfo == null)
                 {
                     Log.Error("ON_CREATE", "Can not find career :" + Info.career);
                 }
                 else
                 {
-                    //Log.Success("OnCreate", "New Character : " + Name);
+                    //Log.Success("OnCreate", "New characters : " + Name);
 
-                    Character Char = new Character
+                    characters Char = new characters
                     {
                         AccountId = cclient._Account.AccountId,
                         bTraits = traits,
@@ -86,14 +86,14 @@ namespace WorldServer.NetWork.Handler
                     }
                     else
                     {
-                        List<CharacterInfo_item> Items = CharMgr.GetCharacterInfoItem(Char.CareerLine);
+                        List<character_info_items> Items = CharMgr.GetCharacterInfoItem(Char.CareerLine);
 
-                        foreach (CharacterInfo_item Itm in Items)
+                        foreach (character_info_items Itm in Items)
                         {
                             if (Itm == null)
                                 continue;
 
-                            CharacterItem Citm = new CharacterItem
+                            characters_items Citm = new characters_items
                             {
                                 Counts = Itm.Count,
                                 CharacterId = Char.CharacterId,
@@ -106,7 +106,7 @@ namespace WorldServer.NetWork.Handler
                             CharMgr.CreateItem(Citm);
                         }
 
-                        Character_value CInfo = new Character_value
+                        characters_value CInfo = new characters_value
                         {
                             CharacterId = Char.CharacterId,
                             Level = 1,
@@ -129,9 +129,9 @@ namespace WorldServer.NetWork.Handler
                         };
 
                         CharMgr.Database.AddObject(CInfo);
-                        Core.AcctMgr.UpdateRealmCharacters(Core.Rm.RealmId, (uint)CharMgr.Database.GetObjectCount<Character>(" Realm=1"), (uint)CharMgr.Database.GetObjectCount<Character>(" Realm=2"));
+                        Core.AcctMgr.UpdateRealmCharacters(Core.Rm.RealmId, (uint)CharMgr.Database.GetObjectCount<characters>(" Realm=1"), (uint)CharMgr.Database.GetObjectCount<characters>(" Realm=2"));
 
-                        CharacterClientData clientData = new CharacterClientData { CharacterId = Char.CharacterId };
+                        characters_client_data clientData = new characters_client_data { CharacterId = Char.CharacterId };
                         CharMgr.Database.AddObject(clientData);
 
                         Char.Value = CInfo;
@@ -265,12 +265,12 @@ namespace WorldServer.NetWork.Handler
             }
 
             byte CharacterSlot = packet.GetUint8();
-            Character Char = CharMgr.GetAccountChar(cclient._Account.AccountId).GetCharacterBySlot(CharacterSlot);
+            characters Char = CharMgr.GetAccountChar(cclient._Account.AccountId).GetCharacterBySlot(CharacterSlot);
 
             if (Char == null)
             {
                 Log.Error("F_DUMP_ARENAS_LARGE", "Can not find character on slot : " + CharacterSlot);
-                cclient.Disconnect("Character not found in F_DUMP_ARENAS_LARGE");
+                cclient.Disconnect("characters not found in F_DUMP_ARENAS_LARGE");
                 return;
             }
 
@@ -315,7 +315,7 @@ namespace WorldServer.NetWork.Handler
             GameClient cclient = client as GameClient;
             RandomNameInfo Info = BaseClient.ByteToType<RandomNameInfo>(packet);
 
-            List<Random_name> Names = CharMgr.GetRandomNames();
+            List<random_names> Names = CharMgr.GetRandomNames();
 
             PacketOut Out = new PacketOut((byte)Opcodes.F_RANDOM_NAME_LIST_INFO);
             Out.WriteByte(0);
@@ -413,7 +413,7 @@ namespace WorldServer.NetWork.Handler
 
             if (NewName.Length > 2 && !CharMgr.NameIsUsed(NewName))
             {
-                Character Char = CharMgr.GetCharacter(Player.AsCharacterName(OldName), false);
+                characters Char = CharMgr.GetCharacter(Player.AsCharacterName(OldName), false);
 
                 if (Char == null || Char.AccountId != cclient._Account.AccountId)
                 {

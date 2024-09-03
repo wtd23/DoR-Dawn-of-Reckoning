@@ -13,7 +13,7 @@ namespace AuthenticationServer.Server
     public class Client : BaseClient
     {
         public long LastInfoRequest = 0;
-        private Account _account;
+        private accounts _account;
         private string _sessionToken;
         private Queue<FileUploadInfo> _uploadQueue = new Queue<FileUploadInfo>();
         private bool _uploading = false;
@@ -118,7 +118,7 @@ namespace AuthenticationServer.Server
             SendTCPRaw(Out);
         }
 
-        public void OnLogin(Account account, string token, string installID)
+        public void OnLogin(accounts account, string token, string installID)
         {
             _account = account;
             _sessionToken = token;
@@ -147,7 +147,7 @@ namespace AuthenticationServer.Server
 
             foreach (var myp in list)
             {
-                Patch_MYP pMYP = myp.Key;
+                launcher_myps pMYP = myp.Key;
                 List<PatchAsset> pAssets = myp.Value;
 
                 uint hashhash = 0;

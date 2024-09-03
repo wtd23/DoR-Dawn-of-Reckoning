@@ -11,7 +11,7 @@ namespace WorldServer.Services.World
         #region GameObjects
 
         public static Dictionary<uint, GameObject_proto> GameObjectProtos;
-        public static Dictionary<uint, GameObject_spawn> GameObjectSpawns;
+        public static Dictionary<uint, gameobject_spawns> GameObjectSpawns;
         public static int MaxGameObjectGUID;
 
         public static int GenerateGameObjectSpawnGUID()
@@ -41,9 +41,9 @@ namespace WorldServer.Services.World
         {
             Log.Debug("WorldMgr", "Loading GameObject_Spawns...");
 
-            GameObjectSpawns = Database.MapAllObjects<uint, GameObject_spawn>("Guid", 25000);
+            GameObjectSpawns = Database.MapAllObjects<uint, gameobject_spawns>("Guid", 25000);
 
-            foreach (GameObject_spawn Spawn in GameObjectSpawns.Values)
+            foreach (gameobject_spawns Spawn in GameObjectSpawns.Values)
             {
                 if (Spawn.Guid > MaxGameObjectGUID)
                     MaxGameObjectGUID = (int)Spawn.Guid;
@@ -56,7 +56,7 @@ namespace WorldServer.Services.World
 
         #region GameObjectLoots
 
-        public static Dictionary<uint, List<GameObject_loot>> GameObjectLoots = new Dictionary<uint, List<GameObject_loot>>();
+        public static Dictionary<uint, List<gameobject_loots>> GameObjectLoots = new Dictionary<uint, List<gameobject_loots>>();
 
         private static void LoadGameObjectLoots(uint entry)
         {
@@ -64,9 +64,9 @@ namespace WorldServer.Services.World
             {
                 Log.Debug("WorldMgr", "Loading GameObject Loots of " + entry + " ...");
 
-                List<GameObject_loot> Loots = new List<GameObject_loot>();
-                IList<GameObject_loot> ILoots = Database.SelectObjects<GameObject_loot>("Entry=" + entry);
-                foreach (GameObject_loot Loot in ILoots)
+                List<gameobject_loots> Loots = new List<gameobject_loots>();
+                IList<gameobject_loots> ILoots = Database.SelectObjects<gameobject_loots>("Entry=" + entry);
+                foreach (gameobject_loots Loot in ILoots)
                     Loots.Add(Loot);
 
                 GameObjectLoots.Add(entry, Loots);
@@ -80,7 +80,7 @@ namespace WorldServer.Services.World
                     ++MissingGameObject;
                 }
 
-                foreach (GameObject_loot Loot in GameObjectLoots[entry].ToArray())
+                foreach (gameobject_loots Loot in GameObjectLoots[entry].ToArray())
                 {
                     Loot.Info = ItemService.GetItem_Info(Loot.ItemId);
 
@@ -100,14 +100,14 @@ namespace WorldServer.Services.World
             }
         }
 
-        public static List<GameObject_loot> GetGameObjectLoots(uint Entry)
+        public static List<gameobject_loots> GetGameObjectLoots(uint Entry)
         {
             LoadGameObjectLoots(Entry);
 
-            List<GameObject_loot> Loots;
+            List<gameobject_loots> Loots;
 
             if (!GameObjectLoots.TryGetValue(Entry, out Loots))
-                Loots = new List<GameObject_loot>();
+                Loots = new List<gameobject_loots>();
 
             return Loots;
         }

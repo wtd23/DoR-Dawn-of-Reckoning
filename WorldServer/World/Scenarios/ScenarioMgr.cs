@@ -474,13 +474,13 @@ namespace WorldServer.World.Scenarios
     public class ScenarioMgr
     {
         /// <summary>Runnable instances of scenarios, indexed by info / tier number</summary>
-        private readonly Dictionary<Scenario_Info, Dictionary<byte, List<Scenario>>> _instances = new Dictionary<Scenario_Info, Dictionary<byte, List<Scenario>>>();
+        private readonly Dictionary<scenario_infos, Dictionary<byte, List<Scenario>>> _instances = new Dictionary<scenario_infos, Dictionary<byte, List<Scenario>>>();
 
         /// <summary>List of queued solo players, indexed by info / tier number / [0,1] for [order,destro]</summary>
-        private readonly Dictionary<Scenario_Info, Dictionary<byte, SoloQueueHandler[]>> _queuedPlayers = new Dictionary<Scenario_Info, Dictionary<byte, SoloQueueHandler[]>>();
+        private readonly Dictionary<scenario_infos, Dictionary<byte, SoloQueueHandler[]>> _queuedPlayers = new Dictionary<scenario_infos, Dictionary<byte, SoloQueueHandler[]>>();
 
         /// <summary>List of queued groups, indexed by info / tier number / [0,1] for [order,destro]</summary>
-        private readonly Dictionary<Scenario_Info, Dictionary<byte, GroupQueueHandler[]>> _queuedGroups = new Dictionary<Scenario_Info, Dictionary<byte, GroupQueueHandler[]>>();
+        private readonly Dictionary<scenario_infos, Dictionary<byte, GroupQueueHandler[]>> _queuedGroups = new Dictionary<scenario_infos, Dictionary<byte, GroupQueueHandler[]>>();
 
         /// <summary>Pending queue actions mainly updated by Scenario TCP handler</summary>
         private readonly List<PendingQueueAction> _pendingQueueActions = new List<PendingQueueAction>();
@@ -497,7 +497,7 @@ namespace WorldServer.World.Scenarios
         private const byte QUEUE_ASSEMBLY_SOLO_ONLY = 255;
 
         /// <summary>List of enabled scenarios (table scenario_objects)</summary>
-        private static List<Scenario_Info> _activeScenarios;
+        private static List<scenario_infos> _activeScenarios;
 
         /// <summary>Current pickup scenario name, for user display on log in</summary>
         public static string PickupScenarioName;
@@ -506,11 +506,11 @@ namespace WorldServer.World.Scenarios
         /// Builds and starts the scenario manager thread.
         /// </summary>
         /// <param name="activeScenarios">List of enabled scenarios (table scenario_objects)</param>
-        public ScenarioMgr(List<Scenario_Info> activeScenarios)
+        public ScenarioMgr(List<scenario_infos> activeScenarios)
         {
             ImpactMatrixManagerInstance = new ImpactMatrixManager();
 
-            foreach (Scenario_Info scenario in ScenarioService.Scenarios)
+            foreach (scenario_infos scenario in ScenarioService.Scenarios)
             {
                 _instances.Add(scenario, new Dictionary<byte, List<Scenario>>());
                 _queuedPlayers.Add(scenario, new Dictionary<byte, SoloQueueHandler[]>());
@@ -673,15 +673,15 @@ namespace WorldServer.World.Scenarios
 
         public void QueueUpdate()
         {
-            Scenario_Info[] scenarioInfo = Randomize(_activeScenarios);
+            scenario_infos[] scenarioInfo = Randomize(_activeScenarios);
 
-            foreach (Scenario_Info info in scenarioInfo)
+            foreach (scenario_infos info in scenarioInfo)
             {
                 foreach (byte tier in _instances[info].Keys)
                     TryFillScenario(info, tier);
             }
 
-            foreach (Scenario_Info info in scenarioInfo)
+            foreach (scenario_infos info in scenarioInfo)
             {
                 foreach (byte tier in _instances[info].Keys)
                     TryCreateScenario(info, tier);
@@ -709,7 +709,7 @@ namespace WorldServer.World.Scenarios
 
         #region Creation/Fill
 
-        private void TryFillScenario(Scenario_Info info, byte tier)
+        private void TryFillScenario(scenario_infos info, byte tier)
         {
             ProcessPendingQueue(); // Why here ? already invoked in main Update() method
 
@@ -762,7 +762,7 @@ namespace WorldServer.World.Scenarios
             }
         }
 
-        private void TryCreateScenario(Scenario_Info info, byte tier)
+        private void TryCreateScenario(scenario_infos info, byte tier)
         {
             ProcessPendingQueue(); // Why here ? already invoked in main Update() method
 
@@ -804,7 +804,7 @@ namespace WorldServer.World.Scenarios
         {
             Vector2[] balanceVectors = { new Vector2(scenario.BalanceVectors[0]), new Vector2(scenario.BalanceVectors[1]) };
 
-            Scenario_Info info = scenario.Info;
+            scenario_infos info = scenario.Info;
 
             int[] counts = { scenario.GetTotalTeamCount(0), scenario.GetTotalTeamCount(1) };
 
@@ -846,7 +846,7 @@ namespace WorldServer.World.Scenarios
             }
         }
 
-        private void TryCreatePugScenario(Scenario_Info info, byte tier, bool favoursPug)
+        private void TryCreatePugScenario(scenario_infos info, byte tier, bool favoursPug)
         {
             if (!favoursPug && info.Name == PickupScenarioName)
                 return;
@@ -890,7 +890,7 @@ namespace WorldServer.World.Scenarios
             }
         }
 
-        private void TryCreateWithGroups(Scenario_Info info, byte tier, int minUnit, int maxUnit, bool favoursPug)
+        private void TryCreateWithGroups(scenario_infos info, byte tier, int minUnit, int maxUnit, bool favoursPug)
         {
             // Return early if no groups exist to create with and solo fill is not permitted.
             if (minUnit > 1 && !_queuedGroups[info][tier][0].HasGroups && !_queuedGroups[info][tier][1].HasGroups)
@@ -1084,7 +1084,7 @@ namespace WorldServer.World.Scenarios
 
         private void TryFillWithGroups(Scenario scenario, byte tier, int minUnit, int maxUnit)
         {
-            Scenario_Info info = scenario.Info;
+            scenario_infos info = scenario.Info;
 
             // Return early if no groups exist to fill with and solo fill is not permitted.
             if (minUnit > 1 && !_queuedGroups[info][tier][0].HasGroups && !_queuedGroups[info][tier][1].HasGroups)
@@ -1231,7 +1231,7 @@ namespace WorldServer.World.Scenarios
             }
         }
 
-        private void TryCreate6V6Scenario(Scenario_Info info, byte tier)
+        private void TryCreate6V6Scenario(scenario_infos info, byte tier)
         {
             while (_queuedGroups[info][tier][0].HasFullGroups && _queuedGroups[info][tier][1].HasFullGroups)
             {
@@ -1339,7 +1339,7 @@ namespace WorldServer.World.Scenarios
 
             byte tier = GetScenarioTier(player.Level);
 
-            Scenario_Info info = _activeScenarios.FirstOrDefault(scen => scen.ScenarioId == playerAction.ScenarioId);
+            scenario_infos info = _activeScenarios.FirstOrDefault(scen => scen.ScenarioId == playerAction.ScenarioId);
 
             if (info == null || !_queuedPlayers.ContainsKey(info))
             {
@@ -1366,7 +1366,7 @@ namespace WorldServer.World.Scenarios
         /// <param name="playerAction">Initial dequeue request</param>
         private void RemovePlayer(PlayerQueueAction playerAction)
         {
-            Scenario_Info info = ScenarioService.GetScenario_Info(playerAction.ScenarioId);
+            scenario_infos info = ScenarioService.GetScenario_Info(playerAction.ScenarioId);
 
             if (info == null)
             {
@@ -1389,7 +1389,7 @@ namespace WorldServer.World.Scenarios
         /// <param name="player">Player to remove from all queue lists</param>
         private void RemovePlayerFromAll(Player player)
         {
-            foreach (Scenario_Info info in _instances.Keys)
+            foreach (scenario_infos info in _instances.Keys)
             {
                 foreach (byte tier in _instances[info].Keys)
                 {
@@ -1464,7 +1464,7 @@ namespace WorldServer.World.Scenarios
 
             // Queue checks passed - add.
 
-            Scenario_Info info = _activeScenarios.FirstOrDefault(scen => scen.ScenarioId == groupAction.ScenarioId);
+            scenario_infos info = _activeScenarios.FirstOrDefault(scen => scen.ScenarioId == groupAction.ScenarioId);
 
             if (info == null || !_queuedGroups.ContainsKey(info))
             {
@@ -1486,7 +1486,7 @@ namespace WorldServer.World.Scenarios
                 return;
             }
 
-            GroupQueueHandler curGrpHandler = _queuedGroups[info][(byte)leaderTier][leader.Realm == Realms.REALMS_REALM_ORDER ? 0 : 1];
+            GroupQueueHandler curGrpHandler = _queuedGroups[info][(byte)leaderTier][leader.Realm == SetRealms.REALMS_REALM_ORDER ? 0 : 1];
 
             if (curGrpHandler == null)
                 return;
@@ -1513,7 +1513,7 @@ namespace WorldServer.World.Scenarios
 
             groupAction.BalanceVectorMag = groupAction.BalanceVector.Magnitude;
 
-            _queuedGroups[info][(byte)leaderTier][leader.Realm == Realms.REALMS_REALM_ORDER ? 0 : 1].AddGroup(groupAction);
+            _queuedGroups[info][(byte)leaderTier][leader.Realm == SetRealms.REALMS_REALM_ORDER ? 0 : 1].AddGroup(groupAction);
         }
 
         public void RemoveGroup(Group group, ushort scenarioId)
@@ -1523,7 +1523,7 @@ namespace WorldServer.World.Scenarios
 
         private void RemoveGroup(GroupQueueAction groupAction)
         {
-            Scenario_Info info = ScenarioService.GetScenario_Info(groupAction.ScenarioId);
+            scenario_infos info = ScenarioService.GetScenario_Info(groupAction.ScenarioId);
 
             if (info == null)
             {
@@ -1537,7 +1537,7 @@ namespace WorldServer.World.Scenarios
                 return;
             }
 
-            int targetRealm = groupAction.MyGroup.Realm == Realms.REALMS_REALM_ORDER ? 0 : 1;
+            int targetRealm = groupAction.MyGroup.Realm == SetRealms.REALMS_REALM_ORDER ? 0 : 1;
 
             bool bRemoved = false;
 
@@ -1622,7 +1622,7 @@ namespace WorldServer.World.Scenarios
 
         private void RemoveAllSoloPlayers()
         {
-            foreach (Scenario_Info info in _instances.Keys)
+            foreach (scenario_infos info in _instances.Keys)
             {
                 foreach (byte tier in _instances[info].Keys)
                 {
@@ -1638,7 +1638,7 @@ namespace WorldServer.World.Scenarios
 
         private void RemoveAllGroups()
         {
-            foreach (Scenario_Info info in _instances.Keys)
+            foreach (scenario_infos info in _instances.Keys)
             {
                 foreach (byte tier in _instances[info].Keys)
                 {
@@ -1700,7 +1700,7 @@ namespace WorldServer.World.Scenarios
 
         #endregion Archetype Balance
 
-        private Scenario CreateInstance(Scenario_Info info, byte tier)
+        private Scenario CreateInstance(scenario_infos info, byte tier)
         {
             Scenario scenario;
 
@@ -1765,14 +1765,14 @@ namespace WorldServer.World.Scenarios
         private static void BuildScenarioList(PacketOut Out)
         {
             Out.WriteByte((byte)_activeScenarios.Count);
-            foreach (Scenario_Info scenario in _activeScenarios)
+            foreach (scenario_infos scenario in _activeScenarios)
             {
                 Out.WriteUInt16(0);
                 Out.WriteUInt16(scenario.ScenarioId);
             }
         }
 
-        public static void SendScenarioStatus(Player plr, ScenarioUpdateType status, Scenario_Info scenario)
+        public static void SendScenarioStatus(Player plr, ScenarioUpdateType status, scenario_infos scenario)
         {
             PacketOut Out = new PacketOut((byte)Opcodes.F_INTERACT_RESPONSE, 64);
             Out.WriteByte(9);
@@ -1854,7 +1854,7 @@ namespace WorldServer.World.Scenarios
 
             scenario.IncrementPlayers(player);
 
-            foreach (Scenario_Info info in _queuedPlayers.Keys)
+            foreach (scenario_infos info in _queuedPlayers.Keys)
             {
                 foreach (var tier in _queuedPlayers[info].Keys)
                     _queuedPlayers[info][tier][(byte)player.Realm - 1].RemovePlayer(player);
@@ -1869,7 +1869,7 @@ namespace WorldServer.World.Scenarios
 
             scenario.IncrementPlayers(player);
 
-            foreach (Scenario_Info info in _queuedPlayers.Keys)
+            foreach (scenario_infos info in _queuedPlayers.Keys)
             {
                 foreach (var tier in _queuedPlayers[info].Keys)
                     _queuedPlayers[info][tier][(byte)player.Realm - 1].RemovePlayer(player);
@@ -1884,7 +1884,7 @@ namespace WorldServer.World.Scenarios
         {
             plr.SendLocalizeString("Queue last updated " + SecondsSinceUpdate + " seconds ago.", ChatLogFilters.CHATLOGFILTERS_SAY, Localized_text.CHAT_TAG_MONSTER_EMOTE);
 
-            foreach (Scenario_Info info in _instances.Keys)
+            foreach (scenario_infos info in _instances.Keys)
             {
                 foreach (byte tier in _instances[info].Keys)
                 {

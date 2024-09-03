@@ -9,7 +9,7 @@ namespace WorldServer.World.Objects.Instances.TheSewersofAltdorfWing1Sewers2
     {
         #region Constructors
 
-        public SimpleKokritManEater(Creature_spawn spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
+        public SimpleKokritManEater(creature_spawns spawn, uint bossId, ushort Instanceid, Instance instance) : base(spawn, bossId, Instanceid, instance)
         {
             //EvtInterface.AddEvent(CheckBossRageTimer, 1000, 0);
         }

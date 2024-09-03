@@ -8,18 +8,18 @@ namespace WorldServer.Services.World
     [Service]
     internal class LiveEventService : ServiceBase
     {
-        public static List<LiveEvent_Info> LiveEvents = new List<LiveEvent_Info>();
+        public static List<live_event_infos> LiveEvents = new List<live_event_infos>();
 
         [LoadingFunction(true)]
         public static void LoadLiveEvents()
         {
             Log.Debug("WorldMgr", "Loading  LiveEvent_Info...");
 
-            var liveEvents = Database.SelectAllObjects<LiveEvent_Info>().ToDictionary(e => e.Entry, e => e);
+            var liveEvents = Database.SelectAllObjects<live_event_infos>().ToDictionary(e => e.Entry, e => e);
 
-            var rewards = Database.SelectAllObjects<LiveEventReward_Info>();
-            var tasks = Database.SelectAllObjects<LiveEventTasks_Info>().ToDictionary(e => e.Entry, e => e);
-            var subTasks = Database.SelectAllObjects<LiveEventSubTasks_Info>();
+            var rewards = Database.SelectAllObjects<live_event_reward_infos>();
+            var tasks = Database.SelectAllObjects<live_event_task_infos>().ToDictionary(e => e.Entry, e => e);
+            var subTasks = Database.SelectAllObjects<live_event_subtask_infos>();
 
             foreach (var reward in rewards)
             {

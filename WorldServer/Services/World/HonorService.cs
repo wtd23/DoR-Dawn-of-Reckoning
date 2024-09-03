@@ -7,7 +7,7 @@ namespace WorldServer.Services.World
     [Service]
     public class HonorService : ServiceBase
     {
-        public static List<HonorReward> HonorRewards;
+        public static List<honor_rewards> HonorRewards;
 
         /// <summary>
         /// List of Honor Rewards
@@ -16,7 +16,7 @@ namespace WorldServer.Services.World
         public static void LoadHonorRewards()
         {
             Log.Debug("WorldMgr", "Loading Honor Rewards...");
-            HonorRewards = Database.SelectAllObjects<HonorReward>() as List<HonorReward>;
+            HonorRewards = Database.SelectAllObjects<honor_rewards>() as List<honor_rewards>;
             if (HonorRewards != null) Log.Success("HonorRewards", "Loaded " + HonorRewards.Count + " HonorRewards");
         }
     }

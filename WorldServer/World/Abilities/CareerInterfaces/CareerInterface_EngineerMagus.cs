@@ -2,8 +2,10 @@
 using FrameWork;
 using GameData;
 using System;
+using WorldServer.Services.World;
 using WorldServer.World.Abilities.Components;
 using WorldServer.World.Objects;
+using WorldServer.World.Positions;
 using Opcodes = WorldServer.NetWork.Opcodes;
 
 namespace WorldServer.World.Abilities.CareerInterfaces
@@ -384,7 +386,7 @@ namespace WorldServer.World.Abilities.CareerInterfaces
         {
             if (myPet != null)
             {
-                myPet.Destroy();
+                myPet.ReceiveDamage(myPet, uint.MaxValue);
                 myPet = null;
             }
 
@@ -422,6 +424,16 @@ namespace WorldServer.World.Abilities.CareerInterfaces
 
                     break;
 
+                case 8535:
+                    proto.Name = myPlayer.Name + "'s Firewyrm of Tzeentch^N";
+                    proto.Model1 = 144;
+                    proto.Faction = 129;
+                    proto.Ranged = 5;
+                    SwitchPetBonusType(2);
+                    SpawnPet(proto);
+
+                    break;
+
                 case 1511:
                     proto.Name = myPlayer.Name + "'s Gun Turret^N";
                     proto.Model1 = 145;
@@ -452,16 +464,6 @@ namespace WorldServer.World.Abilities.CareerInterfaces
 
                     break;
 
-                case 8535:
-                    proto.Name = myPlayer.Name + "'s Firewyrm^N";
-                    proto.Model1 = 144;   // firewyrm
-                    proto.Faction = 129;  //dest
-                    proto.Ranged = 5;
-                    SwitchPetBonusType(2);
-                    SpawnPet(proto);
-
-                    break;
-
                 default:
                     throw new Exception("Engineer/Magus: Requested pet ID " + myID + " not found for SummonPet");
             }
@@ -469,15 +471,16 @@ namespace WorldServer.World.Abilities.CareerInterfaces
 
         private void SpawnPet(Creature_proto proto)
         {
-            Creature_spawn spawn = new Creature_spawn();
+            creature_spawns spawn = new creature_spawns();
 
             proto.MinScale = 50;
             proto.MaxScale = 50;
             spawn.BuildFromProto(proto);
             spawn.WorldO = myPlayer._Value.WorldO;
-            spawn.WorldY = myPlayer._Value.WorldY;
+            Point3D offset = WorldUtils.GetForward(myPlayer, 75);
+            spawn.WorldX = myPlayer._Value.WorldX + offset.X;
+            spawn.WorldY = myPlayer._Value.WorldY + offset.Y;
             spawn.WorldZ = myPlayer._Value.WorldZ;
-            spawn.WorldX = myPlayer._Value.WorldX;
             spawn.ZoneId = myPlayer.Zone.ZoneId;
             spawn.Icone = 18;
             spawn.WaypointType = 0;

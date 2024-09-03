@@ -10,6 +10,6 @@ namespace WorldServer.World.Battlefronts.Apocalypse
         public uint RenownLevel { get; set; }
         public uint RenownBand { get; set; }
         public string CharacterName { get; set; }
-        public Realms CharacterRealm { get; set; }
+        public SetRealms CharacterRealm { get; set; }
     }
 }

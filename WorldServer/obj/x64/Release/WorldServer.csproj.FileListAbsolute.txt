@@ -1,15 +1,28 @@
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\Abilities\Chaos humans login-logout all classes.txt
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\Abilities\Dark elves login-logout all classes.txt
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\Abilities\Dwarves and their classes login-logout.txt
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\Abilities\High elves and their classes login-logout.txt
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\Abilities\Humans and their classes login-logout.txt
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\Abilities\Orcs login-logout all classes.txt
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\WarZone.dll
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\NLog.config
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\WorldServer.exe.config
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\bin\Release\WorldServer.exe
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\WorldServer\obj\x64\Release\WorldServer.csproj.AssemblyReference.cache
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\WorldServer\obj\x64\Release\WorldServer.csproj.SuggestedBindingRedirects.cache
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\WorldServer\obj\x64\Release\WorldServer.csproj.CoreCompileInputs.cache
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\WorldServer\obj\x64\Release\WorldServer.csproj.CopyComplete
-C:\Users\wardwalf\Desktop\projectwar server\ProjectWAR\WorldServer\obj\x64\Release\WorldServer.exe
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\Abilities\Chaos humans login-logout all classes.txt
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\Abilities\Dark elves login-logout all classes.txt
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\Abilities\Dwarves and their classes login-logout.txt
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\Abilities\High elves and their classes login-logout.txt
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\Abilities\Humans and their classes login-logout.txt
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\Abilities\Orcs login-logout all classes.txt
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\WarZone.dll
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\NLog.config
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\WorldServer.exe.config
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\bin\Release\WorldServer.exe
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\WorldServer\obj\x64\Release\WorldServer.csproj.AssemblyReference.cache
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\WorldServer\obj\x64\Release\WorldServer.csproj.CoreCompileInputs.cache
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\WorldServer\obj\x64\Release\WorldSer.6CF0E9F2.Up2Date
+C:\Users\DoR\Desktop\for the lads\WitchKRAFT-CAPITALS-main\WorldServer\obj\x64\Release\WorldServer.exe
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\Abilities\Chaos humans login-logout all classes.txt
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\Abilities\Dark elves login-logout all classes.txt
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\Abilities\Dwarves and their classes login-logout.txt
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\Abilities\High elves and their classes login-logout.txt
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\Abilities\Humans and their classes login-logout.txt
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\Abilities\Orcs login-logout all classes.txt
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\WarZone.dll
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\NLog.config
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\WorldServer.exe.config
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\bin\Release\WorldServer.exe
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\WorldServer\obj\x64\Release\WorldServer.csproj.AssemblyReference.cache
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\WorldServer\obj\x64\Release\WorldServer.csproj.CoreCompileInputs.cache
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\WorldServer\obj\x64\Release\WorldSer.6CF0E9F2.Up2Date
+C:\Users\DoR\Desktop\for the lads\Dor-Dawn of Reckoning\WorldServer\obj\x64\Release\WorldServer.exe

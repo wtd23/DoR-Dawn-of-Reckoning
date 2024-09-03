@@ -17,13 +17,13 @@ namespace WorldServer.World.Objects
     public class LootChest : GameObject
     {
         // Dictionary of characterId, and Bag -* List of Bag Contents
-        public Dictionary<uint, KeyValuePair<Item_Info, List<Talisman>>> LootBags { get; set; }
+        public Dictionary<uint, KeyValuePair<item_infos, List<Talisman>>> LootBags { get; set; }
 
         public string Title { get; set; }
         public string SenderName { get; set; }
         public string Content { get; set; }
 
-        public LootChest(GameObject_spawn spawn)
+        public LootChest(gameobject_spawns spawn)
         {
             Spawn = spawn;
             if (!string.IsNullOrEmpty(Spawn.AlternativeName))
@@ -60,7 +60,7 @@ namespace WorldServer.World.Objects
             }
 
             GameObject_proto proto = GameObjectService.GetGameObjectProto(188);
-            GameObject_spawn spawn = new GameObject_spawn();
+            gameobject_spawns spawn = new gameobject_spawns();
 
             if (convertPin)  // Non-fort zone location points are PIN position system, forts are worldposition.
             {
@@ -86,7 +86,7 @@ namespace WorldServer.World.Objects
 
             spawn.BuildFromProto(proto);
             var chest = region.CreateLootChest(spawn);
-            chest.LootBags = new Dictionary<uint, KeyValuePair<Item_Info, List<Talisman>>>();
+            chest.LootBags = new Dictionary<uint, KeyValuePair<item_infos, List<Talisman>>>();
 
             return chest;
         }
@@ -110,7 +110,7 @@ namespace WorldServer.World.Objects
                     if (String.IsNullOrEmpty(Content))
                         Content = "mail";
 
-                    Character_mail mail = new Character_mail
+                    characters_mails mail = new characters_mails
                     {
                         Guid = CharMgr.GenerateMailGuid(),
                         CharacterId = lootBag.Key,  //CharacterId
@@ -124,7 +124,7 @@ namespace WorldServer.World.Objects
                     };
 
                     mail.CharacterIdSender = lootBag.Key;
-                    MailItem item = new MailItem((uint)lootBag.Value.Key.Entry, lootBag.Value.Value, 0, 0, (ushort)lootBag.Value.Value.Count);
+                    mail_item item = new mail_item((uint)lootBag.Value.Key.Entry, lootBag.Value.Value, 0, 0, (ushort)lootBag.Value.Value.Count);
                     if (item != null)
                     {
                         mail.Items.Add(item);
@@ -161,7 +161,7 @@ namespace WorldServer.World.Objects
 
             if (this.LootBags.ContainsKey(player.CharacterId))
             {
-                KeyValuePair<Item_Info, List<Talisman>> lootBag;
+                KeyValuePair<item_infos, List<Talisman>> lootBag;
                 this.LootBags.TryGetValue(player.CharacterId, out lootBag);
 
                 PacketOut Out = new PacketOut((byte)Opcodes.F_INTERACT_RESPONSE, 32);
@@ -182,7 +182,7 @@ namespace WorldServer.World.Objects
 
         public void TakeLoot(Player plr)
         {
-            Character character = CharMgr.GetCharacter(plr.CharacterId, false);
+            characters character = CharMgr.GetCharacter(plr.CharacterId, false);
 
             var bagExists = LootBags.ContainsKey(character.CharacterId);
             if (bagExists)
@@ -230,7 +230,7 @@ namespace WorldServer.World.Objects
             Out.WriteByte((byte)(Spawn.GetUnk(0) >> 8));
 
             // Get the database if the value hasnt been changed (currently only used for keep doors)
-            if (Realm == Realms.REALMS_REALM_NEUTRAL)
+            if (Realm == SetRealms.REALMS_REALM_NEUTRAL)
                 Out.WriteByte((byte)(Spawn.GetUnk(0) & 0xFF));
             else
                 Out.WriteByte((byte)Realm);
@@ -241,7 +241,7 @@ namespace WorldServer.World.Objects
 
             int flags = Spawn.GetUnk(3);
 
-            if (Realm != Realms.REALMS_REALM_NEUTRAL && !IsInvulnerable)
+            if (Realm != SetRealms.REALMS_REALM_NEUTRAL && !IsInvulnerable)
                 flags |= 8; // Attackable (stops invalid target errors)
 
             LootContainer loots = LootsMgr.GenerateLoot(this, plr, 1);
@@ -477,7 +477,7 @@ namespace WorldServer.World.Objects
         //            Out.Fill(0, 34);  // i just send empty once here
         //}
 
-        public void Add(uint characterId, KeyValuePair<Item_Info, List<Talisman>> generatedLootBag)
+        public void Add(uint characterId, KeyValuePair<item_infos, List<Talisman>> generatedLootBag)
         {
             LootBags.Add(characterId, generatedLootBag);
         }
